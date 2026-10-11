@@ -1,0 +1,9 @@
+{
+  "name": "Xuyên Không Cổ Đại: Chợ Cổ",
+  "short_name": "Chợ Cổ",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#fde8ec",
+  "theme_color": "#fde8ec"
+}

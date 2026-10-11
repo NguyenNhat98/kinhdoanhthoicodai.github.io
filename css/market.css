@@ -1,0 +1,59 @@
+/* ===== BẢN ĐỒ CHỢ CỔ ===== */
+.map { position: absolute; inset: 0; overflow: hidden; background: #2a1d14; touch-action: none; cursor: grab; }
+.map:active { cursor: grabbing; }
+.map-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; --inv: 1; }
+.map-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; -webkit-user-drag: none; transition: filter .8s; }
+.map-glow { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; transition: background .8s; }
+.map-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(30, 14, 6, .45)); }
+
+/* ánh sáng bản đồ theo chủ đề: chợ đổi theo thời điểm */
+[data-theme="daituong"] .map-img { filter: brightness(.7) saturate(1.2) sepia(.3) hue-rotate(-14deg); }
+[data-theme="daituong"] .map-glow { background: radial-gradient(circle at 70% 20%, rgba(255, 190, 80, .5), transparent 55%); }
+[data-theme="giangnam"] .map-img { filter: saturate(.85) brightness(1.04) hue-rotate(8deg); }
+[data-theme="giangnam"] .map-glow { background: linear-gradient(rgba(170, 215, 195, .5), rgba(240, 250, 244, .18)); }
+[data-theme="thuymac"] .map-img { filter: grayscale(.92) contrast(1.1) sepia(.18); }
+[data-theme="thuymac"] .map-glow { background: radial-gradient(circle at 80% 15%, rgba(200, 54, 46, .4), transparent 30%); }
+[data-theme="dahoi"] .map-img { filter: brightness(.5) saturate(1.15) hue-rotate(205deg) contrast(1.1); }
+[data-theme="dahoi"] .map-glow { background: radial-gradient(circle at 30% 30%, rgba(255, 180, 70, .55), transparent 40%), radial-gradient(circle at 75% 60%, rgba(255, 150, 60, .4), transparent 40%); }
+
+/* điểm chạm: kích thước cố định trên màn hình (scale ngược với zoom) */
+.map-hs { position: absolute; inset: 0; pointer-events: none; }
+.hs { position: absolute; transform: translate(-50%, -100%) scale(var(--inv)); transform-origin: 50% 100%; pointer-events: auto; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; min-height: 52px; padding: 0; z-index: 2; }
+.hs-pin { position: relative; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #fffbe8, #f4d77a 60%, #c8901a); border: 3px solid #7a1a14; box-shadow: 0 4px 8px rgba(0, 0, 0, .45), 0 0 0 3px rgba(255, 213, 74, .35); animation: pinBob 2.4s ease-in-out infinite; }
+.hs-pin::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 12px; height: 12px; margin-left: -6px; transform: rotate(45deg); background: #7a1a14; border-radius: 0 0 3px 0; z-index: -1; }
+.hs-pin i { font-style: normal; font-size: 24px; line-height: 1; }
+.hs-name { padding: 1px 9px; border-radius: 99px; background: rgba(40, 20, 10, .85); color: #ffe9b0; font-size: 12px; font-weight: 700; white-space: nowrap; border: 1px solid #c8902a; }
+.hs.locked .hs-pin { background: radial-gradient(circle at 35% 30%, #ddd, #8a8a8a); border-color: #3a3a3a; box-shadow: 0 4px 8px rgba(0, 0, 0, .5); animation: none; filter: grayscale(.6); }
+.hs.locked .hs-name { background: rgba(60, 60, 60, .85); color: #ddd; border-color: #777; }
+.hs.live .hs-pin { box-shadow: 0 0 0 4px rgba(120, 255, 130, .75), 0 4px 12px rgba(0, 0, 0, .5); }
+.hs.npc .hs-pin { width: 38px; height: 38px; background: radial-gradient(circle at 35% 30%, #fff, #e8d8b8); border-color: #6a4a2a; }
+.hs.npc .hs-pin i { font-size: 20px; } .hs.npc .hs-name { font-size: 11px; }
+.hs.supply .hs-pin { background: radial-gradient(circle at 35% 30%, #fff, #bde0a8); border-color: #3a6a2a; }
+.hs.gate .hs-pin { background: radial-gradient(circle at 35% 30%, #ffe8e0, #e0603a); border-color: #7a1a14; }
+@keyframes pinBob { 50% { transform: translateY(-4px); } }
+.hs-q { position: absolute; right: -4px; top: -6px; min-width: 22px; height: 22px; border-radius: 99px; background: #d8392b; color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; border: 2px solid #fff; animation: pulse 1s ease-in-out infinite; }
+.hs-q[hidden] { display: none; }
+
+/* người đi chợ */
+.map-walkers { position: absolute; inset: 0; pointer-events: none; }
+.wk { position: absolute; left: var(--x0); top: var(--y0); font-size: 30px; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, .4)); animation: walkTo var(--d) ease-in-out var(--dl) infinite alternate, stepBob .6s ease-in-out infinite; }
+@keyframes walkTo { from { transform: translate(0, 0); } to { transform: translate(var(--dx), var(--dy)); } }
+@keyframes stepBob { 50% { margin-top: -5px; } }
+
+/* thẻ chương + điều khiển + thẻ thông tin */
+.map-chap { position: absolute; left: 8px; right: 8px; top: 8px; z-index: 6; padding: 6px 10px; border-radius: 12px; background: rgba(40, 20, 10, .82); color: #ffe9b0; border: 1.5px solid #c8902a; font-size: 12.5px; line-height: 1.35; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.map-chap b { color: #ffd54a; } .map-chap small { width: 100%; color: #f2dca8; }
+.map-chap .resume { width: 100%; margin-top: 4px; padding: 6px; border-radius: 8px; background: linear-gradient(#7fe08a, #3aa84a); color: #0e3a14; font-weight: 800; }
+.map-ctl { position: absolute; right: 8px; bottom: 12px; z-index: 6; display: flex; flex-direction: column; gap: 6px; }
+.map-ctl button { width: 44px; height: 44px; border-radius: 50%; background: rgba(40, 20, 10, .85); color: #ffe9b0; border: 2px solid #c8902a; font-size: 20px; font-weight: 700; box-shadow: 0 3px 8px rgba(0, 0, 0, .4); }
+.map-ctl button:active { transform: scale(.92); }
+.map-card { position: absolute; left: 8px; right: 62px; bottom: 10px; z-index: 7; padding: 12px; border-radius: 16px; background: var(--card); border: 3px solid var(--wood); box-shadow: 0 8px 24px rgba(0, 0, 0, .5); display: flex; flex-direction: column; gap: 6px; animation: slideUp .25s; }
+.map-card[hidden] { display: none; }
+.map-card .x { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--wood); background: var(--card2); }
+.mc-h { display: flex; gap: 10px; align-items: center; padding-right: 30px; } .mc-i { font-size: 34px; line-height: 1; }
+.mc-h b { color: var(--title); font: 700 15px 'Noto Serif', serif; display: block; } .map-card p { margin: 0; font-size: 13px; }
+.mc-b { display: flex; gap: 8px; } .mc-b .btn { flex: 1; font-size: 13px; padding: 6px 8px; } .mc-b.wrap { flex-wrap: wrap; } .mc-b.wrap .btn { flex: 1 1 40%; }
+.mc-need { color: var(--muted); }
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce), (hover: none) and (max-width: 0px) { .wk { animation: none; } }
+body.reduce-motion .wk, body.reduce-motion .hs-pin { animation: none !important; }

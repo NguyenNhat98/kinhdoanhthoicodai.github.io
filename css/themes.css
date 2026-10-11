@@ -1,0 +1,31 @@
+/* ===== 5 CHỦ ĐỀ GIAO DIỆN: biến màu (đổi theme = đổi cả game) ===== */
+:root, [data-theme="thanhphong"] {
+  --bg1: #fde8ec; --bg2: #fff6ee; --card: #fffaf2; --card2: #ffffff; --text: #4a2f2f; --muted: #8a6a66; --line: rgba(120, 60, 60, .2);
+  --title: #b8334f; --primary: #c8445f; --primary2: #e87a90; --gold: #f2b84a; --wood: #8a5a34; --roof: #c8445f; --ink: #3a2020;
+  --sky1: #fbd5dc; --sky2: #fff1e6; --m1: #8fbf8a; --m2: #b9d3b0; --m3: #d9e4d2; --river: #9fd0e0; --sun: #ffd98a; --pag: #a8374f; --lan: #d8392b;
+  --hud: rgba(255, 250, 242, .9); --nav: rgba(255, 250, 242, .95); --btn-text: #fff;
+}
+[data-theme="daituong"] {
+  --bg1: #3a0d12; --bg2: #5a1519; --card: #6b1f23; --card2: #7d2a2c; --text: #fff0d6; --muted: #e0b890; --line: rgba(255, 213, 120, .3);
+  --title: #ffd54a; --primary: #d8392b; --primary2: #ff7a5a; --gold: #f5c542; --wood: #c8902a; --roof: #d8392b; --ink: #fff0d6;
+  --sky1: #2a0a10; --sky2: #7a2428; --m1: #5a1a1e; --m2: #6e2226; --m3: #84302e; --river: #9a4a3a; --sun: #ffd54a; --pag: #f5c542; --lan: #ff5a3a;
+  --hud: rgba(70, 18, 22, .92); --nav: rgba(58, 13, 18, .96); --btn-text: #3a1a08;
+}
+[data-theme="giangnam"] {
+  --bg1: #e2f0e6; --bg2: #f4f9f0; --card: #fbfdf8; --card2: #ffffff; --text: #24402f; --muted: #5f7f6c; --line: rgba(40, 90, 60, .22);
+  --title: #2f6a4a; --primary: #3f7d5b; --primary2: #6fb08a; --gold: #e0b84a; --wood: #7a6a44; --roof: #3f7d5b; --ink: #1f3a2a;
+  --sky1: #cfe3d8; --sky2: #eef5ee; --m1: #7fb08f; --m2: #a6c9b2; --m3: #c9ddd0; --river: #8fc2c0; --sun: #f6f0d0; --pag: #3f6a50; --lan: #c8a24a;
+  --hud: rgba(251, 253, 248, .9); --nav: rgba(251, 253, 248, .95); --btn-text: #fff;
+}
+[data-theme="thuymac"] {
+  --bg1: #f1ede4; --bg2: #faf7f0; --card: #fffdf8; --card2: #ffffff; --text: #2b2b2b; --muted: #77716a; --line: rgba(40, 40, 40, .25);
+  --title: #2a2a2a; --primary: #2f2f2f; --primary2: #5a5a5a; --gold: #b8322a; --wood: #5a4a3a; --roof: #3a3a3a; --ink: #1a1a1a;
+  --sky1: #e6e1d6; --sky2: #f6f3ea; --m1: #4a4a4a; --m2: #8a8680; --m3: #bdb8ae; --river: #a8b0b0; --sun: #c8362e; --pag: #2a2a2a; --lan: #b8322a;
+  --hud: rgba(255, 253, 248, .92); --nav: rgba(255, 253, 248, .96); --btn-text: #fff;
+}
+[data-theme="dahoi"] {
+  --bg1: #161a40; --bg2: #2a1f5a; --card: #2e2a66; --card2: #3a3480; --text: #f2ecff; --muted: #b9b0e8; --line: rgba(190, 170, 255, .3);
+  --title: #cdb8ff; --primary: #7a4ad8; --primary2: #a98bff; --gold: #ffb347; --wood: #8a6ac8; --roof: #7a4ad8; --ink: #f2ecff;
+  --sky1: #0e1230; --sky2: #3a2a7a; --m1: #2a2860; --m2: #38347a; --m3: #4a448f; --river: #5a58b0; --sun: #f6f0c0; --pag: #ffb347; --lan: #ffb347;
+  --hud: rgba(30, 26, 80, .92); --nav: rgba(22, 20, 64, .96); --btn-text: #2a1a08;
+}
