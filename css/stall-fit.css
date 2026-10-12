@@ -1,0 +1,65 @@
+/* ===== Màn pha chế gọn một màn hình: không phải kéo trang; chỉ vùng thao tác có thể cuộn phụ ===== */
+#stall:has(.st-bench) { height: 100dvh; }
+#stall:has(.st-bench) .st-top { padding: calc(4px + env(safe-area-inset-top)) 8px 4px; }
+#stall:has(.st-bench) .st-back { padding: 4px 9px; font-size: 13px; }
+#stall:has(.st-bench) .st-banner { height: 40px; background-position: center 35%; }
+#stall:has(.st-bench) .st-lan, #stall:has(.st-bench) .counter-steam { display: none; }
+#stall:has(.st-bench) .stall-tools { gap: 4px; padding: 3px 6px; }
+#stall:has(.st-bench) .stall-tools button { min-height: 28px; font-size: 10px; border-radius: 8px; line-height: 1.05; }
+#stall:has(.st-bench) .shift-dashboard { padding: 2px 8px; font-size: 10px; }
+
+/* khách: thẻ ngang gọn */
+#stall:has(.st-bench) .st-queue { gap: 4px; padding: 4px 6px 0; }
+#stall:has(.st-bench) .cust { display: grid; grid-template-columns: 34px 1fr; grid-template-rows: auto auto auto; column-gap: 4px; align-items: center; justify-items: start; min-height: 0; padding: 3px 5px 4px; text-align: left; border-radius: 10px; }
+#stall:has(.st-bench) .cust .c-face { grid-row: 1 / 3; width: 34px; }
+#stall:has(.st-bench) .c-face .customer-sprite { width: 30px; height: 40px; }
+#stall:has(.st-bench) .c-face i { right: -6px; bottom: -2px; font-size: 11px; }
+#stall:has(.st-bench) .c-name { grid-column: 2; font-size: 10.5px; max-width: 100%; }
+#stall:has(.st-bench) .cust small { grid-column: 2; height: auto; max-height: 2.3em; font-size: 9.5px; -webkit-line-clamp: 2; }
+#stall:has(.st-bench) .cust .pbar { grid-column: 1 / -1; width: 100%; height: 5px; margin-top: 2px; }
+#stall:has(.st-bench) .cust.empty { display: flex; min-height: 54px; justify-content: center; }
+#stall:has(.st-bench) .cust.empty .c-face { font-size: 18px; width: auto; }
+#stall:has(.st-bench) .st-ticket { margin: 3px 6px 0; padding: 3px 8px; min-height: 0; border-radius: 10px; }
+#stall:has(.st-bench) .tk-head { font-size: 11.5px; } #stall:has(.st-bench) .tk-chips { margin-top: 2px; gap: 3px; }
+#stall:has(.st-bench) .tk-chips span { font-size: 10.5px; padding: 0 7px; } #stall:has(.st-bench) .tk-hint { margin-top: 2px; font-size: 11.5px; line-height: 1.2; }
+
+/* bàn thao tác: sản phẩm bên trái nhỏ, các nhóm nút xếp dạng lưới dày bên phải */
+#stall:has(.st-bench) .st-bench { grid-template-columns: 92px 1fr; gap: 5px; padding: 4px 6px; min-height: 0; }
+#stall:has(.st-bench) .prod { aspect-ratio: auto; height: min(150px, 100%); min-height: 96px; }
+#stall:has(.st-bench) .b-right { display: flex; flex-flow: row wrap; align-content: flex-start; gap: 4px; overflow-y: auto; padding-right: 0; }
+#stall:has(.st-bench) .sec { flex: 1 1 auto; padding: 2px 4px 4px; border-radius: 10px; min-width: 0; }
+#stall:has(.st-bench) .sec.wide, #stall:has(.st-bench) .sec.three, #stall:has(.st-bench) .sec.four, #stall:has(.st-bench) .sec.five { flex-basis: 100%; }
+#stall:has(.st-bench) .sec h5 { margin: 0 0 2px 2px; font-size: 9.5px; }
+#stall:has(.st-bench) .tr { min-height: 38px; padding: 2px 1px; border-radius: 9px; }
+#stall:has(.st-bench) .tr i { font-size: 16px; } #stall:has(.st-bench) .tr i:has(.sprite) { width: 28px; height: 22px; }
+#stall:has(.st-bench) .tr span { font-size: 9.5px; } #stall:has(.st-bench) .tr b { font-size: 9px; top: 0; }
+#stall:has(.st-bench) .ch { padding: 3px 7px; font-size: 10.5px; }
+#stall:has(.st-bench) .cell { height: 26px; }
+#stall:has(.st-bench) .st-actions { gap: 5px; padding: 4px 6px calc(5px + env(safe-area-inset-bottom)); }
+#stall:has(.st-bench) .ac { min-height: 40px; font-size: 10px; } #stall:has(.st-bench) .ac i { font-size: 15px; }
+@media (max-height: 700px) { #stall:has(.st-bench) .st-banner { display: none; } #stall:has(.st-bench) .tr { min-height: 34px; } }
+
+/* hiệu ứng nút: gợn sóng, nảy, viền sáng, chữ nổi, gợi ý nhấp nháy */
+.tr, .ac, .ch { position: relative; overflow: hidden; transition: transform .12s, box-shadow .2s, background .2s; }
+.tr::before, .ac::before { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%); transform: translateX(-120%); transition: transform .5s; pointer-events: none; }
+.tr:hover::before, .tr:focus-visible::before { transform: translateX(120%); }
+.ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,.7); transform: scale(0); animation: rip .5s ease-out forwards; pointer-events: none; }
+@keyframes rip { to { transform: scale(3); opacity: 0; } }
+.tr.pop, .ac.pop { animation: popBtn .35s cubic-bezier(.3,1.6,.5,1); } @keyframes popBtn { 0% { transform: scale(.88); } 100% { transform: scale(1); } }
+.tr.hint-glow, .ac.hint-glow, .ch.hint-glow { animation: hintGlow .8s ease-in-out 4; z-index: 1; }
+@keyframes hintGlow { 50% { box-shadow: 0 0 0 3px #ffd54a, 0 0 16px 4px rgba(255,200,40,.9); transform: scale(1.06); } }
+.tap-float { position: fixed; z-index: 90; pointer-events: none; font-weight: 800; font-size: 14px; color: #fff3a0; text-shadow: 0 1px 3px rgba(60,20,0,.8); animation: tapUp .8s ease-out forwards; transform: translateX(-50%); }
+@keyframes tapUp { to { transform: translate(-50%, -38px); opacity: 0; } }
+.tap-spark { position: fixed; z-index: 90; width: 7px; height: 7px; border-radius: 50%; background: #ffd54a; pointer-events: none; animation: spark .6s ease-out forwards; }
+@keyframes spark { to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+.cust.sel { animation: selGlow 1.6s ease-in-out infinite; } @keyframes selGlow { 50% { box-shadow: 0 0 0 2px var(--gold), 0 0 14px 2px rgba(255,200,60,.7); } }
+.combo-pill { color: #ffd54a; font-weight: 800; } .combo-pill.up { animation: popBtn .4s; }
+body.reduce-motion .ripple, body.reduce-motion .tap-spark, body.reduce-motion .tr.hint-glow, body.reduce-motion .cust.sel { animation: none; }
+#stall:has(.st-bench) .stall-tools button { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 3px 2px; }
+#stall:has(.st-bench) .st-top .st-title small { display: none; }
+@media (max-height: 700px) {
+  #stall:has(.st-bench) .shift-dashboard { display: none; }
+  #stall:has(.st-bench) .c-face .customer-sprite { width: 24px; height: 32px; } #stall:has(.st-bench) .cust { grid-template-columns: 28px 1fr; }
+  #stall:has(.st-bench) .st-bench { grid-template-columns: 78px 1fr; } #stall:has(.st-bench) .prod { min-height: 78px; }
+  #stall:has(.st-bench) .gauge { font-size: 10px; }
+}

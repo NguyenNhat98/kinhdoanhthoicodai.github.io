@@ -16,6 +16,7 @@
     host.innerHTML = `<section class="page festival-page"><div class="festival-hero"><small>GÓC SÂN ĐÌNH</small><h2>Hội làng vui</h2><p>Chơi khéo tay, rinh nguyên liệu.<br>Một khoảng nghỉ giữa những ca bán.</p><span>🪁</span></div><div class="festival-budget">🎁 Còn ${Math.max(0,5-l.rounds)}/5 lượt nhận thưởng hôm nay · Đã kiếm ${G.fmt(l.earned)} xu</div><div class="festival-cards"><button data-fgame="throw"><i>🎯</i><div><b>Ném còn</b><small>Canh vòng sáng · 5 lần ném</small><span>Xu + một ít nguyên liệu</span></div><em>Chơi →</em></button><button data-fgame="oanquan"><i>🪨</i><div><b>Ô ăn quan</b><small>Rải dân, ăn ô · đấu với máy</small><span>Chiến thuật trên sân đình</span></div><em>Chơi →</em></button><button data-fgame="memory"><i>🧺</i><div><b>Gánh hàng tìm đôi</b><small>Nhớ 6 cặp nguyên liệu · 18 lần thử</small><span>Trò phụ ở hội làng</span></div><em>Chơi →</em></button></div><p class="muted">Chơi miễn phí. Hết lượt thưởng vẫn có thể chơi luyện tập. Thưởng chuyển thẳng vào túi xu và kho của quầy đã mở. Lượt thưởng làm mới lúc 0 giờ Việt Nam.</p><div id="festivalGame"></div></section>`;
   };
   F.start = type => {
+    if (F.extra && F.extra[type]) return F.startExtra(type);
     if (!['throw','memory','oanquan'].includes(type) || F.run && !F.run.done) return;
     const r = F.run = { type, done:false, start:performance.now() };
     const host = $('#festivalGame'); if (!host) { F.run=null; return; }
@@ -44,6 +45,7 @@
     if(type==='oanquan')renderQuan(r);
     host.scrollIntoView({behavior:document.body.classList.contains('reduce-motion')?'instant':'smooth',block:'start'});
   };
+  F.finish = (...a) => finish(...a);
   function finish(r, score, text) {
     if(r!==F.run || r.done)return;
     r.done=true; if(r.raf)cancelAnimationFrame(r.raf); if(r.timer)clearTimeout(r.timer);

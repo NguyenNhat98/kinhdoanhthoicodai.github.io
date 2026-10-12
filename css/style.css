@@ -94,3 +94,9 @@ textarea { width: 100%; padding: 8px; border-radius: 10px; border: 1.5px solid v
 /* ---------- giờ cao điểm / theme đêm ---------- */
 body.rush #hud { animation: rushGlow 1.2s ease-in-out infinite; } @keyframes rushGlow { 50% { box-shadow: 0 0 0 2px var(--primary), 0 3px 22px rgba(216, 57, 43, .6); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* cài đặt: nút Bật/Tắt gọn, cân đối */
+.set-row.tg { gap: 12px; } .tg-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; } .tg-txt label { font-weight: 600; line-height: 1.25; }
+.set-row .seg { flex: none; } .set-row .seg button { min-width: 52px; min-height: 36px; padding: 6px 12px; text-align: center; }
+.set-row.col .seg { align-self: flex-start; } .set-row.col .row2 { flex-wrap: wrap; }
+.set-row.col .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .set-row.col .row2 .btn { min-height: 38px; white-space: normal; text-align: center; line-height: 1.15; }

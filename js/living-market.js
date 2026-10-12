@@ -12,7 +12,7 @@
     mycay: ['Chọn cỡ tô', 'Trụng mì, vớt đúng lúc', 'Múc nước dùng đúng loại', 'Thêm thịt, rau và topping', 'Canh kim, chốt đúng cấp cay', 'Giao đúng khách; theo dõi thời gian chờ']
   };
   L.prepGuide = (id) => `<details class="recipe-guide" open><summary>📖 Quy trình ${G.shopDef(id).short}</summary><ol>${steps[id].map(s => `<li>${s}</li>`).join('')}</ol><p>Phiếu đơn là yêu cầu chính xác. Thao tác sai tiêu hao nguyên liệu; xem chất lượng và tiền thưởng sau khi giao.</p></details>`;
-  L.stallTools = (id, ws) => `<div class="stall-tools"><button data-live="guide">📖 Công thức</button><button data-live="report">📊 Sổ ca</button>${ws ? '<button data-live="door">🚪 Tạm ngưng nhận khách</button><button data-live="pause">⏸ Tạm dừng</button>' : '<button data-live="stock-all">🧺 Bổ sung kho</button><button data-live="settings">⚙ Cài đặt ca</button>'}</div><div class="shift-dashboard" ${ws ? '' : 'hidden'}><span data-live-revenue></span><span data-live-quality></span><span data-live-stock></span></div>`;
+  L.stallTools = (id, ws) => `<div class="stall-tools"><button data-live="guide">📖 Công thức</button><button data-live="report">📊 Sổ ca</button>${ws ? '<button data-fx="hint">💡 Gợi ý</button><button data-live="door">🚪 Ngưng đón</button><button data-live="pause">⏸ Tạm dừng</button>' : '<button data-live="stock-all">🧺 Bổ sung kho</button><button data-live="settings">⚙ Cài đặt ca</button>'}</div><div class="shift-dashboard" ${ws ? '' : 'hidden'}><span data-live-revenue></span><span data-live-quality></span><span data-live-stock></span></div>`;
   function consult(html) {
     const ws = window.WS.state(); if (ws) window.WS.setPause('consult', true);
     window.UI.modal(html, () => { if (window.WS.state() === ws) window.WS.setPause('consult', false); });
@@ -24,7 +24,7 @@
     const texts = { '[data-live-revenue]': `🪙 ${G.fmt(ws.stats.revenue)} · ${ws.stats.served} đơn`, '[data-live-quality]': `✦ ${ws.stats.perfect} hoàn hảo`, '[data-live-stock]': `🧺 ${C.items[ws.shop].filter(i => i.w > 0 && G.stock(ws.shop, i.id) < 3).length} vật tư sắp hết` };
     Object.entries(texts).forEach(([q, t]) => { const e = $(q); if (e && e.textContent !== t) e.textContent = t; });
     const door = $('[data-live="door"]'), pause = $('[data-live="pause"]');
-    if (door) { door.textContent = !ws.accepting ? '🚪 Hết giờ nhận khách' : ws.doorOpen === false ? '🚪 Nhận khách trở lại' : '🚪 Tạm ngưng nhận khách'; door.disabled = !ws.accepting; }
+    if (door) { door.textContent = !ws.accepting ? '🚪 Hết giờ' : ws.doorOpen === false ? '🚪 Đón khách' : '🚪 Ngưng đón'; door.disabled = !ws.accepting; }
     if (pause) pause.textContent = ws.pauseWhy.manual ? '▶ Tiếp tục' : '⏸ Tạm dừng';
   };
   const options = {
@@ -127,9 +127,9 @@
     else if (action === 'door' && ws && ws.accepting) { ws.doorOpen = ws.doorOpen === false; L.updateStall(ws); G.save(); window.UI.toast(ws.doorOpen ? 'Đang đón khách mới' : 'Tạm ngưng đón khách; đồng hồ và đơn hiện tại vẫn tiếp tục.'); }
     else if (action === 'report') {
       const st = G.S.shops[id];
-      consult(`<h3>📊 Sổ quầy ${G.shopDef(id).short}</h3><p>Tổng đã giao: <b>${st.served}</b> đơn · cấp ${st.level} · ${st.staff} tiểu nhị</p>${ws ? `<p>Ca này: ${ws.stats.served} đơn · ${ws.stats.perfect} hoàn hảo</p><p>Doanh thu ${G.fmt(ws.stats.revenue)} · Giá vốn món ${G.fmt(ws.stats.cost)} · Hao phí ${G.fmt(ws.stats.waste)} xu</p>` : '<p>Chưa mở ca mới.</p>'}<h4>Vật tư sắp hết (&lt; 3 phần)</h4><p>${C.items[id].filter(i => i.w > 0 && G.stock(id,i.id) < 3).map(i => `${i.name}: ${G.stock(id,i.id)}`).join(' · ') || 'Kho còn đủ.'}</p><button class="btn gold" data-close>Đóng sổ</button>`);
+      consult(`<h3>📊 Sổ quầy ${G.shopDef(id).short}</h3><p>Tổng đã giao: <b>${st.served}</b> đơn · cấp ${st.level} · ${st.staff} tiểu nhị</p>${ws ? `<p>Ca này: ${ws.stats.served} đơn · ${ws.stats.perfect} hoàn hảo</p><p>Doanh thu ${G.fmt(ws.stats.revenue)} · Giá vốn món ${G.fmt(ws.stats.cost)} · Hao phí ${G.fmt(ws.stats.waste)} xu</p>` : '<p>Chưa mở ca mới.</p>'}<h4>Vật tư sắp hết (&lt; 3 phần)</h4><p>${C.items[id].filter(i => (i.w > 0 || i.reuse) && G.stock(id,i.id) < 3).map(i => `${i.name}: ${G.stock(id,i.id)}`).join(' · ') || 'Kho còn đủ.'}</p><button class="btn gold" data-close>Đóng sổ</button>`);
     } else if (action === 'stock-all' && id && !ws) {
-      const needs = C.items[id].filter(i => i.w > 0 && G.stock(id,i.id) < Math.max(3, G.packSize(id,i.id)));
+      const needs = C.items[id].filter(i => (i.w > 0 || i.reuse) && G.stock(id,i.id) < Math.max(3, G.packSize(id,i.id)));
       const cost = needs.reduce((n,i) => n + G.packCost(id,i.id),0);
       window.UI.modal(`<h3>🧺 Bổ sung kho</h3><p>Mua một gói cho mỗi vật tư còn dưới mức một gói:</p><p>${needs.map(i => `${i.name} +${G.packSize(id,i.id)}`).join(' · ') || 'Kho đang đủ, chưa cần bổ sung.'}</p><p>Tổng: <b>${G.fmt(cost)} xu</b></p><button class="btn gold" data-live="confirm-stock" data-shop="${id}" ${!needs.length || G.S.coins < cost ? 'disabled' : ''}>Mua các gói trên</button> <button class="btn ghost" data-close>Đóng</button>`);
       L.restockQuote = { id, items: needs.map(i=>i.id), cost };

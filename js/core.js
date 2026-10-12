@@ -169,11 +169,11 @@
   Game.itemDef = (shop, item) => C.items[shop].find((i) => i.id === item);
   Game.packCost = function (shop, item) {
     const d = Game.itemDef(shop, item), sd = Game.shopDef(shop);
-    return Math.max(1, Math.ceil(sd.itemCost * d.w * sd.pack * (item.indexOf('nep_') === 0 ? 1 : 1)));
+    return Math.max(1, Math.ceil(sd.itemCost * (d.reuse ? 1.2 : d.w) * Game.packSize(shop, item) * (item.indexOf('nep_') === 0 ? 1 : 1)));
   };
-  Game.packSize = (shop, item) => { const d = Game.itemDef(shop, item); return d.batch ? 1 : Game.shopDef(shop).pack; };
+  Game.packSize = (shop, item) => { const d = Game.itemDef(shop, item); return d.batch ? 1 : d.reuse ? 4 : Game.shopDef(shop).pack; };
   Game.buyPack = function (shop, item) {
-    const d = Game.itemDef(shop, item), c = d.w === 0 ? 0 : Game.packCost(shop, item);
+    const d = Game.itemDef(shop, item), c = Game.packCost(shop, item);
     if (Game.S.coins < c) return false;
     Game.S.coins -= c; Game.give(shop, item, Game.packSize(shop, item));
     // chi phí nguyên liệu tính ở lúc nhập hàng; thống kê cuối ca dùng giá vốn từng phần đã dùng

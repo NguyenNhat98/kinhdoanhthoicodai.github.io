@@ -96,11 +96,13 @@
       <div class="set-row"><label>🎵 Nhạc nền</label><input type="range" min="0" max="100" value="${Math.round(s.music * 100)}" data-range="music"></div>
       <div class="set-row"><label>🔔 Hiệu ứng âm thanh</label><input type="range" min="0" max="100" value="${Math.round(s.sfx * 100)}" data-range="sfx"></div>
       <div class="set-row"><label>📳 Rung</label>${seg('haptic', [[0, 'Tắt'], [1, 'Nhẹ'], [2, 'Vừa'], [3, 'Mạnh']])}</div>
-      <div class="set-row"><label>🗣️ Giọng hô “Hảo hán!”</label>${onoff('speech')}</div>
-      <div class="set-row col"><label>👆 Rót: chạm để rót, chạm lại để dừng</label>${onoff('tapPour')}<small>Dành cho người khó giữ tay. Mặc định là giữ để rót.</small></div>
-      <div class="set-row col"><label>🧭 Hỗ trợ (tự dừng, chọn cấp cay)</label>${onoff('assist')}<small>Cần trang bị cấp 3 tương ứng: vòi rót, ấm đồng, muỗng ớt.</small></div>
-      <div class="set-row col"><label>🌶️ Chế độ thư giãn (mỳ cay chọn trực tiếp)</label>${onoff('relaxed')}</div>
-      <div class="set-row col"><label>🐢 Giảm chuyển động</label>${onoff('reduce')}<small>Giảm hạt bay, NPC nền và rung camera; giữ nước dâng, tiến độ và đổi biểu cảm.</small></div>
+      <div class="set-row tg"><div class="tg-txt"><label>🗣️ Giọng hô “Hảo hán!”</label></div>${onoff('speech')}</div>
+      <div class="set-row tg"><div class="tg-txt"><label>🖥️ Toàn màn hình</label><small>Ẩn thanh địa chỉ của trình duyệt.</small></div><div class="seg"><button class="on" data-fs>Bật / Tắt</button></div></div>
+      <div class="set-row col"><label>📖 Hướng dẫn chi tiết</label><small>Xem lại cách chơi từng bước.</small><div class="row2"><button class="btn gold sm" data-guide="start">Hướng dẫn cơ bản</button><button class="btn ghost sm" data-guide="shops">Các quầy hàng</button><button class="btn ghost sm" data-guide="festival">Hội làng</button><button class="btn ghost sm" data-guide="settings">Về cài đặt</button><button class="btn ghost sm" data-guide="tutorial">Chơi lại hướng dẫn quầy</button></div></div>
+      <div class="set-row tg"><div class="tg-txt"><label>👆 Rót: chạm để rót, chạm lại để dừng</label><small>Dành cho người khó giữ tay. Mặc định là giữ để rót.</small></div>${onoff('tapPour')}</div>
+      <div class="set-row tg"><div class="tg-txt"><label>🧭 Hỗ trợ (tự dừng, chọn cấp cay)</label><small>Cần trang bị cấp 3 tương ứng: vòi rót, ấm đồng, muỗng ớt.</small></div>${onoff('assist')}</div>
+      <div class="set-row tg"><div class="tg-txt"><label>🌶️ Chế độ thư giãn (mỳ cay chọn trực tiếp)</label></div>${onoff('relaxed')}</div>
+      <div class="set-row tg"><div class="tg-txt"><label>🐢 Giảm chuyển động</label><small>Giảm hạt bay, NPC nền và rung camera; giữ nước dâng, tiến độ và đổi biểu cảm.</small></div>${onoff('reduce')}</div>
       ${window.LivingMarket.settingsHtml()}
       <div class="set-row col"><label>💾 Sao lưu / khôi phục</label><div class="row2"><button class="btn gold sm" data-export>Sao chép mã</button><button class="btn ghost sm" data-import>Nhập mã</button></div></div>
       <div class="set-row col"><button class="btn danger sm" data-reset>↩️ Chơi lại từ đầu</button></div>

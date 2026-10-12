@@ -1,0 +1,27 @@
+/* ===== Hội làng: trò mới + hướng dẫn + hiệu ứng ===== */
+.folk-game { animation: fgIn .35s ease-out; } @keyframes fgIn { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+.festival-cards button { position: relative; transition: transform .15s, box-shadow .2s; } .festival-cards button:active { transform: scale(.97); }
+.festival-cards button:hover i { animation: wob .6s; } @keyframes wob { 30% { transform: rotate(-12deg) scale(1.1); } 60% { transform: rotate(10deg); } }
+.g-help { position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: #3a2208; font-weight: 800; display: grid; place-items: center; font-size: 14px; }
+.game-guide { margin: 6px 0 10px; padding: 8px 11px; background: var(--card2); border: 1px dashed var(--wood); border-radius: 12px; font-size: 12.5px; }
+.game-guide summary { font-weight: 800; cursor: pointer; } .game-guide ol, .g-steps { padding-left: 20px; display: grid; gap: 4px; text-align: left; } .g-steps { font-size: 14px; }
+.x-hud { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; margin: 6px 0; border-radius: 99px; background: #50311f; color: #fff0c6; font-weight: 800; font-size: 13px; }
+.pot-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; border-radius: 16px; background: radial-gradient(#9bc36a, #6f9a48); border: 3px solid #4a6a2a; touch-action: manipulation; }
+.pot-hole { position: relative; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(#3a2512 55%, #6a4524 56%); overflow: hidden; box-shadow: inset 0 6px 10px #0008; }
+.pot { position: absolute; left: 12%; right: 12%; bottom: -70%; height: 70%; display: grid; place-items: center; font-size: 36px; transition: bottom .16s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
+.pot::before { content: '🏺'; } .pot.up { bottom: 8%; } .pot.gold::before { content: '🏆'; filter: drop-shadow(0 0 8px gold); } .pot.bomb::before { content: '🔥'; }
+.pot.smash { bottom: 8%; animation: smash .3s ease-out forwards; } .pot.smash::before { content: '💥'; } .pot.smash.gold::before { content: '✨'; }
+@keyframes smash { to { transform: scale(1.5) rotate(20deg); opacity: 0; } }
+.pond { position: relative; height: 230px; overflow: hidden; border-radius: 16px; background: linear-gradient(#8fd3e8, #4aa2c8); border: 3px solid #2f7a9a; touch-action: manipulation; }
+.pond .wave { position: absolute; left: -10%; right: -10%; height: 14px; border-radius: 50%; background: rgba(255, 255, 255, .25); animation: wave 4s ease-in-out infinite alternate; }
+.pond .w1 { top: 30%; } .pond .w2 { top: 66%; animation-delay: -2s; } @keyframes wave { to { transform: translateX(8%); } }
+.duck { position: absolute; font-size: 34px; line-height: 1; padding: 6px; transition: opacity .3s, transform .3s; filter: drop-shadow(0 3px 2px #0004); }
+.duck.gold { filter: drop-shadow(0 0 8px gold) sepia(1) saturate(4); } .duck.caught { transform: scale(1.6) rotate(25deg); opacity: 0; }
+.rope { margin: 12px 0; } .rope-line { position: relative; height: 14px; border-radius: 99px; background: repeating-linear-gradient(90deg, #b88a4a 0 8px, #a07838 8px 16px); margin: 14px 4px; }
+.rope-line::before, .rope-line::after { content: ''; position: absolute; top: -8px; width: 4px; height: 30px; border-radius: 2px; } .rope-line::before { left: 8%; background: #3a9a4a; } .rope-line::after { right: 8%; background: #c8301f; }
+.rope-goal { font-size: 10px; font-weight: 800; } .rope-goal.r { float: right; } #ropeMark { position: absolute; top: -14px; transform: translateX(-50%); font-size: 26px; transition: left .06s linear; }
+.pull-btn { width: 100%; min-height: 64px; font-size: 22px; touch-action: manipulation; user-select: none; } .pull-btn.pop { animation: popBtn .2s; }
+.memory-board button.revealed { animation: flipIn .35s; } .memory-board button.matched { animation: matchPulse .5s; }
+@keyframes flipIn { from { transform: rotateY(90deg); } } @keyframes matchPulse { 50% { transform: scale(1.12); box-shadow: 0 0 14px gold; } }
+.quan-pit { transition: transform .15s, background .2s; } .quan-pit:not(:disabled):active { transform: scale(.92); }
+body.reduce-motion .folk-game, body.reduce-motion .pot, body.reduce-motion .wave { animation: none; transition: none; }

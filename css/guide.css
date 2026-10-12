@@ -1,0 +1,6 @@
+.gd { text-align: center; display: flex; flex-direction: column; gap: 8px; animation: gdIn .3s ease-out; } @keyframes gdIn { from { opacity: 0; transform: translateX(16px); } }
+.gd-t { color: var(--muted); letter-spacing: .5px; } .gd-ic { font-size: 54px; line-height: 1.1; animation: gdBob 2s ease-in-out infinite; } @keyframes gdBob { 50% { transform: translateY(-5px) scale(1.05); } }
+.gd h3 { margin: 0; color: var(--title); } .gd-b { font-size: 14px; line-height: 1.55; text-align: left; } .gd-ol { margin: 0; padding-left: 20px; display: grid; gap: 5px; }
+.gd-dots { display: flex; justify-content: center; gap: 5px; } .gd-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); } .gd-dots i.on { background: var(--gold); width: 18px; border-radius: 99px; }
+.gd-nav { display: flex; gap: 8px; justify-content: space-between; } .gd-nav .btn { flex: 1; }
+body.reduce-motion .gd, body.reduce-motion .gd-ic { animation: none; }

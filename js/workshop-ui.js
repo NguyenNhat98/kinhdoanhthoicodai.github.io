@@ -447,7 +447,7 @@
       const steam = S().steam || [];
       h += `<h4>🥘 Hấp mẻ xôi (trước ca)</h4><div class="pp-grid">${['gac', 'nuong', 'dua'].concat(G.S.shops.xoi.level >= 5 ? ['ngusac'] : []).map((t) => `<div class="pp-item"><span class="pi-i">${({ gac: '🔴', nuong: '⚪', dua: '🟡', ngusac: '🌈' })[t]}</span><div class="pi-t"><b>${R.xoi.BASES[t]}</b><small>Đã hấp: ${G.stock('xoi', 'p_' + t)} phần · nếp: ${G.stock('xoi', 'nep_' + t)}</small></div><button class="btn gold sm" data-w="cook" data-type="${t}">Hấp ${[10, 10, 15, 20][G.eqLv('xoi', 'xung')]}</button></div>`).join('')}</div>${steam.length ? `<div class="steam-now">${steam.map((s) => `🔥 Đang hấp ${R.xoi.BASES[s.type]}… ${Math.ceil(s.t)}s`).join(' · ')}</div>` : ''}`;
     }
-    h += `<h4>🧺 Nhập hàng</h4><div class="pp-grid" data-pp-stock>${items.filter((it) => it.w > 0 || false).map((it) => stockRow(id, it)).join('')}</div>`;
+    h += `<h4>🧺 Nhập hàng</h4><div class="pp-grid" data-pp-stock>${items.filter((it) => it.w > 0 || it.reuse).map((it) => stockRow(id, it)).join('')}</div>`;
     h += `<h4>🛠️ Nâng cấp dụng cụ</h4><div class="pp-eq">${G.eqList(id).map((e) => eqCard(id, e)).join('')}</div>`;
     if (ch) h += `<div class="pp-chap"><b>📜 Chương ${ch.id}: ${esc(ch.title)}</b><small>${esc(ch.goal)} · ${esc(ch.prog(S()))}</small></div>`;
     return h + '</div>';
@@ -465,8 +465,8 @@
   WUI.restock = function (sid) {
     const id = sid || WUI.shop;
     if (WS.state()) WS.setPause('modal', true);
-    const m = window.UI.modal(`<h3>🧺 Nhập hàng nhanh</h3><div class="pp-grid mini" data-pp-stock>${C.items[id].filter((it) => it.w > 0).map((it) => stockRow(id, it)).join('')}</div><button class="btn gold" data-close>Xong</button>`, () => { if (WS.state()) WS.setPause('modal', false); });
-    $('#modal').addEventListener('click', (e) => { const b = e.target.closest('[data-w="buy"]'); if (!b) return; if (G.buyPack(id, b.dataset.item)) { sfx('buy'); const g = $('[data-pp-stock]', $('#modal')); g.innerHTML = C.items[id].filter((it) => it.w > 0).map((it) => stockRow(id, it)).join(''); } else { sfx('error'); } });
+    const m = window.UI.modal(`<h3>🧺 Nhập hàng nhanh</h3><div class="pp-grid mini" data-pp-stock>${C.items[id].filter((it) => (it.w > 0 || it.reuse)).map((it) => stockRow(id, it)).join('')}</div><button class="btn gold" data-close>Xong</button>`, () => { if (WS.state()) WS.setPause('modal', false); });
+    $('#modal').addEventListener('click', (e) => { const b = e.target.closest('[data-w="buy"]'); if (!b) return; if (G.buyPack(id, b.dataset.item)) { sfx('buy'); const g = $('[data-pp-stock]', $('#modal')); g.innerHTML = C.items[id].filter((it) => (it.w > 0 || it.reuse)).map((it) => stockRow(id, it)).join(''); } else { sfx('error'); } });
     void m;
   };
 
