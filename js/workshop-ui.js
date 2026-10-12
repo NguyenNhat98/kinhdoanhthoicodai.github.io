@@ -16,7 +16,7 @@
   const sum = (o) => Object.keys(o).reduce((a, k) => a + (o[k] || 0), 0);
   const MOOD = ['😐', '🙂', '🤩', '😠', '😐', '😤'];
 
-  const bannerOf = (id) => `assets/scenes/${id}.png`;
+  const bannerOf = (id) => `assets/scenes/hd/${id}.jpg`;
 
   /* ======================== MỞ / ĐÓNG QUẦY ======================== */
   WUI.open = function (id) {
