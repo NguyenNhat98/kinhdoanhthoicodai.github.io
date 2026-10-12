@@ -45,7 +45,7 @@
       v: 2, coins: 0, gold: 0, rep: 0, day: 1, shops, stock, eq,
       stats: { earned: 0, served: 0, perfect: 0, failed: 0, shifts: 0, streaks: 0, waste: 0 },
       ach: {}, chapter: 1, chapterSeen: 0, tut: {}, rel: {}, boostUntil: 0, flags: {},
-      theme: 'thanhphong', settings: { music: 0.5, sfx: 0.8, haptic: 2, speech: true, tapPour: false, assist: false, relaxed: false, reduce: false },
+      theme: 'thanhphong', settings: { music: 0.5, sfx: 0.8, haptic: 2, speech: true, tapPour: false, assist: false, relaxed: false, reduce: false, crowd: 10, daylight: 0, weather: 0, quality: 2, textSize: 1, contrast: false, hints: true, autoSelect: false, difficulty: 1, shiftLength: 240, autosave: 10 },
       lastSeen: now(), started: now(), daily: 0, ws: null, steam: [],
     };
   }
@@ -54,6 +54,9 @@
     const s = Object.assign({}, d, raw || {});
     s.stats = Object.assign({}, d.stats, raw && raw.stats);
     s.settings = Object.assign({}, d.settings, raw && raw.settings);
+    const allowed = { crowd: [0,6,10,16], daylight: [0,1,2,3], weather: [0,1,2], quality: [0,1,2], textSize: [1,1.12,1.24], difficulty: [0,1,2], shiftLength: [120,240,360], autosave: [5,10,30] };
+    Object.keys(allowed).forEach(k => { if (!allowed[k].includes(s.settings[k])) s.settings[k] = d.settings[k]; });
+    ['contrast','hints','autoSelect'].forEach(k => { if (typeof s.settings[k] !== 'boolean') s.settings[k] = d.settings[k]; });
     s.ach = Object.assign({}, raw && raw.ach);
     s.tut = Object.assign({}, raw && raw.tut); s.rel = Object.assign({}, raw && raw.rel); s.flags = Object.assign({}, raw && raw.flags);
     s.shops = {}; s.stock = {}; s.eq = {};

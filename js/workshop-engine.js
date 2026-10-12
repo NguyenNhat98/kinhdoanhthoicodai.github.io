@@ -23,11 +23,11 @@
     const tutorial = !S().tut[shop];
     const def = G.shopDef(shop);
     const ws = {
-      shop, tutorial, clock: 0, total: tutorial ? C.tutorialShiftSec : C.shiftSec, accepting: true, graceLeft: C.graceSec, paused: false, pauseWhy: {},
+      shop, tutorial, clock: 0, total: tutorial ? C.tutorialShiftSec : S().settings.shiftLength, accepting: true, graceLeft: C.graceSec, paused: false, pauseWhy: {},
       orders: [], oid: 0, sel: null, product: null, shelf: [], hold: null, busy: null, nextSpawn: 1.5, patMul: 1, ended: false, msgs: [],
       dirty: { s: 0, l: 0 }, scoopN: 1, served: 0, tutTarget: 3,
       stats: { revenue: 0, cost: 0, waste: 0, tips: 0, served: 0, perfect: 0, cancelled: 0, left: 0, rep: 0 }, reasons: {}, hearts: {},
-      rush: null, rushNoted: 0,
+      rush: null, rushNoted: 0, difficulty: S().settings.difficulty, doorOpen: true,
     };
     // giờ cao điểm: tối đa một lần mỗi ca, sau hướng dẫn, và khi quầy đã có trang bị
     const hasEq = Object.keys(S().eq[shop] || {}).some((k) => S().eq[shop][k] > 0);
@@ -66,7 +66,7 @@
   function patience(ws) {
     const def = G.shopDef(ws.shop);
     if (ws.tutorial) return 9999;
-    return (rand(def.patience[0], def.patience[1]) + Math.min(20, G.patienceBonus(ws.shop))) * ws.patMul;
+    return (rand(def.patience[0], def.patience[1]) + Math.min(20, G.patienceBonus(ws.shop))) * ws.patMul * [1.5, 1, 0.8][ws.difficulty == null ? 1 : ws.difficulty];
   }
   function newOrder(ws) {
     const def = G.shopDef(ws.shop), reg = pickRegular(ws);
@@ -75,7 +75,7 @@
     const spec = R[ws.shop].makeOrder(ws, reg);
     const p = patience(ws) * (vip ? 0.9 : 1);
     const o = { id: ++ws.oid, who, vip, spec, p, max: p, status: 'wait', mood: 0, paid: false };
-    ws.orders.push(o); G.emit('order', { order: o }); return o;
+    ws.orders.push(o); if (S().settings.autoSelect && !ws.sel) WS.select(o.id); G.emit('order', { order: o }); return o;
   }
   function pickRegular(ws) {
     if (ws.tutorial || Math.random() > 0.3) return null;
@@ -221,10 +221,10 @@
     const def = G.shopDef(ws.shop);
     const waiting = ws.orders.filter((o) => o.status === 'wait').length;
     const cap = 3;
-    if (ws.accepting) {
+    if (ws.accepting && ws.doorOpen !== false) {
       ws.nextSpawn -= dt;
       if (ws.nextSpawn <= 0) {
-        if (waiting < cap && !(ws.tutorial && ws.oid >= ws.tutTarget)) { newOrder(ws); ws.nextSpawn = rand(def.spawn[0], def.spawn[1]) * (WS.rushOn() ? 0.75 : 1); if (ws.tutorial) ws.nextSpawn = 9; }
+        if (waiting < cap && !(ws.tutorial && ws.oid >= ws.tutTarget)) { newOrder(ws); ws.nextSpawn = rand(def.spawn[0], def.spawn[1]) * (WS.rushOn() ? 0.75 : 1) * [1.3, 1, 0.85][ws.difficulty == null ? 1 : ws.difficulty]; if (ws.tutorial) ws.nextSpawn = 9; }
         else ws.nextSpawn = 2; // hàng đầy: khách đi chợ tiếp, không sinh đơn để phạt
       }
     }

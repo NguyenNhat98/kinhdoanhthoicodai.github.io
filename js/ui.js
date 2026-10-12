@@ -64,8 +64,8 @@
 
   /* ---------------- điều hướng ---------------- */
   function buildNav() {
-    $('#nav').innerHTML = [['market', '🏮', 'Chợ'], ['quest', '📜', 'Nhiệm vụ'], ['perks', '🧧', 'Phúc đức'], ['theme', '🎨', 'Giao diện'], ['settings', '⚙️', 'Cài đặt']]
-      .map(([p, i, l]) => `<button data-page="${p}" class="${p === 'market' ? 'on' : ''}"><i>${i}</i><span>${l}</span></button>`).join('');
+    $('#nav').innerHTML = [['market', '🏮', 'Chợ'], ['festival', '🪁', 'Hội làng'], ['quest', '📜', 'Nhiệm vụ'], ['perks', '🧧', 'Phúc đức'], ['theme', '🎨', 'Giao diện'], ['settings', '⚙️', 'Cài đặt']]
+      .map(([p, i, l]) => `<button data-page="${p}" class="${p === 'market' ? 'on' : ''}"><i>${p === 'festival' ? i : `<img class="nav-sprite" src="assets/sprites/trasua2-ui-${({market:'shop',quest:'quest',perks:'bag',theme:'decor',settings:'settings'})[p]}.png" alt="">`}</i><span>${l}</span></button>`).join('');
   }
 
   function pageQuest() {
@@ -101,6 +101,7 @@
       <div class="set-row col"><label>🧭 Hỗ trợ (tự dừng, chọn cấp cay)</label>${onoff('assist')}<small>Cần trang bị cấp 3 tương ứng: vòi rót, ấm đồng, muỗng ớt.</small></div>
       <div class="set-row col"><label>🌶️ Chế độ thư giãn (mỳ cay chọn trực tiếp)</label>${onoff('relaxed')}</div>
       <div class="set-row col"><label>🐢 Giảm chuyển động</label>${onoff('reduce')}<small>Giảm hạt bay, NPC nền và rung camera; giữ nước dâng, tiến độ và đổi biểu cảm.</small></div>
+      ${window.LivingMarket.settingsHtml()}
       <div class="set-row col"><label>💾 Sao lưu / khôi phục</label><div class="row2"><button class="btn gold sm" data-export>Sao chép mã</button><button class="btn ghost sm" data-import>Nhập mã</button></div></div>
       <div class="set-row col"><button class="btn danger sm" data-reset>↩️ Chơi lại từ đầu</button></div>
       <p class="muted center">Xuyên Không Cổ Đại · Chợ Cổ · v${C.version}</p></section>`;
@@ -111,6 +112,7 @@
     const v = $('#view');
     if (p === 'market') { window.MM.mount(v); v.classList.add('is-map'); return; }
     v.classList.remove('is-map');
+    if (p === 'festival') { window.Festival.mount(v); return; }
     v.innerHTML = ({ quest: pageQuest, perks: pagePerks, theme: pageTheme, settings: pageSettings }[p])(); v.scrollTop = 0;
   };
 
@@ -126,6 +128,7 @@
         const k = el.dataset.set; let v = el.dataset.v; v = v === 'true' ? true : v === 'false' ? false : Number(v);
         S().settings[k] = v; sfx('click'); if (k === 'haptic') buzz([40, 60, 40]); if (k === 'speech' && v) window.Audio2.speak('Hảo hán!');
         if (k === 'reduce') document.body.classList.toggle('reduce-motion', v);
+        window.LivingMarket.applySettings();
         G.save(); UI.showPage('settings'); return;
       }
       if (t.closest('[data-export]')) { const code = G.exportCode(); (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(() => UI.toast('Đã sao chép mã sao lưu', 'ok'), () => UI.modal(`<h3>Mã sao lưu</h3><textarea readonly rows="5">${code}</textarea><p class="muted">Nhấn giữ để sao chép.</p><button class="btn gold" data-close>Đóng</button>`)); return; }

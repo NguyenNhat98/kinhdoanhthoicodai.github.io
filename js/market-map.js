@@ -123,7 +123,7 @@
   function bind() {
     const el = MM.el;
     el.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('.map-card,.map-ctl,.map-chap')) return;
+      if (e.target.closest('.map-card,.map-ctl,.map-chap,.market-dock')) return;
       MM.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
       MM.drag = { x: MM.x, y: MM.y, sx: e.clientX, sy: e.clientY, moved: false, pinch: null };
       if (MM.pts.size === 2) { const [a, b] = Array.from(MM.pts.values()); MM.drag.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s: MM.s }; }

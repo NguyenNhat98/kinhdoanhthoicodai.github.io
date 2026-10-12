@@ -1,0 +1,72 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Chợ Cổ browser checks</title><style>body{margin:0;background:#f3e5c8}iframe{border:0;width:390px;height:844px}pre{white-space:pre-wrap}</style><iframe id="game" src="../index.html"></iframe><pre id="result">RUNNING</pre><script>
+const out=document.querySelector('#result'),errors=[];
+const params=new URLSearchParams(location.search);document.querySelector('#game').style.width=(params.get('width')||390)+'px';document.querySelector('#game').style.height=(params.get('height')||844)+'px';
+document.querySelector('#game').addEventListener('load',async()=>{
+const w=document.querySelector('#game').contentWindow,d=w.document,passed=[];
+w.addEventListener('error',e=>errors.push(e.message));
+const check=(condition,message)=>{if(!condition)throw Error(message);passed.push(message);};
+try{
+ const {Game:G,WS,WUI,UI,LivingMarket:L,Festival:F}=w;
+ check(!!G.S&&!!L&&!!F,'Game booted with both new modules');
+ check(d.querySelector('#nav').scrollWidth===d.querySelector('#nav').clientWidth,'Navigation fits mobile width');
+ d.querySelector('#splash').hidden=true;UI.closeModal();
+ check(d.querySelectorAll('.pedestrian').length===10,'Market has 10 sprite pedestrians');
+ const x=L.walkers[0].x;for(let i=0;i<30;i++)L.tick(.1);check(L.walkers[0].x!==x,'Pedestrians move along the street');
+ G.S.settings.reduce=true;L.applySettings();const paused=L.walkers[0].x;L.tick(.5);check(L.walkers[0].x===paused,'Reduced motion stops pedestrians');G.S.settings.reduce=false;L.applySettings();
+ G.S.settings.crowd=0;L.applySettings();w.MM.lastUn=-1;w.MM.refresh();check(d.querySelectorAll('.pedestrian,.wk').length===0,'Zero crowd remains empty after market unlock refresh');G.S.settings.crowd=10;L.applySettings();
+ UI.showPage('settings');check(d.querySelectorAll('[data-pref]').length===11,'All advanced settings rendered');
+ const select=d.querySelector('[data-pref="shiftLength"]');select.value='120';select.dispatchEvent(new w.Event('change',{bubbles:true}));check(G.S.settings.shiftLength===120,'Setting change persists into game state');
+ G.S.settings.autoSelect=true;G.S.coins=100000;
+ for(const shop of w.CFG.shops){
+   G.S.shops[shop.id].unlocked=true;G.S.shops[shop.id].level=1;G.S.tut[shop.id]=true;
+   check(WS.start(shop.id).ok,shop.id+' starts');check(WS.state().total===120,shop.id+' obeys duration');
+   WUI.open(shop.id);WS.tick(2);WUI.update();check(WS.waiting().length===1,shop.id+' spawns a customer');check(WS.state().sel===1,shop.id+' automatically selects order');
+   check(d.querySelector('[data-live="door"]'),shop.id+' has door control');
+   const ws=WS.state();ws.doorOpen=false;ws.nextSpawn=0;WS.tick(1);check(WS.waiting().length===1,shop.id+' door stops new customers');
+   d.querySelector('[data-live="pause"]').click();const clock=ws.clock;WS.tick(1);check(ws.clock===clock,shop.id+' pauses');d.querySelector('[data-live="pause"]').click();
+   d.querySelector('[data-live="guide"]').click();check(ws.paused,shop.id+' recipe guide pauses shift');UI.closeModal();check(!ws.paused,shop.id+' closing guide resumes shift');
+   const command=(name,arg)=>{const result=WS.cmd(name,arg);check(result.ok,shop.id+' command '+name+(arg?.id?' '+arg.id:''));if(ws.busy)WS.tick(ws.busy.t+.01);};
+   if(shop.id==='trada'){
+     const o=WS.waiting()[0];o.spec={size:'s',ice:1,honey:false};
+     check(WS.cmd('bowl',{size:'s'}).ok,'Take bowl');WS.tick(1);check(WS.cmd('ice').ok,'Add ice');check(WS.holdStart('tea').ok,'Begin pouring');
+     const target=w.R.trada.target(ws.product);for(let i=0;i<100&&ws.product.vol<target;i++)WS.tick(.05);WS.holdStop();
+     const before=G.S.coins;check(WS.deliver(o.id).ok,'Deliver real tea order');check(G.S.coins>before,'Order pays coins');const after=G.S.coins;WS.deliver(o.id);check(G.S.coins===after,'Duplicate delivery cannot pay twice');
+   }
+   else {
+     const o=WS.waiting()[0],s=o.spec;
+     if(shop.id==='trasua'){
+       command('cup',{size:s.size});for(const [id,n] of Object.entries(s.tops))for(let i=0;i<n;i++)command('top',{id});command('ice',{level:s.ice});command('sugar',{level:s.sugar,type:s.sugarType});
+       const T=w.R.trasua,liquid=T.liquidTarget(ws.product),tea=liquid*T.ratio(s.milk);
+       check(WS.holdStart('tea',s.tea).ok,'Start actual tea tap');for(let i=0;i<1000&&ws.product.teaVol<tea;i++)WS.tick(.01);WS.holdStop();
+       if(s.milk){check(WS.holdStart('milk',s.milk).ok,'Start actual milk tap');for(let i=0;i<1000&&ws.product.milkVol<liquid-tea;i++)WS.tick(.01);WS.holdStop();}
+       command('stir');command('seal');command('straw');
+     }else if(shop.id==='banhmi'){
+       command('bread',{size:s.size});command('oven');WS.tick(5);command('oven');command('cut');for(const id of ['pate','xaxiu','trung','dua','rau','ot'])for(let i=0;i<(s[id]||0);i++)command('add',{id});command('close');command('wrap');
+     }else if(shop.id==='xoi'){
+       check(WS.cook(s.base).ok,'Start actual rice steaming');WS.tick(9);command('container',{type:s.wrap});command('base',{id:s.base});for(let i=0;i<w.R.xoi.scoopsFor(s.size);i++)command('scoop');for(const [id,n] of Object.entries(s.tops))for(let i=0;i<n;i++)command('top',{id});if(s.wrap==='la'){command('fold');command('tie');}else command('spoon');
+     }else if(shop.id==='mycay'){
+       command('bowl',{size:s.size});command('dip');WS.tick(4);command('lift');for(let i=0;i<(s.size==='l'?3:2);i++)command('ladle',{id:s.broth});for(const [id,n] of Object.entries(s.tops))for(let i=0;i<n;i++)command('top',{id});command('spice');WS.tick((s.spice-.5-ws.product.gauge.pos)/w.R.mycay.needleSpeed(ws));command('stop');command('sticks');
+     }
+     WUI.update();const delivered=WS.deliver(o.id);check(delivered.ok,shop.id+' serves a real prepared order');check(delivered.grade.perfect,shop.id+' prepared order grades perfect');
+   }
+   const snap=WS.serialize();WS.ws=null;check(WS.restore(snap),'Restore shift snapshot');check(WS.state().paused,'Restored shift pauses safely');WS.finish(true);UI.closeModal();WUI.close();
+ }
+ UI.showPage('festival');F.start('throw');const r=F.run;
+ const before=G.S.coins;for(let i=0;i<5;i++){r.angle=50;r.nextShot=0;d.querySelector('[data-faction="throw"]').click();if(i===0){d.querySelector('[data-faction="throw"]').click();check(r.shots===1,'Throw cooldown blocks rapid duplicate clicks');}}
+ check(r.done&&G.S.coins>before,'Ném còn pays only after 5 throws');const after=G.S.coins;d.querySelector('[data-faction="throw"]').click();check(G.S.coins===after,'Finished game cannot pay twice');
+ d.querySelector('[data-faction="again"]').click();d.querySelector('[data-faction="leave"]').click();check(G.S.coins===after,'Leaving an incomplete game gives no reward');
+ F.start('memory');const memory=F.run;for(const id of [...new Set(memory.deck)]){memory.deck.forEach((item,i)=>{if(item===id)d.querySelector('[data-faction="flip"][data-index="'+i+'"]').click();});}
+ check(memory.done&&memory.matched.length===12,'Memory game completes all 6 pairs');
+ let a=[10,5,5,5,5,5,10,5,5,5,5,5],captured=0;
+ for(let k=0;k<60;k++){const candidates=[1,2,3,4,5,7,8,9,10,11].filter(i=>a[i]);if(!candidates.length)break;const result=F.sow(a,candidates[k%candidates.length],k%2?1:-1);captured+=result.captured;a=result.pits;check(a.reduce((s,n)=>s+n,0)+captured===70,'Ô ăn quan conserves all 70 stones, move '+k);}
+ UI.showPage('festival');F.start('oanquan');d.querySelector('[data-faction="pit"][data-index="1"]').click();check(F.run.moves===1,'Ô ăn quan player move works');d.querySelector('[data-faction="leave"]').click();
+ for(let round=0;round<5;round++){F.start('throw');const game=F.run;for(let i=0;i<5;i++){game.angle=50;game.nextShot=0;d.querySelector('[data-faction="throw"]').click();}}
+ check(G.S.flags.festival.rounds===5,'Daily reward limit holds at 5');const finalCoins=G.S.coins;F.start('throw');for(let i=0;i<5;i++){F.run.angle=50;F.run.nextShot=0;d.querySelector('[data-faction="throw"]').click();}check(G.S.coins===finalCoins,'Practice games do not exceed daily reward budget');
+ check(G.save(),'Save succeeds');G.load();check(G.S.flags.festival.rounds===5,'Reward quota survives reload');
+ UI.showPage('market');WUI.close();L.applySettings();
+ await Promise.all([...d.images].map(im=>im.complete?Promise.resolve():new Promise(resolve=>{im.onload=resolve;im.onerror=resolve;})));
+ check([...d.images].every(im=>im.complete&&im.naturalWidth>0),'Visible game images load');check(errors.length===0,'No browser runtime errors');
+ out.textContent=JSON.stringify({status:'PASS',count:passed.length,passed,errors},null,2);
+}catch(e){out.textContent=JSON.stringify({status:'FAIL',message:e.stack,passed,errors},null,2);}
+});
+</script></html>

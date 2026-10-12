@@ -1,7 +1,7 @@
 /* ===== 5 CHỦ ĐỀ GIAO DIỆN: biến màu (đổi theme = đổi cả game) ===== */
 :root, [data-theme="thanhphong"] {
-  --bg1: #fde8ec; --bg2: #fff6ee; --card: #fffaf2; --card2: #ffffff; --text: #4a2f2f; --muted: #8a6a66; --line: rgba(120, 60, 60, .2);
-  --title: #b8334f; --primary: #c8445f; --primary2: #e87a90; --gold: #f2b84a; --wood: #8a5a34; --roof: #c8445f; --ink: #3a2020;
+  --bg1: #f2e3c5; --bg2: #fff7e6; --card: #fffaf0; --card2: #fff1d8; --text: #4a301f; --muted: #89715a; --line: rgba(120, 78, 38, .22);
+  --title: #a53e2b; --primary: #b75236; --primary2: #d47b58; --gold: #e9b84c; --wood: #8a5a34; --roof: #b75236; --ink: #3a2518;
   --sky1: #fbd5dc; --sky2: #fff1e6; --m1: #8fbf8a; --m2: #b9d3b0; --m3: #d9e4d2; --river: #9fd0e0; --sun: #ffd98a; --pag: #a8374f; --lan: #d8392b;
   --hud: rgba(255, 250, 242, .9); --nav: rgba(255, 250, 242, .95); --btn-text: #fff;
 }

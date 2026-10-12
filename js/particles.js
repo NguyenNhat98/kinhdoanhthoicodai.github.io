@@ -92,15 +92,18 @@
       if (!this.running) return;
       const dt = Math.min(2.5, (t - this.last) / 16.67); this.last = t;
       const c = this.ctx; c.clearRect(0, 0, this.w, this.h);
+      if (window.Game.S && window.Game.S.settings.quality === 0) { this.coins = []; this.sparks = []; requestAnimationFrame(tt => this.loop(tt)); return; }
+      const reduced = document.body.classList.contains('reduce-motion');
+      const ambientVisible = !window.WUI?.isOpen() && (!window.UI || window.UI.page === 'market');
       // hạt nền
-      for (const p of this.amb) {
+      for (const p of reduced || !ambientVisible ? [] : this.amb) {
         p.x += (p.vx + (p.k === 'petal' || p.k === 'leaf' ? Math.sin(p.y / 50 + p.ph) * 0.5 : p.k === 'fly' || p.k === 'lan' ? Math.sin(t / 900 + p.ph) * 0.4 : 0)) * dt; p.y += p.vy * dt;
         if (p.r != null) p.r += p.vr * dt;
         if (p.y > this.h + 24 || p.y < -30 || p.x < -30 || p.x > this.w + 30) Object.assign(p, this.newAmb(false), p.vy < 0 ? { y: this.h + 20 } : { y: -20 });
         this.drawAmb(p, t);
       }
       // mưa bụi (Giang Nam)
-      if (this.rain.length) {
+      if (this.rain.length && !reduced && ambientVisible) {
         c.strokeStyle = 'rgba(120,160,150,.35)'; c.lineWidth = 1; c.beginPath();
         for (const r of this.rain) { c.moveTo(r.x, r.y); c.lineTo(r.x - r.l * 0.25, r.y + r.l); r.y += r.v * dt; r.x -= r.v * 0.25 * dt; if (r.y > this.h) { r.y = -r.l; r.x = rnd(0, this.w + 40); } }
         c.stroke();

@@ -16,8 +16,7 @@
   const sum = (o) => Object.keys(o).reduce((a, k) => a + (o[k] || 0), 0);
   const MOOD = ['😐', '🙂', '🤩', '😠', '😐', '😤'];
 
-  const BANNER = { trasua: 'assets/banner-trasua.jpg' };
-  const bannerOf = (id) => (BANNER[id] ? BANNER[id] : `assets/front-${id}.jpg`);
+  const bannerOf = (id) => `assets/scenes/${id}.png`;
 
   /* ======================== MỞ / ĐÓNG QUẦY ======================== */
   WUI.open = function (id) {
@@ -54,7 +53,8 @@
     const id = WUI.shop; if (!id) return;
     const el = $('#stall'), ws = WS.state(), def = sd(id);
     el.innerHTML = `<header class="st-top"><button class="st-back" data-w="back" aria-label="Ra chợ">‹ Ra chợ</button><div class="st-title"><b>${esc(def.name)}</b><small data-w-sub></small></div><div class="st-coins">${Art.coin(18)}<b data-w-coins>0</b></div></header>
-      <div class="st-banner" style="background-image:url('${bannerOf(id)}')"><div class="st-pills"><span class="pill" data-w-clock></span><span class="pill rush" data-w-rush hidden></span></div><span class="st-lan l"></span><span class="st-lan r"></span></div>
+      <div class="st-banner" style="background-image:url('${bannerOf(id)}')"><div class="st-pills"><span class="pill" data-w-clock></span><span class="pill rush" data-w-rush hidden></span></div><span class="st-lan l"></span><span class="st-lan r"></span><span class="counter-steam" aria-hidden="true"></span></div>
+      ${window.LivingMarket.stallTools(id, ws)}
       ${ws && WUI.tab === 'work' ? workHtml(ws) : prepHtml(id)}`;
     WUI.update(0);
   };
@@ -74,7 +74,7 @@
       const face = st === 'done' ? (o.mood >= 2 ? '🤩' : o.mood === 1 ? '😊' : o.mood === -2 ? '😠' : '🙂') : st === 'left' ? '💨' : (low ? '😤' : frac < 0.5 ? '😐' : '🙂');
       const brief = o.spec.name || ({ trada: () => R.trada.chips(o.spec).slice(0, 2).join(' · '), banhmi: () => R.banhmi.chips(o.spec).slice(0, 2).join(' · '), xoi: () => R.xoi.chips(o.spec).slice(0, 2).join(' · '), mycay: () => R.mycay.chips(o.spec).slice(-1)[0] })[ws.shop]();
       h += `<button class="cust ${ws.sel === o.id ? 'sel' : ''} ${st !== 'wait' ? 'gone ' + st : ''} ${WUI.delivering && st === 'wait' ? 'target' : ''}" data-w="pick" data-id="${o.id}" ${st !== 'wait' ? 'disabled' : ''}>
-        <span class="c-face">${o.who.avatar}<i>${face}</i></span><span class="c-name">${esc(o.who.name)}${o.vip ? ' <em>VIP</em>' : ''}${o.who.regular ? ' <em class="reg">❤</em>' : ''}</span>
+        <span class="c-face">${window.LivingMarket.customer(o.id)}<i>${face}</i></span><span class="c-name">${esc(o.who.name)}${o.vip ? ' <em>VIP</em>' : ''}${o.who.regular ? ' <em class="reg">❤</em>' : ''}</span>
         <small>${esc(brief || '')}</small><div class="pbar ${low ? 'low' : ''}"><i data-p="${o.id}" style="width:${ws.tutorial ? 100 : frac * 100}%"></i></div></button>`;
     });
     for (let i = cards.length; i < 3; i++) h += '<div class="cust empty"><span class="c-face">⋯</span><small>Chờ khách ghé</small></div>';
@@ -290,6 +290,7 @@
   WUI.update = function () {
     if (!WUI.shop) return;
     const ws = WS.state(), id = WUI.shop;
+    window.LivingMarket.updateStall(ws);
     const coins = $('[data-w-coins]'); if (coins) coins.textContent = G.fmt(S().coins);
     if (!ws || WUI.tab !== 'work') {
       const sub = $('[data-w-sub]'); if (sub) sub.textContent = ws ? 'Ca đang tạm dừng' : 'Chuẩn bị mở ca'; updatePrep(); return;
@@ -439,7 +440,8 @@
     const items = C.items[id];
     const un = !S().tut[id];
     let h = `<div class="st-prep"><div class="pp-tabs"><button class="on" data-w="tab" data-tab="prep">Chuẩn bị</button></div>`;
-    h += `<div class="pp-start"><div><b>${un ? '📖 Ca hướng dẫn (2 phút)' : '▶ Ca bán tiêu chuẩn (4 phút)'}</b><small>${un ? 'Làm 3 đơn đầu, khách chờ vô hạn, sai không bị phạt.' : 'Khách tới sau ' + def.spawn[0] + '–' + def.spawn[1] + ' giây · thao tác quen tay ' + ({ trada: '8–12', trasua: '18–26', banhmi: '18–28', xoi: '15–23', mycay: '24–35' })[id] + ' giây'}</small></div><button class="btn gold big" data-w="start">Mở ca</button></div>`;
+    h += `<div class="pp-start"><div><b>${un ? '📖 Ca hướng dẫn (2 phút)' : '▶ Ca bán · ' + S().settings.shiftLength / 60 + ' phút'}</b><small>${un ? 'Làm 3 đơn đầu, khách chờ vô hạn, sai không bị phạt.' : ['Thong thả','Tiêu chuẩn','Thử thách'][S().settings.difficulty] + ' · tối đa 3 khách chờ · hoàn thành đơn trước khi hết kiên nhẫn'}</small></div><button class="btn gold big" data-w="start">Mở cửa đón khách</button></div>`;
+    h += window.LivingMarket.prepGuide(id);
     h += `<div class="pp-info">Cấp quầy <b>${st.level}</b> · Tiểu nhị <b>${st.staff}</b> (+${G.fmt(G.cps(id))}/s khi giao quản lý) <button class="btn ghost sm" data-w="upgrade">Nâng cấp ${G.fmt(G.upgradeCost(id))}</button> <button class="btn ghost sm" data-w="hire">Thuê ${G.fmt(G.hireCost(id))}</button></div>`;
     if (id === 'xoi') {
       const steam = S().steam || [];
@@ -478,7 +480,7 @@
       <div><small>Đã giao</small><b>${s.served}</b></div><div><small>Hoàn hảo</small><b>${s.perfect}</b></div><div><small>Bị từ chối</small><b>${s.cancelled}</b></div><div><small>Khách bỏ đi</small><b>${s.left}</b></div></div>
       <p class="sum-tip">Tiền boa ${G.fmt(s.tips)} · Uy tín ${s.rep >= 0 ? '+' : ''}${s.rep}</p>
       ${s.comments.length ? `<div class="sum-cm"><b>Nhận xét của khách:</b>${s.comments.map((c) => `<span>• ${esc(c)}</span>`).join('')}</div>` : '<div class="sum-cm"><b>Nhận xét:</b><span>• Khách hài lòng với tay nghề của bạn.</span></div>'}
-      ${s.tutorial ? '<p class="sum-tut">📖 Hoàn thành ca hướng dẫn! Lần sau mở ca tiêu chuẩn 4 phút.</p>' : ''}
+      ${s.tutorial ? '<p class="sum-tut">📖 Hoàn thành ca hướng dẫn! Ca tiếp theo dùng độ khó và thời lượng bạn chọn trong Cài đặt.</p>' : ''}
       <div class="row2"><button class="btn gold" data-sumok>Về chuẩn bị</button></div>`);
     $('#modal').onclick = (e) => { if (e.target.closest('[data-sumok]')) { window.UI.closeModal(); WUI.tab = 'prep'; if (WUI.shop) WUI.render(); } };
     sfx('levelup'); G.buzz([30, 40, 30]);
