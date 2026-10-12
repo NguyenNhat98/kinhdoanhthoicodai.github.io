@@ -6,7 +6,7 @@
   L.customer = (id) => img('trada-walker-' + (id % 10), 'customer-sprite');
   const steps = {
     trada: ['Chọn khách và cỡ bát', 'Thêm đá theo đơn', 'Giữ ấm, rót đến vạch', 'Thêm mật nếu có', 'Giao đúng khách', 'Rửa bát để tái sử dụng'],
-    trasua: ['Chọn ly M hoặc L', 'Múc topping đúng số phần', 'Rót đúng nền trà', 'Rót sữa đến vạch', 'Chọn đường và đá', 'Khuấy, ép nắp, thêm ống hút', 'Giao ly đúng khách'],
+    trasua: ['Chọn ly M hoặc L', 'Múc topping đúng số phần', 'Chọn đường và đá trước khi rót để tính đúng dung tích', 'Rót đúng nền trà', 'Rót sữa đến vạch', 'Khuấy, ép nắp, thêm ống hút', 'Giao ly đúng khách'],
     banhmi: ['Chọn cỡ ổ bánh', 'Nướng đến vùng vàng', 'Lấy ra trước khi cháy', 'Rạch bánh, phết pate', 'Thêm nhân và rau theo đơn', 'Rưới sốt, đóng bánh', 'Gói giấy rồi giao'],
     xoi: ['Nhập nếp và hấp mẻ trước ca', 'Chọn đĩa hoặc lá chuối', 'Đơm đúng loại và số muỗng', 'Xếp đủ năm màu nếu được yêu cầu', 'Thêm topping theo phiếu', 'Gấp lá, buộc lạt hoặc thêm thìa', 'Giao và chuẩn bị mẻ kế tiếp'],
     mycay: ['Chọn cỡ tô', 'Trụng mì, vớt đúng lúc', 'Múc nước dùng đúng loại', 'Thêm thịt, rau và topping', 'Canh kim, chốt đúng cấp cay', 'Giao đúng khách; theo dõi thời gian chờ']

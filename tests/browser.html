@@ -20,7 +20,13 @@ try{
  for(const shop of w.CFG.shops){
    G.S.shops[shop.id].unlocked=true;G.S.shops[shop.id].level=1;G.S.tut[shop.id]=true;
    check(WS.start(shop.id).ok,shop.id+' starts');check(WS.state().total===120,shop.id+' obeys duration');
+   G.S.flags['guide_'+shop.id]=1;
    WUI.open(shop.id);WS.tick(2);WUI.update();check(WS.waiting().length===1,shop.id+' spawns a customer');check(WS.state().sel===1,shop.id+' automatically selects order');
+   const customer=d.querySelector('.cust img'),control=d.querySelector('.b-right .tr');
+   for(let frame=0;frame<30;frame++){WS.tick(.01);WUI.update();}
+   check(d.querySelector('.cust img')===customer&&d.querySelector('.b-right .tr')===control,shop.id+' keeps portraits and controls stable across frames');
+   for(const tab of [...d.querySelectorAll('[data-desk="stage"]')]){tab.click();const panel=d.querySelector('.b-right');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' stage '+tab.dataset.stage+' fits without scrolling');}
+   check(d.querySelector('#stall').scrollHeight<=d.querySelector('#stall').clientHeight+1,shop.id+' fits fixed viewport');
    check(d.querySelector('[data-live="door"]'),shop.id+' has door control');
    const ws=WS.state();ws.doorOpen=false;ws.nextSpawn=0;WS.tick(1);check(WS.waiting().length===1,shop.id+' door stops new customers');
    d.querySelector('[data-live="pause"]').click();const clock=ws.clock;WS.tick(1);check(ws.clock===clock,shop.id+' pauses');d.querySelector('[data-live="pause"]').click();
@@ -41,7 +47,7 @@ try{
        if(s.milk){check(WS.holdStart('milk',s.milk).ok,'Start actual milk tap');for(let i=0;i<1000&&ws.product.milkVol<liquid-tea;i++)WS.tick(.01);WS.holdStop();}
        command('stir');command('seal');command('straw');
      }else if(shop.id==='banhmi'){
-       command('bread',{size:s.size});command('oven');WS.tick(5);command('oven');command('cut');for(const id of ['pate','xaxiu','trung','dua','rau','ot'])for(let i=0;i<(s[id]||0);i++)command('add',{id});command('close');command('wrap');
+       command('bread',{size:s.size});command('oven');WUI.update();const oven=d.querySelector('[data-cmd="oven"]'),portrait=d.querySelector('.cust img');for(let f=0;f<50;f++){WS.tick(.1);WUI.update();}check(d.querySelector('[data-cmd="oven"]')===oven&&d.querySelector('.cust img')===portrait,'Baking animation preserves oven control and decoded portrait');command('oven');command('cut');for(const id of ['pate','xaxiu','trung','dua','rau','ot'])for(let i=0;i<(s[id]||0);i++)command('add',{id});command('close');command('wrap');
      }else if(shop.id==='xoi'){
        check(WS.cook(s.base).ok,'Start actual rice steaming');WS.tick(9);command('container',{type:s.wrap});command('base',{id:s.base});for(let i=0;i<w.R.xoi.scoopsFor(s.size);i++)command('scoop');for(const [id,n] of Object.entries(s.tops))for(let i=0;i<n;i++)command('top',{id});if(s.wrap==='la'){command('fold');command('tie');}else command('spoon');
      }else if(shop.id==='mycay'){
@@ -51,6 +57,34 @@ try{
    }
    const snap=WS.serialize();WS.ws=null;check(WS.restore(snap),'Restore shift snapshot');check(WS.state().paused,'Restored shift pauses safely');WS.finish(true);UI.closeModal();WUI.close();
  }
+ for(const shop of w.CFG.shops){
+   G.S.shops[shop.id].level=5;WUI.open(shop.id);
+   for(const tab of ['home','stock','equip']){w.ServiceDesk.prepTab=tab;w.ServiceDesk.preparation();const panel=d.querySelector('.st-prep');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' preparation '+tab+' fits');}
+   check(WS.start(shop.id).ok,shop.id+' advanced service starts');WUI.tab='work';WUI.render();
+   if(shop.id==='xoi'){WS.state().product=w.R.xoi.newProduct();WS.state().product.base='ngusac';WUI.renderAll();}
+   for(const button of [...d.querySelectorAll('[data-desk="stage"]')]){button.click();const panel=d.querySelector('.b-right');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' advanced stage '+button.dataset.stage+' fits');}
+   WS.finish(true);UI.closeModal();WUI.close();
+ }
+ G.S.flags.deskPolicies={banhmi:'rush'};check(WS.start('banhmi').ok,'Start rush service');
+ check(WS.state().deskMode==='rush','Selected mode is applied to next shift');
+ const pay=G.eventMult();WS.state().deskMode='classic';check(Math.abs(pay/G.eventMult()-1.15)<.0001,'Rush service increases payment by 15%');
+ G.S.coins=100000;const goldEnd=w.R.banhmi.zone(WS.state()).gold[1];check(G.eqBuy('banhmi','precision'),'Purchase precision tools');
+ const z=w.R.banhmi.zone(WS.state());check(Math.abs(z.gold[1]-goldEnd-.4)<.0001,'Precision purchase extends baking window by 0.4 seconds');
+ check(G.eqBuy('banhmi','workflow'),'Purchase workflow tools');
+ const prep=WS.cmd('bread',{size:'s'});check(prep.ok,'Upgraded service accepts preparation');if(WS.state().busy)WS.tick(WS.state().busy.t+.01);
+ WS.finish(true);UI.closeModal();WUI.close();
+ G.S.flags.deskPolicies.trada='signature';check(WS.start('trada').ok,'Start signature service');WUI.open('trada');
+ check(G.eqBuy('trada','hospitality'),'Purchase hospitality');
+ for(let round=0;round<5;round++){
+   const s=WS.state();s.nextSpawn=0;WS.tick(.1);const order=WS.waiting()[0];order.spec={size:'s',ice:1,honey:false};WS.select(order.id);
+   if(round===0){order.p=order.max-10;WUI.renderAll();const p=order.p;d.querySelector('[data-desk="invite"]').click();check(order.p===Math.min(order.max,p+6),'Hospitality restores six seconds of patience');d.querySelector('[data-desk="invite"]').click();check(s.deskInvites===1,'Hospitality cannot exceed purchased allowance');}
+   check(WS.cmd('bowl',{size:'s'}).ok,'Signature take bowl');if(s.busy)WS.tick(s.busy.t+.01);check(WS.cmd('ice').ok,'Signature add ice');if(s.busy)WS.tick(s.busy.t+.01);
+   WS.holdStart('tea');const target=w.R.trada.target(s.product);while(s.product.vol<target)WS.tick(.01);WS.holdStop();
+   check(WS.deliver(order.id).grade.perfect,'Signature delivers perfect order '+round);
+ }
+ check(WS.state().deskPrize&&WS.state().deskRun===5,'Five real perfect orders award signature bonus');
+ const prize=G.S.coins;G.emit('delivered',{grade:{perfect:true}});check(G.S.coins===prize,'Signature bonus cannot be claimed twice');
+ WS.finish(true);UI.closeModal();WUI.close();
  UI.showPage('festival');F.start('throw');const r=F.run;
  const before=G.S.coins;for(let i=0;i<5;i++){r.angle=50;r.nextShot=0;d.querySelector('[data-faction="throw"]').click();if(i===0){d.querySelector('[data-faction="throw"]').click();check(r.shots===1,'Throw cooldown blocks rapid duplicate clicks');}}
  check(r.done&&G.S.coins>before,'Ném còn pays only after 5 throws');const after=G.S.coins;d.querySelector('[data-faction="throw"]').click();check(G.S.coins===after,'Finished game cannot pay twice');

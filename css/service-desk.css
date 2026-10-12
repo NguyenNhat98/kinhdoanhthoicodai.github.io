@@ -1,0 +1,80 @@
+/* Final layer: fixed-height desk, discrete stages, no scrollable work surface. */
+#stall.service-desk {background:linear-gradient(#f1dfbc,#fff8e8);isolation:isolate;animation:none;}
+#stall.service-desk[hidden] {display:none;}
+#stall.service-desk .st-banner {position:relative;inset:auto;z-index:0;height:96px;max-height:none;aspect-ratio:auto;flex:none;overflow:hidden;background-image:var(--desk-scene)!important;background-size:cover;background-position:50% 38%;filter:none;}
+#stall.service-desk .st-banner::before {content:none;}
+#stall.service-desk .st-banner::after {inset:0;height:auto;aspect-ratio:auto;background:linear-gradient(transparent 60%,#38200e66);mask-image:none;-webkit-mask-image:none;}
+#stall.service-desk::before,#stall.service-desk::after {content:none;}
+#stall.service-desk:has(.st-bench) .st-top {background:#fff5e1;border-bottom:1px solid #c48c47;padding:5px 8px;min-height:43px;}
+#stall.service-desk .st-top .st-title b,#stall.service-desk .st-coins {color:#783c20;text-shadow:none;}
+#stall.service-desk .st-title small {font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#stall.service-desk:has(.st-bench) .st-top .st-title small {display:block;}
+#stall.service-desk:has(.st-bench) .st-banner {display:block;height:56px;flex:none;background-position:50% 39%;border-bottom:2px solid #a46d38;}
+#stall.service-desk .stall-tools {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:#fff0d0;padding:4px 6px;gap:4px;}
+#stall.service-desk .stall-tools button {min-height:30px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fffaf0;backdrop-filter:none;}
+#stall.service-desk .shift-dashboard {margin:0;border-radius:0;min-height:18px;background:#735034;padding:2px 8px;}
+#stall.service-desk .shift-dashboard:not([hidden]) {display:flex;}
+#stall.service-desk .st-queue {grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px 6px 2px;}
+#stall.service-desk .cust {display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto 5px;min-height:68px;gap:2px 5px;padding:4px;border-radius:12px;text-align:left;background:#fffaf0;backdrop-filter:none;transform:none;}
+#stall.service-desk .cust .c-face {width:40px;grid-row:1/3;grid-column:1;isolation:isolate;}
+#stall.service-desk .c-face .customer-sprite {width:40px;height:50px;object-fit:contain;animation:none!important;transform:none!important;filter:none;image-rendering:-webkit-optimize-contrast;}
+#stall.service-desk .cust .c-name {grid-column:2;font-size:10px;line-height:1.2;max-width:100%;}
+#stall.service-desk .cust>small {grid-column:2;font-size:9px;height:auto;max-height:27px;line-height:1.2;}
+#stall.service-desk .cust .pbar {grid-column:1/-1;grid-row:3;width:100%;margin:0;height:5px;}
+#stall.service-desk .cust.empty {display:flex;align-items:center;justify-content:center;opacity:.65;}
+#stall.service-desk .cust.empty .c-face {width:auto;}
+#stall.service-desk .cust.target {animation:none;border-color:#43955b;box-shadow:0 0 0 2px #43955b;}
+#stall.service-desk .cust,#stall.service-desk .cust .c-face {animation:none!important;transform:none!important;}
+#stall.service-desk .st-ticket {min-height:0;max-height:94px;margin:4px 6px;padding:6px 8px;background:#fff0c8;backdrop-filter:none;border:1px solid #dbab55;animation:none;overflow:hidden;}
+#stall.service-desk .tk-head {font-size:11px;}
+#stall.service-desk .tk-head em {font-size:9px;}
+#stall.service-desk .tk-chips {gap:3px;margin-top:3px;}
+#stall.service-desk .tk-chips span {font-size:10px;padding:1px 5px;line-height:1.2;}
+#stall.service-desk .tk-hint {font-size:11px;line-height:1.3;}
+.desk-tabs,.desk-prep-tabs {display:flex;gap:5px;padding:4px 6px;flex:none;}
+.desk-tabs button,.desk-prep-tabs button {flex:1;min-width:0;padding:7px 3px;border:1px solid #cbaa78;background:#fff7e6;border-radius:9px;font-size:10px;font-weight:700;white-space:nowrap;}
+.desk-tabs button b {display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#e7c78f;margin-right:3px;font-size:9px;}
+.desk-tabs button.on,.desk-prep-tabs button.on {background:#764a2e;color:#fff3d4;border-color:#764a2e;}
+#stall.service-desk .st-bench {display:grid;grid-template-columns:99px minmax(0,1fr);flex:1;min-height:0;padding:6px;gap:7px;background:repeating-linear-gradient(0deg,#ab773e10 0,#ab773e10 1px,transparent 1px,transparent 20px);border-top:1px solid #cdab78;overflow:hidden;}
+#stall.service-desk .b-left {gap:5px;overflow:hidden;}
+#stall.service-desk .prod {height:100px;min-height:0;aspect-ratio:auto;background:radial-gradient(#fffdf5,#e8cfa4);backdrop-filter:none;animation:none!important;transform:none!important;border-radius:16px;}
+#stall.service-desk .b-right {display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:6px;min-height:0;overflow:hidden;padding:0;}
+#stall.service-desk .sec {display:block;flex:0 0 auto;width:100%;background:#fffaf0;border:1px solid #d6ba8c;backdrop-filter:none;padding:5px;border-radius:12px;min-width:0;}
+#stall.service-desk .sec[hidden] {display:none!important;}
+#stall.service-desk .sec>h5 {writing-mode:horizontal-tb;transform:none;width:auto;margin:0 0 4px;font-size:10px;color:#795a3d;text-align:left;white-space:normal;}
+#stall.service-desk .tr {min-height:42px;padding:3px 2px;border-radius:8px;animation:none;background:#fff1d6;}
+#stall.service-desk .tr span {font-size:10px;line-height:1.1;}
+#stall.service-desk .tr i {font-size:18px;}
+#stall.service-desk .tr i:has(.sprite) {width:30px;height:23px;}
+#stall.service-desk .tr b {font-size:9px;}
+#stall.service-desk .ch {min-height:27px;font-size:10px;padding:4px 6px;}
+#stall.service-desk .sec.wide .grid {gap:4px;}
+#stall.service-desk .gauge {font-size:10px;line-height:1.3;min-height:12px;}
+.desk-side {display:grid;gap:5px;width:100%;}.desk-side button {width:100%;min-height:30px;padding:4px 2px;background:#fff2d2;border:1px solid #bf9a67;border-radius:8px;font-size:10px;}
+.desk-side button:disabled {opacity:.5;}
+#stall.service-desk .st-actions {grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.2fr);background:#fff2d8;border-top:2px solid #c79951;padding:5px 6px calc(5px + env(safe-area-inset-bottom));gap:5px;}
+#stall.service-desk .ac {min-height:46px;font-size:10px;background:#fffaf0;animation:none!important;}
+#stall.service-desk .ac.go {background:linear-gradient(#a1d89c,#58a66b);}
+#stall.service-desk>.st-amb {inset:43px 0 auto!important;height:56px!important;overflow:hidden;z-index:1!important;opacity:.45;}
+#stall.service-desk .st-glow,#stall.service-desk .st-shaft {display:none;}
+#stall.service-desk .st-prep {overflow:hidden;gap:7px;padding:6px 8px;}
+#stall.service-desk .st-prep>[hidden],#stall.service-desk .pp-item[hidden],#stall.service-desk .eq[hidden],.desk-prep-pager[hidden] {display:none!important;}
+#stall.service-desk .pp-start {padding:9px;gap:8px;}
+#stall.service-desk .pp-start .btn {padding:8px 10px;font-size:13px;min-height:43px;}
+#stall.service-desk .pp-start small {font-size:10px;line-height:1.3;}
+#stall.service-desk .pp-info {font-size:11px;gap:4px;}
+.desk-policy {padding:10px;background:#fff4d9;border:1px solid #cbaa78;border-radius:13px;display:grid;gap:6px;}
+.desk-policy label {font-size:12px;font-weight:800;}.desk-policy select {padding:8px;border:1px solid #b99863;border-radius:8px;background:#fffdf4;font:inherit;font-size:12px;}.desk-policy p {font-size:11px;margin:0;color:#75583e;}.desk-policy button {padding:7px;border:1px solid #cbaa78;border-radius:8px;font-size:11px;background:#fffdf4;}
+.desk-pager {display:flex;align-items:center;justify-content:space-between;gap:8px;}.desk-pager button {padding:8px 13px;border:1px solid #cbaa78;border-radius:9px;background:#fff5df;font-size:12px;}.desk-pager span {font-size:12px;}.desk-pager button:disabled {opacity:.4;}
+.desk-equip {display:flex;align-items:center;gap:9px;padding:10px 8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;margin:6px 0;}.desk-equip>span {font-size:25px;}.desk-equip>div {flex:1;min-width:0;text-align:left;}.desk-equip b {font-size:12px;display:block;}.desk-equip small {font-size:11px;display:block;line-height:1.35;}.desk-equip .btn {font-size:11px;min-width:45px;}
+@media(max-height:620px){#stall.service-desk:has(.st-bench) .st-banner {height:38px;}#stall.service-desk .st-amb {height:38px;}#stall.service-desk .st-ticket {padding:4px 6px;margin:2px 6px;max-height:84px;}#stall.service-desk .prod {height:86px;}#stall.service-desk .tr {min-height:36px;}#stall.service-desk .sec {padding:4px;}#stall.service-desk .desk-side button {min-height:25px;}}
+@media(max-width:340px){.desk-tabs button {font-size:9px;padding:6px 1px;}.desk-tabs button b {margin-right:1px;width:13px;}#stall.service-desk .st-bench {grid-template-columns:84px 1fr;}.desk-equip {padding:7px;}}
+#stall.service-desk:has(.st-bench) .st-banner {position:relative!important;inset:auto;flex:0 0 auto;height:56px;min-height:0;display:block;}
+@media(max-height:620px){#stall.service-desk:has(.st-bench) .st-banner {height:38px;}}
+@media(max-height:620px){#stall.service-desk .st-ticket {height:59px;max-height:59px;}#stall.service-desk .tk-chips {max-height:25px;overflow:hidden;}#stall.service-desk .cust {min-height:62px;}#stall.service-desk .desk-tabs button {padding-top:5px;padding-bottom:5px;}#stall.service-desk .prod {min-height:0;}#stall.service-desk .st-queue {padding-top:4px;}}
+@media(max-height:620px){#stall.service-desk:not(:has(.st-bench)) .st-banner {height:68px;}#stall.service-desk .desk-policy {padding:7px;gap:4px;}#stall.service-desk .st-prep {gap:5px;}#stall.service-desk .pp-info .btn {padding:6px 9px;}}
+#stall.service-desk .st-bench {position:relative;isolation:isolate;}
+#stall.service-desk .st-bench::before {content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(#fff8e8e8,#fff8e8a8),var(--desk-scene);background-size:cover;background-position:center 70%;}
+#stall.service-desk:has(.st-bench) .st-banner {background-position:center 62%;}
+#stall.service-desk .prod small {font-size:10px;line-height:1.15;}
+@media(min-height:750px){#stall.service-desk:has(.st-bench) .st-banner {height:76px;}}

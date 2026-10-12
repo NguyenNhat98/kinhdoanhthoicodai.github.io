@@ -34,4 +34,10 @@ thanh toán một lần mỗi đơn; lưu giữa ca có dữ liệu ca.
 - Chưa có phân vai nhân viên; vẫn dùng chế độ quản lý CPS cũ.
 - Chưa có thiết bị: kho mát, bàn thứ hai, bàn ghế, biển hiệu.
 - Mỳ cay: chọn trực tiếp mức cay cần bật "Hỗ trợ" hoặc nâng Muỗng ớt cấp 3; mặc định dùng kim cay.
-- Chưa thử UI cho: khay, sự kiện cao điểm, 360×640, hiệu ứng chủ đề lên bản đồ.
+- Chưa thử khay và hiệu ứng chủ đề trên điện thoại thật.
+
+## Mở rộng màn hình phục vụ
+
+Xem [kịch bản chi tiết](docs/KICH-BAN-MO-RONG-PHUC-VU.md) cho quy trình năm quầy, ba cách chơi và nâng cấp mới. Màn hình dùng thẻ công đoạn, kho/trang bị phân trang; không cần kéo bàn thao tác. Bộ ảnh có thêm 50 nhân vật tách riêng từ bốn bảng mới; đối chiếu qua [trang kiểm tra sprite](assets-review.html).
+
+Đã chạy kiểm tra trình duyệt ở 320×568, 360×640 và 390×844: làm và giao món thật năm quầy, bố cục cấp cao, ảnh/nút giữ nguyên khi nướng, nâng cấp, mời khách, chuỗi năm đơn hoàn hảo, lưu ca và trò dân gian. Chạy lại bằng `powershell -ExecutionPolicy Bypass -File scripts/check-browser.ps1 -Width 320 -Height 568`. Kiểm tra 239 ảnh bằng `scripts/check-assets.ps1`.

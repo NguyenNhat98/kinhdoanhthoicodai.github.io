@@ -15,6 +15,34 @@
   const sd = (id) => G.shopDef(id);
   const sum = (o) => Object.keys(o).reduce((a, k) => a + (o[k] || 0), 0);
   const MOOD = ['😐', '🙂', '🤩', '😠', '😐', '😤'];
+  // Keep interactive nodes, decoded images and SVGs alive between frames.
+  function syncHtml(host, html) {
+    const template = document.createElement('template'); template.innerHTML = html;
+    function patch(parent, source) {
+      const wanted = Array.from(source.childNodes);
+      wanted.forEach((next, i) => {
+        let old = parent.childNodes[i];
+        if (!old || old.nodeType !== next.nodeType || old.nodeName !== next.nodeName) {
+          const copy = next.cloneNode(true); if (old) parent.replaceChild(copy, old); else parent.appendChild(copy); return;
+        }
+        if (next.nodeType === 3) { if (old.nodeValue !== next.nodeValue) old.nodeValue = next.nodeValue; return; }
+        if (next.nodeType !== 1) return;
+        // Sprite/bowl decorators own their icon, not the recipe's emoji placeholder.
+        if (old.tagName === 'I' && old.querySelector('img,svg') && !next.querySelector('img,svg')) return;
+        Array.from(old.attributes).forEach(a => {
+          if (!next.hasAttribute(a.name) && !['data-desk-stage','hidden','data-bowl'].includes(a.name)) old.removeAttribute(a.name);
+        });
+        Array.from(next.attributes).forEach(a => {
+          let value = a.value;
+          if (a.name === 'class') value += ['pouring','arrive','happy','angry'].filter(c=>old.classList.contains(c) && !next.classList.contains(c)).map(c=>' '+c).join('');
+          if (old.getAttribute(a.name) !== value) old.setAttribute(a.name, value);
+        });
+        patch(old, next);
+      });
+      while (parent.childNodes.length > wanted.length) parent.lastChild.remove();
+    }
+    patch(host, template.content);
+  }
 
   const bannerOf = (id) => `assets/scenes/hd/${id}.jpg`;
 
@@ -74,18 +102,18 @@
       const face = st === 'done' ? (o.mood >= 2 ? '🤩' : o.mood === 1 ? '😊' : o.mood === -2 ? '😠' : '🙂') : st === 'left' ? '💨' : (low ? '😤' : frac < 0.5 ? '😐' : '🙂');
       const brief = o.spec.name || ({ trada: () => R.trada.chips(o.spec).slice(0, 2).join(' · '), banhmi: () => R.banhmi.chips(o.spec).slice(0, 2).join(' · '), xoi: () => R.xoi.chips(o.spec).slice(0, 2).join(' · '), mycay: () => R.mycay.chips(o.spec).slice(-1)[0] })[ws.shop]();
       h += `<button class="cust ${ws.sel === o.id ? 'sel' : ''} ${st !== 'wait' ? 'gone ' + st : ''} ${WUI.delivering && st === 'wait' ? 'target' : ''}" data-w="pick" data-id="${o.id}" ${st !== 'wait' ? 'disabled' : ''}>
-        <span class="c-face">${window.LivingMarket.customer(o.id)}<i>${face}</i></span><span class="c-name">${esc(o.who.name)}${o.vip ? ' <em>VIP</em>' : ''}${o.who.regular ? ' <em class="reg">❤</em>' : ''}</span>
+        <span class="c-face">${window.LivingMarket.customer(o.id, ws.shop)}<i>${face}</i></span><span class="c-name">${esc(o.who.name)}${o.vip ? ' <em>VIP</em>' : ''}${o.who.regular ? ' <em class="reg">❤</em>' : ''}</span>
         <small>${esc(brief || '')}</small><div class="pbar ${low ? 'low' : ''}"><i data-p="${o.id}" style="width:${ws.tutorial ? 100 : frac * 100}%"></i></div></button>`;
     });
     for (let i = cards.length; i < 3; i++) h += '<div class="cust empty"><span class="c-face">⋯</span><small>Chờ khách ghé</small></div>';
-    el.innerHTML = h;
+    syncHtml(el, h);
   }
   function renderTicket(ws) {
     const el = $('[data-w-ticket]'); if (!el) return;
     const o = ws.orders.find((x) => x.id === ws.sel && x.status === 'wait'), mod = R[ws.shop];
     const hint = mod.hint(ws, ws.product, o);
-    el.innerHTML = o ? `<div class="tk-head"><span>🎫 Đơn của <b>${esc(o.who.name)}</b></span>${ws.tutorial ? '<em>Ca hướng dẫn · không phạt</em>' : ''}</div><div class="tk-chips">${mod.chips(o.spec).map((c) => `<span>${esc(c)}</span>`).join('')}</div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`
-      : `<div class="tk-head"><span>🎫 Chưa chọn đơn</span></div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`;
+    syncHtml(el, o ? `<div class="tk-head"><span>🎫 Đơn của <b>${esc(o.who.name)}</b></span>${ws.tutorial ? '<em>Ca hướng dẫn · không phạt</em>' : ''}</div><div class="tk-chips">${mod.chips(o.spec).map((c) => `<span>${esc(c)}</span>`).join('')}</div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`
+      : `<div class="tk-head"><span>🎫 Chưa chọn đơn</span></div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`);
   }
 
   /* ---------------- hình sản phẩm (SVG) ---------------- */
@@ -263,7 +291,7 @@
   function renderBench(ws) {
     const el = $('[data-w-bench]'); if (!el) return;
     const keep = el.querySelector('.b-right') ? el.querySelector('.b-right').scrollTop : 0;
-    el.innerHTML = { trada: benchTrada, trasua: benchTrasua, banhmi: benchBanhmi, xoi: benchXoi, mycay: benchMycay }[ws.shop](ws);
+    syncHtml(el, { trada: benchTrada, trasua: benchTrasua, banhmi: benchBanhmi, xoi: benchXoi, mycay: benchMycay }[ws.shop](ws));
     const br = el.querySelector('.b-right'); if (br) br.scrollTop = keep;
     updateDisabled(ws);
   }
@@ -274,11 +302,11 @@
   function renderActions(ws) {
     const el = $('[data-w-actions]'); if (!el) return;
     const slots = G.shelfSlots(ws.shop);
-    el.innerHTML = `<button class="ac" data-w="discard"><i>🗑️</i>Bỏ món</button>
-      <button class="ac" data-w="shelve" ${slots ? '' : 'data-off="1"'}><i>🗄️</i>Cất khay ${slots ? `${ws.shelf.length}/${slots}` : '(chưa có)'}</button>
+    syncHtml(el, `<button class="ac" data-w="discard"><i>🗑️</i>Bỏ món</button>
+      <button class="ac" data-desk="shelf"><i>🗄️</i>Khay ${slots ? `${ws.shelf.length}/${slots}` : '(chưa có)'}</button>
       <button class="ac stock" data-w="restock"><i>🧺</i>Nhập hàng</button>
       <button class="ac go ${WUI.delivering ? 'on' : ''}" data-w="deliver"><i>📦</i>${WUI.delivering ? 'Chọn khách…' : 'Giao'}</button>
-      ${ws.shelf.map((p, i) => `<button class="ac shelf" data-w="shelfpick" data-i="${i}"><i>🥡</i>Món cất #${i + 1}</button>`).join('')}`;
+      `);
   }
   WUI.renderAll = function () {
     const ws = WS.state(); if (!ws || WUI.tab !== 'work' || !WUI.shop) return;
@@ -300,16 +328,16 @@
     const clk = $('[data-w-clock]'); if (clk) clk.textContent = ws.accepting ? `⏱ ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` : `🔔 Hoàn thành đơn: ${Math.max(0, Math.ceil(ws.graceLeft))}s`;
     const rs = $('[data-w-rush]'); if (rs) { const on = WS.rushOn(); rs.hidden = !(on || (ws.rush && ws.clock >= ws.rush.warn && ws.clock < ws.rush.start)); rs.textContent = on ? '🥁 Giờ đông khách ×1,5' : '🥁 Sắp đông khách…'; }
     // phiếu và hàng chờ chỉ dựng lại khi cấu trúc thay đổi
-    const sig = ws.orders.map((o) => o.id + o.status + (ws.sel === o.id ? 's' : '')).join(',') + '|' + (ws.product ? JSON.stringify(ws.product, (k, v) => (k === 'used' ? undefined : v)) : '-') + '|' + (ws.busy ? ws.busy.key : '') + '|' + ws.shelf.length + '|' + WUI.delivering + '|' + ws.dirty.s + ws.dirty.l + '|' + JSON.stringify(WUI.ui);
+    const sig = ws.orders.map((o) => o.id + o.status + (ws.sel === o.id ? 's' : '')).join(',') + '|' + (ws.product ? JSON.stringify(ws.product, (k, v) => (['used','bake','cook','gauge','teaVol','milkVol','vol'].includes(k) ? undefined : v)) : '-') + '|' + (ws.busy ? ws.busy.key : '') + '|' + ws.shelf.length + '|' + WUI.delivering + '|' + ws.dirty.s + ws.dirty.l + '|' + JSON.stringify(WUI.ui);
     const holdSig = ws.hold ? ws.hold.kind + ws.hold.id : '';
     if (sig !== lastSig && !ws.hold) { lastSig = sig; WUI.renderAll(); }
-    else if (ws.hold) { const pr = $('[data-w-prod]'); if (pr) pr.innerHTML = productHtml(ws); }
+    else if (ws.hold) { const pr = $('[data-w-prod]'); if (pr) syncHtml(pr, productHtml(ws)); }
     // thanh kiên nhẫn
     ws.orders.forEach((o) => { const b = $(`[data-p="${o.id}"]`); if (b && !ws.tutorial) { const f = Math.max(0, Math.min(1, o.p / o.max)); b.style.width = (f * 100) + '%'; b.parentElement.classList.toggle('low', f < 0.2); } });
     // đồng hồ lò / trụng / kim cay (không dựng lại cả bàn)
     const p = ws.product;
     if (p) {
-      const heat = $('[data-w-heat]'); if (heat && ws.shop === 'banhmi') { const z = R.banhmi.zone(ws); heat.style.width = Math.min(100, (p.bake / (z.dark + 2)) * 100) + '%'; heat.classList.toggle('gold', R.banhmi.state(ws, p) === 'gold'); const pr = $('[data-w-prod]'); if (pr && p.inOven) pr.innerHTML = productHtml(ws); }
+      const heat = $('[data-w-heat]'); if (heat && ws.shop === 'banhmi') { const z = R.banhmi.zone(ws); heat.style.width = Math.min(100, (p.bake / (z.dark + 2)) * 100) + '%'; heat.classList.toggle('gold', R.banhmi.state(ws, p) === 'gold'); const pr = $('[data-w-prod]'); if (pr && p.inOven) syncHtml(pr, productHtml(ws)); }
       const ck = $('[data-w-cook]'); if (ck && ws.shop === 'mycay') { const z = R.mycay.zone(ws); ck.style.width = (p.noodle === 'cooking' ? Math.min(100, (p.cook / (z[1] + 4)) * 100) : p.noodle === 'done' ? 100 : 0) + '%'; ck.classList.toggle('gold', p.noodle === 'cooking' && p.cook >= z[0] && p.cook <= z[1]); }
       const nd = $('[data-w-needle]'); if (nd && p.gauge) nd.style.left = (p.gauge.pos / 7) * 100 + '%';
       const g = $('[data-w-gauge]'); if (g) g.textContent = gaugeText(ws, p);
@@ -408,7 +436,7 @@
     G.on('order', () => { lastSig = ''; if (WUI.isOpen()) sfx('bell'); });
     G.on('burnt', () => { sfx('error'); G.buzz([80, 40, 80]); });
     G.on('washed', () => { lastSig = ''; sfx('coin'); });
-    G.on('steamDone', ({ type, n }) => { window.UI.toast(`Mẻ ${R.xoi.BASES[type]} đã chín: +${n} phần`, 'ok'); sfx('coin'); if (WUI.isOpen()) WUI.render(); });
+    G.on('steamDone', ({ type, n }) => { window.UI.toast(`Mẻ ${R.xoi.BASES[type]} đã chín: +${n} phần`, 'ok'); sfx('coin'); if (WUI.isOpen()) { if (WS.state() && WUI.tab === 'work') WUI.renderAll(); else WUI.render(); } });
     G.on('rushWarn', () => { window.UI.banner('🥁 Sắp đông khách! Chuẩn bị tay nghề.'); });
     G.on('rush', () => { window.UI.banner('🥁 GIỜ ĐÔNG KHÁCH! Giá ×1,5 trong 30 giây', 'rush'); sfx('gong'); G.buzz([60, 40, 60, 40, 120]); window.Audio2.setMode('rush'); });
     G.on('rushEnd', () => { window.Audio2.setMode('calm'); window.UI.banner('🌿 Hết giờ đông khách'); });

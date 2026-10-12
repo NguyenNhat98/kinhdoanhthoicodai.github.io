@@ -208,10 +208,10 @@
       if (!p || !p.size) return `Lấy ly ${s.size}.`;
       const miss = Object.keys(s.tops).find((k) => (p.tops[k] || 0) < s.tops[k]);
       if (miss) return `Múc ${TOPS[miss]}.`;
-      if (!p.tea) return `Chọn bình ${TEAS[s.tea]} rồi giữ vòi để rót.`;
-      if (s.milk && !p.milk) return `Thêm ${MILKS[s.milk]} (giữ vòi sữa).`;
       if (p.sugar == null) return `Chọn đường ${SUG[s.sugar]} rồi bấm Bơm.`;
       if (p.ice == null) return `Chọn đá ${s.ice}% rồi bấm Múc.`;
+      if (!p.tea) return `Chọn bình ${TEAS[s.tea]} rồi giữ vòi để rót.`;
+      if (s.milk && !p.milk) return `Thêm ${MILKS[s.milk]} (giữ vòi sữa).`;
       if (!p.stirred) return 'Chạm “Khuấy”.';
       if (!p.lid) return 'Đưa ly vào máy: chạm “Ép nắp”.';
       if (!p.straw) return 'Lấy ống hút.';

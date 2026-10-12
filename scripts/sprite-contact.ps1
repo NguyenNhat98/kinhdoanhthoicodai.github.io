@@ -1,7 +1,9 @@
+param([string]$Kind='',[string]$Name='contact')
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 $root=Join-Path $PSScriptRoot '..'
 $entries=Get-Content -Encoding utf8 (Join-Path $root 'assets/sprites/manifest.json') -Raw | ConvertFrom-Json
+if($Kind){$entries=@($entries | Where-Object {$_.kind -eq $Kind})}
 $cols=10;$cellW=140;$cellH=120;$rows=[Math]::Ceiling($entries.Count/$cols)
 $bitmap=[Drawing.Bitmap]::new($cols*$cellW,$rows*$cellH)
 $g=[Drawing.Graphics]::FromImage($bitmap);$g.Clear([Drawing.Color]::LightGray)
@@ -15,5 +17,5 @@ for($i=0;$i -lt $entries.Count;$i++){
  $g.DrawString("$i $($entries[$i].id)",$font,[Drawing.Brushes]::Black,[single]($x+2),[single]($y+94))
  $im.Dispose()
 }
-$bitmap.Save((Join-Path $root 'assets/sprites/contact.png'),[Drawing.Imaging.ImageFormat]::Png)
+$bitmap.Save((Join-Path $root ('assets/sprites/'+$Name+'.png')),[Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose();$font.Dispose();$bitmap.Dispose()

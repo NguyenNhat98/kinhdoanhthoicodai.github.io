@@ -111,3 +111,4 @@ $utf8 = [System.Text.UTF8Encoding]::new($false)
 [IO.File]::WriteAllText((Join-Path $out 'manifest.json'),($manifest | ConvertTo-Json -Depth 5),$utf8)
 [IO.File]::WriteAllText((Join-Path $out 'manifest.js'),('window.SPRITES = '+($manifest | ConvertTo-Json -Depth 5 -Compress)+';'),$utf8)
 Write-Output "Extracted $($manifest.Count) sprites. Inspect assets-review.html before adding new bounds."
+if(Test-Path (Join-Path $PSScriptRoot '../assets/source/01_banh_mi.png')){& (Join-Path $PSScriptRoot 'register-portraits.ps1')}

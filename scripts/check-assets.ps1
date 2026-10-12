@@ -31,6 +31,13 @@ try {
  foreach($asset in $entries) {
   if($seen.ContainsKey($asset.id)){throw "Duplicate ID $($asset.id)"};$seen[$asset.id]=$true
   $rect=$asset.rect
+  if($asset.kind -in @('portrait','queue')){
+   foreach($other in $entries){
+    if($other.id -eq $asset.id -or $other.sheet -ne $asset.sheet -or $other.kind -notin @('portrait','queue')){continue}
+    $r=$other.rect
+    if($rect[0] -lt ($r[0]+$r[2]) -and ($rect[0]+$rect[2]) -gt $r[0] -and $rect[1] -lt ($r[1]+$r[3]) -and ($rect[1]+$rect[3]) -gt $r[1]){throw "Overlapping character bounds: $($asset.id), $($other.id)"}
+   }
+  }
   [SpriteVerify]::Check((Join-Path $root $asset.url),(Join-Path $root ('assets/source/'+$asset.sheet)),$rect[0],$rect[1],$rect[2],$rect[3],$asset.padding)
  }
 } finally {[SpriteVerify]::Close()}
