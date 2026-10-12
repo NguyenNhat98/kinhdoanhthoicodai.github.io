@@ -94,5 +94,11 @@
   window.addEventListener('DOMContentLoaded', () => {
     const b = $('#splashBtn'); if (b) b.addEventListener('click', enterFs);
   });
-  document.addEventListener('pointerdown', function once() { if (!isFs() && window.matchMedia('(pointer:coarse)').matches) enterFs(); document.removeEventListener('pointerdown', once); }, { once: true });
+  /* mặc định toàn màn hình: vào lại ở lần chạm kế tiếp nếu trình duyệt thoát ra (cần thao tác người dùng) */
+  let desktopTried = false;
+  document.addEventListener('pointerdown', () => {
+    if (isFs()) return;
+    if (window.matchMedia('(pointer:coarse)').matches) enterFs();
+    else if (!desktopTried) { desktopTried = true; enterFs(); }
+  }, true);
 })();

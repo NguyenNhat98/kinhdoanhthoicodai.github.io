@@ -93,7 +93,7 @@
     if(!end)return false;
     [1,2,3,4,5].forEach(i=>{r.banks[0]+=a[i];a[i]=0;});[7,8,9,10,11].forEach(i=>{r.banks[1]+=a[i];a[i]=0;});
     renderQuan(r);
-    const won=r.banks[0]>r.banks[1];finish(r,won?25:r.banks[0]===r.banks[1]?12:4,`${won?'Bạn thắng!':r.banks[0]===r.banks[1]?'Hòa ván!':'Máy thắng ván này.'} ${r.banks[0]} – ${r.banks[1]}`);return true;
+    const won=r.banks[0]>r.banks[1];F.finish(r,won?25:r.banks[0]===r.banks[1]?12:4,`${won?'Bạn thắng!':r.banks[0]===r.banks[1]?'Hòa ván!':'Máy thắng ván này.'} ${r.banks[0]} – ${r.banks[1]}`);return true;
   }
   function quanMove(r,i,direction){
     if(r.done||!r.pits[i])return;
@@ -122,7 +122,7 @@
       b.setAttribute('aria-disabled','true');b.textContent='Quả còn đang bay…';
       r.timer=setTimeout(()=>{if(F.run!==r||r.done)return;b.setAttribute('aria-disabled','false');b.textContent='Ném còn';},550);
       window.Audio2.sfx(hit?'coin':'tap');$('#throwScore').textContent=`${hit?'Trúng vòng!':'Chệch rồi!'} · Đã ném ${r.shots}/5 · Trúng ${r.hits}`;
-      if(r.shots>=5)finish(r,r.hits*5,`Trúng ${r.hits}/5 lần ném.`);
+      if(r.shots>=5)F.finish(r,r.hits*5,`Trúng ${r.hits}/5 lần ném.`);
     } else if(action==='flip' && r.type==='memory'){
       const i=Number(b.dataset.index);if(r.locked||r.matched.includes(i)||r.chosen.includes(i))return;
       r.chosen.push(i);b.innerHTML=picture(r.deck[i]);b.classList.add('revealed');b.setAttribute('aria-label',r.deck[i]);
@@ -130,7 +130,7 @@
         if(r.deck[a]===r.deck[c]){r.matched.push(a,c);r.chosen=[];[a,c].forEach(i=>{$(`[data-index="${i}"]`).classList.add('matched');$(`[data-index="${i}"]`).disabled=true;});}
         else{r.locked=true;r.timer=setTimeout(()=>{if(F.run!==r||r.done)return;r.chosen.forEach(i=>{const el=$(`[data-faction="flip"][data-index="${i}"]`);if(el){el.innerHTML='<span>❀</span>';el.classList.remove('revealed');el.setAttribute('aria-label','Lật thẻ '+(i+1));}});r.chosen=[];r.locked=false;},800);}
         $('#memoryScore').textContent=`${r.matched.length/2}/6 cặp · ${r.tries}/18 lần`;
-        if(r.matched.length===12||r.tries>=18)finish(r,r.matched.length*2,`Tìm được ${r.matched.length/2}/6 cặp trong ${r.tries} lần thử.`);
+        if(r.matched.length===12||r.tries>=18)F.finish(r,r.matched.length*2,`Tìm được ${r.matched.length/2}/6 cặp trong ${r.tries} lần thử.`);
       }
     } else if(action==='direction'&&r.type==='oanquan'){
       r.direction=Number(b.dataset.direction);b.parentElement.querySelectorAll('button').forEach(el=>el.classList.toggle('on',el===b));

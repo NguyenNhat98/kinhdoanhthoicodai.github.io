@@ -82,6 +82,10 @@ window.CFG = {
     common: [
       { id: 'khay', name: 'Khay giữ món', k: 1.5, icon: '🗄️', tiers: ['1 ô giữ món hoàn thiện', '2 ô giữ món', '3 ô giữ món'] },
       { id: 'mai', name: 'Mái che, đèn', k: 1, icon: '🏮', tiers: ['+3 giây kiên nhẫn', '+6 giây kiên nhẫn', '+10 giây kiên nhẫn'] },
+      { id: 'bien', name: 'Biển hiệu', k: 1.3, icon: '🪧', tiers: ['Giá món +5%', 'Giá món +10%', 'Giá món +18%'] },
+      { id: 'tip', name: 'Hộp tiền thưởng', k: 1.1, icon: '🎁', tiers: ['Tiền thưởng +25%', 'Tiền thưởng +50%', 'Tiền thưởng +100%'] },
+      { id: 'kho', name: 'Kho lạnh', k: 1.4, icon: '❄️', tiers: ['Gói nhập hàng +10%', 'Gói nhập hàng +20%', 'Gói nhập hàng +35%'] },
+      { id: 'ship', name: 'Túi giao hàng', k: 1.2, icon: '🛍️', tiers: ['Đơn online +10% tiền', 'Đơn online +25% tiền, giao nhanh hơn', 'Đơn online +45% tiền, giao nhanh hơn nữa'] },
     ],
     trada: [
       { id: 'am', name: 'Ấm đồng', k: 1, icon: '🫖', tiers: ['Vạch lượng rõ hơn', 'Rót nhanh hơn 10%', 'Tự dừng khi đủ lượng (bật Hỗ trợ)'] },

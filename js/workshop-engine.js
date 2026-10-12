@@ -169,9 +169,9 @@
     if (g.reject) {
       ws.stats.cancelled++; ws.stats.rep -= (g.repLoss || 1); if (!ws.tutorial) S_.rep = Math.max(0, S_.rep - (g.repLoss || 1)); S_.stats.failed++; sh.streak = 0;
     } else {
-      let mult = G.baseOrderPrice(ws.shop) * (1 + (o.spec.surcharge || 0)) * G.shopMult(ws.shop) * G.repMult() * G.eventMult() * q * (o.vip ? 2 : 1);
+      let mult = G.baseOrderPrice(ws.shop) * (1 + (o.spec.surcharge || 0)) * G.shopMult(ws.shop) * G.repMult() * G.eventMult() * G.eqPrice(ws.shop) * q * (o.vip ? 2 : 1);
       const rapid = o.p / o.max >= 0.5 && !ws.tutorial ? 1.1 : 1; mult *= rapid;
-      if (g.perfect) { tip = mult * 0.5; mult *= 1.5; }
+      if (g.perfect) { const base = mult * 0.5; tip = base * G.eqTip(ws.shop); mult = mult * 1.5 + (tip - base); }
       if (ws.shop === 'trasua') { if (g.perfect) { sh.streak++; if (sh.streak >= 5) { mult *= 2; sh.streak = 0; streakBonus = true; S_.stats.streaks++; } } else sh.streak = 0; }
       pay = Math.round(mult); G.addCoins(pay);
       ws.stats.revenue += pay; ws.stats.tips += Math.round(tip); ws.stats.served++; ws.served++; sh.served++; S_.stats.served++;

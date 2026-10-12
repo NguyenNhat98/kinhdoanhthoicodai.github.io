@@ -16,7 +16,7 @@
     batvit: ['🦆', 'Bắt vịt', 'Vịt bơi ao, chạm để bắt · 20 giây', 'Xu + nguyên liệu'],
     keoco: ['🪢', 'Kéo co', 'Gõ thật nhanh đấu với máy', 'Xu + nguyên liệu']
   };
-  F.extra = { dapnieu: 1, batvit: 1, keoco: 1 };
+  F.extra = { dapnieu: 1, batvit: 1, keoco: 1 }; F.GUIDES = GUIDES; F.EXTRA = EXTRA; F.custom = {};
   const guideHtml = (t) => `<details class="game-guide" open><summary>📖 Cách chơi ${GUIDES[t][0]}</summary><ol>${GUIDES[t][1].map((x) => `<li>${x}</li>`).join('')}</ol></details>`;
 
   const mount = F.mount;
@@ -41,6 +41,7 @@
   F.startExtra = (t) => startExtra(t);
 
   function startExtra(type) {
+    if (F.custom[type]) { F.run = { type, done: false, start: performance.now() }; return F.custom[type](F.run, $('#festivalGame')); }
     const r = F.run = { type, done: false, start: performance.now() }, host = $('#festivalGame'); if (!host) { F.run = null; return; }
     let body = '';
     if (type === 'dapnieu') {

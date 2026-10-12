@@ -155,6 +155,9 @@
     const c = Game.eqCost(id, eq); if (Game.S.coins < c) return false;
     Game.S.coins -= c; Game.S.eq[id][eq] = lv + 1; Game.emit('equip', { id, eq, lv: lv + 1 }); Game.save(); return true;
   };
+  Game.eqPrice = (id) => [1, 1.05, 1.1, 1.18][Game.eqLv(id, 'bien')];
+  Game.eqTip = (id) => [1, 1.25, 1.5, 2][Game.eqLv(id, 'tip')];
+  Game.eqPack = (id) => [1, 1.1, 1.2, 1.35][Game.eqLv(id, 'kho')];
   Game.patienceBonus = (id) => [0, 3, 6, 10][Game.eqLv(id, 'mai')];
   Game.shelfSlots = (id) => Game.eqLv(id, 'khay');
 
@@ -171,7 +174,7 @@
     const d = Game.itemDef(shop, item), sd = Game.shopDef(shop);
     return Math.max(1, Math.ceil(sd.itemCost * (d.reuse ? 1.2 : d.w) * Game.packSize(shop, item) * (item.indexOf('nep_') === 0 ? 1 : 1)));
   };
-  Game.packSize = (shop, item) => { const d = Game.itemDef(shop, item); return d.batch ? 1 : d.reuse ? 4 : Game.shopDef(shop).pack; };
+  Game.packSize = (shop, item) => { const d = Game.itemDef(shop, item); return d.batch ? 1 : d.reuse ? 4 : Math.round(Game.shopDef(shop).pack * Game.eqPack(shop)); };
   Game.buyPack = function (shop, item) {
     const d = Game.itemDef(shop, item), c = Game.packCost(shop, item);
     if (Game.S.coins < c) return false;
