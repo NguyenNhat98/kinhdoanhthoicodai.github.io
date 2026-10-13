@@ -1,0 +1,55 @@
+/* ===== Tab Phát triển: trang bị, trang trí, nhân viên, dịch vụ ===== */
+#nav { grid-template-columns: repeat(7, minmax(0, 1fr)); padding-left: 2px; padding-right: 2px; }
+#nav button { font-size: 9.5px; padding: 5px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+.dv-page { gap: 8px; padding-bottom: 20px; }
+.dv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 16px; color: #fff1cf; background: linear-gradient(125deg, #5a2f1f, #a95c30 70%, #d9a24e); box-shadow: 0 4px 14px rgba(100, 50, 10, .3); position: relative; overflow: hidden; }
+.dv-head::after { content: '🏗️'; position: absolute; right: -6px; bottom: -14px; font-size: 64px; opacity: .15; }
+.dv-head h2 { margin: 0; font-size: 20px; color: #fff1cf; } .dv-head small { font-size: 11px; opacity: .85; }
+.dv-money { text-align: right; font-size: 15px; z-index: 1; } .dv-money b { font-size: 17px; } .dv-money span { display: block; font-size: 12px; opacity: .9; }
+.dv-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.dv-tabs button { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px; border-radius: 12px; font-size: 11px; font-weight: 700; background: var(--card); border: 1.5px solid var(--line); color: var(--muted); transition: transform .12s, background .2s; }
+.dv-tabs button i { font-style: normal; font-size: 19px; } .dv-tabs button.on { background: linear-gradient(#e9a14a, #c4702a); color: #fff; border-color: #8a4a14; box-shadow: 0 3px 0 rgba(90, 40, 8, .35); transform: translateY(-1px); }
+.dv-chips { display: flex; gap: 5px; overflow-x: auto; padding: 2px 1px 4px; scrollbar-width: none; } .dv-chips::-webkit-scrollbar { display: none; }
+.dv-chip { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 99px; background: var(--card); border: 1.5px solid var(--line); font-size: 12px; font-weight: 700; color: var(--text); }
+.dv-chip i { font-style: normal; font-size: 15px; } .dv-chip.on { background: linear-gradient(#ff8fb0, #e0507a); border-color: #b02a52; color: #fff; } .dv-chip:disabled { opacity: .4; }
+.dv-hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; } .dv-hint b { color: var(--title); }
+.dv-h { margin: 4px 0 0; font-size: 16px; color: var(--title); }
+.dv-sum { display: flex; flex-wrap: wrap; gap: 5px; padding: 7px 9px; border-radius: 12px; background: linear-gradient(#fff6dc, #ffe9b8); border: 1px solid #e1b25b; font-size: 11.5px; font-weight: 700; color: #6a3a14; }
+.dv-sum span { padding: 1px 7px; border-radius: 99px; background: rgba(255, 255, 255, .7); }
+.dv-list { display: flex; flex-direction: column; gap: 8px; }
+.dv-card { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 10px; border-radius: 16px; background: var(--card); border: 1.5px solid var(--line); box-shadow: 0 3px 8px rgba(100, 60, 20, .1); animation: prepIn .4s ease-out both; }
+.dv-card.max { border-color: #e1b25b; background: linear-gradient(120deg, var(--card), color-mix(in srgb, var(--gold) 16%, var(--card))); }
+.dv-ic { width: 48px; height: 48px; display: grid; place-items: center; font-size: 28px; border-radius: 14px; background: linear-gradient(#ffeccc, #ffd9a0); border: 1px solid #e8b878; } .dv-ic.big { font-size: 30px; }
+.dv-bd { min-width: 0; text-align: left; } .dv-bd h4 { margin: 0 0 2px; font-size: 13.5px; line-height: 1.2; color: var(--text); display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.dv-bd h4 em { font-style: normal; font-size: 10px; font-weight: 800; padding: 1px 7px; border-radius: 99px; background: #dbeafe; color: #1d4ed8; } .dv-bd h4 em.gold { background: linear-gradient(#ffe27a, #ffb300); color: #5a3a00; }
+.dv-now { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.3; } .dv-next { margin: 2px 0 0; font-size: 11px; color: #a05a1a; line-height: 1.3; font-weight: 600; }
+.dv-bar { display: flex; gap: 3px; margin-top: 5px; } .dv-bar i { flex: 1; height: 5px; border-radius: 99px; background: rgba(120, 90, 50, .22); } .dv-bar i.on { background: linear-gradient(90deg, #6fc46a, #3a9a4a); }
+.dv-act { display: flex; flex-direction: column; align-items: center; min-width: 78px; } .dv-act .btn { display: flex; flex-direction: column; align-items: center; line-height: 1.15; padding: 6px 10px; min-width: 78px; } .dv-act .btn small { font-size: 10.5px; font-weight: 700; display: flex; align-items: center; gap: 3px; }
+.dv-done { font-size: 11px; font-weight: 800; color: #3a8a4a; text-align: center; }
+.dv-sec { margin: 8px 0 0; font-size: 13.5px; color: var(--title); font-family: 'Noto Serif', serif; } .dv-empty { margin: 0; padding: 12px; border: 1.5px dashed var(--line); border-radius: 12px; font-size: 12px; color: var(--muted); text-align: center; }
+/* nhân viên */
+.dv-staff { padding: 9px 10px 6px; border-radius: 16px; background: var(--card); border: 1.5px solid var(--line); box-shadow: 0 3px 8px rgba(100, 60, 20, .1); margin-top: 8px; animation: prepIn .4s ease-out both; }
+.dv-staff.on { border-color: #5ac86a; background: linear-gradient(120deg, color-mix(in srgb, #bff0c4 40%, var(--card)), var(--card)); box-shadow: 0 0 0 1px #5ac86a55, 0 3px 10px rgba(60, 160, 80, .18); }
+.sf-top { display: flex; align-items: center; gap: 9px; } .sf-top img { width: 52px; height: 62px; object-fit: contain; flex: none; background: radial-gradient(#fff6dc, #f3dbb0 70%); border-radius: 12px; border: 1px solid #e8b878; }
+.sf-name { flex: 1; min-width: 0; text-align: left; line-height: 1.2; } .sf-name b { font-size: 14.5px; color: var(--text); } .sf-name small { font-size: 11px; color: var(--muted); margin-left: 4px; }
+.sf-st { display: flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-top: 2px; } .sf-st i { width: 9px; height: 9px; border-radius: 50%; background: #ccc; border: 1px solid #aaa; } .sf-st i.ok { background: #3ec45a; border-color: #2a9a42; box-shadow: 0 0 6px #3ec45a; }
+.sf-pay { font-size: 12px; font-weight: 800; color: #2a8a42; }
+.sf-btn { flex: none; max-width: 112px; text-align: center; } .sf-btn .btn { display: flex; flex-direction: column; align-items: center; line-height: 1.15; padding: 7px 12px; } .sf-btn .btn small { font-size: 10.5px; font-weight: 700; display: flex; align-items: center; gap: 3px; }
+.dv-block { display: block; padding: 6px 8px; border-radius: 10px; background: rgba(120, 100, 80, .12); color: var(--muted); font-size: 11px; font-weight: 700; line-height: 1.2; }
+.sf-more { display: block; width: 100%; text-align: left; padding: 5px 0 2px; margin-top: 4px; font-size: 11.5px; font-weight: 700; color: #2a6ad8; border-top: 1px dashed var(--line); }
+.sf-detail { padding: 7px 9px; margin: 3px 0 4px; border-radius: 10px; background: rgba(255, 244, 214, .7); font-size: 12px; line-height: 1.4; text-align: left; animation: prepIn .25s ease-out; } .sf-detail p { margin: 0 0 4px; } .sf-detail ul { margin: 0 0 4px; padding-left: 4px; list-style: none; font-weight: 700; color: #3a7a30; } .sf-detail small { color: var(--muted); }
+/* hiển thị trên ảnh quầy */
+.dv-deco { position: absolute; left: 6px; right: 6px; bottom: 4px; z-index: 3; display: flex; align-items: flex-end; justify-content: space-between; pointer-events: none; }
+.dd-items b { display: inline-block; font-weight: 400; font-size: 17px; margin-right: 1px; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .6)); animation: ddBob 2.6s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -.35s); } @keyframes ddBob { to { transform: translateY(-3px) rotate(4deg); } }
+.dd-staff { display: flex; gap: 1px; } .dd-staff img { width: 24px; height: 30px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+#stall.service-desk .dv-deco { bottom: 2px; } @media (max-height: 660px) { #stall .dd-staff img { width: 18px; height: 22px; } }
+body.reduce-motion .dd-items b, body.reduce-motion .dv-card, body.reduce-motion .dv-staff { animation: none; }
+
+/* ===== biểu tượng SVG trò chơi ===== */
+.gi { display: block; filter: drop-shadow(0 2px 2px rgba(60, 30, 10, .3)); }
+.festival-cards button[data-cat] > i.gi-wrap { display: grid; place-items: center; font-size: 0; }
+.gi-h { display: flex !important; align-items: center; justify-content: center; gap: 6px; } .gi-h .gi { width: 26px; height: 26px; flex: none; }
+.cd-icon .gi { margin: 0 auto; width: 72px; height: 72px; }
+.game-guide summary .gi { display: inline-block; vertical-align: -4px; width: 18px; height: 18px; margin: 0 3px; }
+.dv-head small { color: #ffe9c0 !important; opacity: 1; }

@@ -99,7 +99,7 @@
     mount(host);
     const stage = $('#mapStage');
     stage.insertAdjacentHTML('beforeend', `<div class="market-atmosphere" aria-hidden="true">${[150,455,735,975,1205].map((x,i) => `<span class="stall-steam" style="left:${x}px;top:${210 + i % 2 * 12}px"></span>`).join('')}${Array.from({length:18},(_,i)=>`<i class="weather-particle" style="left:${i * 5.7}%;--delay:-${i * .7}s;--speed:${3 + i % 4}s"></i>`).join('')}</div>`);
-    $('#map').insertAdjacentHTML('beforeend', `<div class="market-heading"><small>PHỐ CHỢ • LÀNG CỔ</small><b>Một ngày ở chợ</b><span data-market-day></span></div><div class="market-dock"><button data-live="stalls">🏪 Các quầy</button><button data-live="festival">🪁 Hội làng</button><button data-live="stock-market">🧺 Nhập hàng</button></div>`);
+    $('#map').insertAdjacentHTML('beforeend', `<div class="market-heading"><small>PHỐ CHỢ • LÀNG CỔ</small><b>Một ngày ở chợ</b><span data-market-day></span></div><div class="market-dock"><button data-live="stalls">🏪 Các quầy</button><button data-live="festival">🪁 Hội làng</button><button data-dev-open="decor">🏗️ Phát triển</button><button data-live="stock-market">🧺 Nhập hàng</button></div>`);
     L.applySettings();
     window.MM.refresh();
   };

@@ -377,6 +377,7 @@
       list.forEach((id, i) => {
         const el = by[id], s = starsOf(b[id] || 0); totalStars += s; if (b[id]) played++;
         el.dataset.cat = ic; el.style.setProperty('--i', i);
+        const ico = el.querySelector(':scope > i'); if (ico && window.gameIcon && window.gameIcon(id)) { ico.innerHTML = window.gameIcon(id, 66); ico.classList.add('gi-wrap'); }
         if (NEW[id]) el.insertAdjacentHTML('beforeend', '<span class="fg-new">MỚI</span>');
         const meta = el.querySelector('div > span'); if (meta) meta.insertAdjacentHTML('beforeend', ` <u class="fg-stars">${'★'.repeat(s)}${'☆'.repeat(3 - s)}</u>${b[id] ? ` · 🏆 ${b[id]}` : ''}`);
         box.appendChild(el);

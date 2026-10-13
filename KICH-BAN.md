@@ -53,3 +53,26 @@ Thưởng vẫn theo điểm 0–30 qua `Festival.finish`, giới hạn 5 lượ
 | 3b | Hướng dẫn lần đầu chi tiết hơn | `js/guide.js`: hướng dẫn cơ bản 18 bước, từng quầy 7 bước, Hội làng 5 bước, Cài đặt 8 bước; `js/coach.js`: **tham quan giao diện có đèn chiếu** (7 bước) + nút bước kế tiếp tự nhấp nháy trong ca hướng dẫn; xem lại ở Cài đặt → Tham quan lại |
 
 Lưu ý kỹ thuật: ảnh nền gốc có ô caro "trong suốt giả" in sẵn vào pixel; đã tự lấp bằng thuật toán khuếch tán rồi phóng 2×. Trò mới nằm trong `F.GROUPS` nên tự lên sảnh theo nhóm.
+
+---
+
+# Kịch bản nâng cấp kinh tế (đợt 4): tiêu tiền đa dạng · nhân viên · icon trò chơi
+
+## 1. Tab "Phát triển" (mới, trên thanh điều hướng + nút ở bản đồ chợ + tab ở màn chuẩn bị)
+Logic nằm ở `js/dev.js`, giao diện `css/dev.css`. Mọi khoản chi đều có **tác dụng thật** qua bộ cộng dồn `Dev.fx(shop)`:
+giá món, tiền thưởng, kiên nhẫn khách, lượng khách, tốc độ thao tác, uy tín/ca, tự nhập hàng.
+
+| Mục | Nội dung |
+|---|---|
+| Trang bị | Danh sách thẻ theo quầy: icon, bậc C0–C3, mô tả bậc hiện tại/kế tiếp, thanh 3 đoạn, nút "Lên Cx · giá". Thêm 5 hạng mục mới: Bàn ghế khách ngồi, Biển LED, Mascot, Quảng cáo MXH, Bộ nhận diện thương hiệu |
+| Trang trí | 6 món cho mỗi quầy + 9 món cho Chợ làng (6 mua bằng xu, 3 cao cấp bằng nguyên bảo). Hiện trực tiếp trên ảnh quầy |
+| Nhân viên | 9 vị trí có tên/chân dung, trạng thái Đang làm/Chưa tuyển, lương/ngày, "Xem chi tiết", Thuê / Cho nghỉ / Thuê lại, điều kiện mở (cấp quầy, ngày, trang bị, xung đột Quản lý tập sự ↔ Quản gia) |
+| Dịch vụ | Tờ rơi, gánh hát, mời trà, đại tiệc (tính theo ca) + Quyên góp xây đình (uy tín vĩnh viễn, giá tăng dần) |
+
+Nhân viên: lương trừ sau mỗi ca (1 ca = 1 ngày); thiếu tiền thì nghỉ việc và có thể thuê lại. *Nhân viên đi chợ* tự mua gói nguyên liệu khi hết giữa ca (phí chạy +15%).
+
+## 2. Icon trò chơi
+`js/game-icons.js`: 20 SVG riêng cho từng trò (niêu đất, vịt, dây kéo cờ, bao bố, dây nhảy, lồng đèn, còn, thẻ bài, bàn ô ăn quan, diều, rồng rắn, đầu lân, chuyền, tò he, dê bịt mắt, bi, cà kheo, nồi cơm, thuyền rồng, bánh chưng). Dùng ở thẻ sảnh, tiêu đề ván, màn đếm ngược, mục hướng dẫn.
+
+## 3. Lỗi tìm thấy khi làm
+`Game.fmt` rút gọn sai số tròn trăm (100 K hiện "1 K", 140 K hiện "14 K"); đã sửa trong `js/core.js`.

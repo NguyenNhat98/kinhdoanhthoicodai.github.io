@@ -25,7 +25,7 @@
     const a = Math.abs(n);
     if (a < 1000) return a < 10 && Math.abs(n % 1) > 0.049 ? n.toFixed(1).replace('.', ',') : String(Math.round(n));
     const U = [[1e15, 'Triệu Tỷ'], [1e12, 'Nghìn Tỷ'], [1e9, 'Tỷ'], [1e6, 'Tr'], [1e3, 'K']];
-    for (const [v, s] of U) if (a >= v) { const x = n / v; return (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2)).replace(/\.?0+$/, '').replace('.', ',') + ' ' + s; }
+    for (const [v, s] of U) if (a >= v) { const x = n / v; return (x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2)).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '').replace('.', ',') + ' ' + s; }
     return String(Math.floor(n));
   };
 
