@@ -41,8 +41,8 @@
 /* ===== Không khí quầy (hạt bay + ánh đèn) ===== */
 .st-amb, #stall > .st-amb { position: absolute !important; inset: 0 !important; z-index: 0 !important; height: auto !important; pointer-events: none; overflow: hidden; }
 .st-amb span { position: absolute; left: var(--x); bottom: -30px; font-size: var(--s); opacity: 0; animation: ambRise var(--d) linear var(--dl) infinite; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .25)); }
-#stall[data-shop="trada"] .st-amb span { top: -30px; bottom: auto; animation-name: ambFall; }
-#stall[data-shop="mycay"] .st-amb span { animation-name: ambEmber; }
+#stall[data-amb-mode="fall"] .st-amb span { top: -30px; bottom: auto; animation-name: ambFall; }
+#stall[data-amb-mode="ember"] .st-amb span { animation-name: ambEmber; }
 @keyframes ambRise { 0% { transform: translate(0, 0) scale(.6); opacity: 0; } 15% { opacity: .75; } 100% { transform: translate(var(--w), -85vh) scale(1.15); opacity: 0; } }
 @keyframes ambFall { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 15% { opacity: .8; } 100% { transform: translate(var(--w), 90vh) rotate(300deg); opacity: 0; } }
 @keyframes ambEmber { 0% { transform: translate(0, 0) scale(.7); opacity: 0; } 12% { opacity: .9; } 50% { transform: translate(var(--w), -40vh) scale(1); } 100% { transform: translate(calc(var(--w) * -1), -90vh) scale(.4); opacity: 0; } }

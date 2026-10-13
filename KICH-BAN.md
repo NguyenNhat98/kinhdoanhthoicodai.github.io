@@ -39,3 +39,17 @@ Thưởng vẫn theo điểm 0–30 qua `Festival.finish`, giới hạn 5 lượ
 
 ## 4. Tệp
 `js/stall-fx.js`, `css/stall-fx.css` (khai trương, không khí quầy, nền nét) · `js/festival-games.js`, `css/festival-games.css` (trò mới + hiệu ứng Hội làng) · `assets/scenes/hd/`.
+
+---
+
+# Kịch bản sửa lỗi theo phản hồi (đợt 3)
+
+| # | Lỗi người chơi gặp | Cách sửa |
+|---|---|---|
+| 1a | Màn **Mở cửa đón khách** hằng ngày: nền xấu, ít hiệu ứng | `css/stall-v3.css`: hero ảnh quầy nét (đã xóa ô caro nền trong suốt khỏi 5 ảnh `assets/scenes/hd`), vệt sáng quét, biển **ĐÓNG CỬA** đung đưa, nút mở cửa nhấp nháy, thẻ **"Hôm nay"** (ngày, ánh sáng, danh hiệu, mẹo quầy), hạt không khí theo quầy, nền toàn màn mờ cùng tông màu quầy |
+| 1b | Phải chọn từng thẻ 1-Trụng mì / 2-Nước & nhân / 3-Nêm & giao | `js/service-desk.js`: bỏ thẻ công đoạn, **mọi công đoạn hiện cùng lúc**, tự dàn nút theo chiều cao màn (quầy ít nút thì nút to), lấp đầy toàn màn hình; đã kiểm tra không cuộn ở 320×568, 360×640, 390×844 |
+| 2 | **Hội làng**: thiết kế lại cách chơi, bố cục, hiệu ứng, thêm trò | `js/festival-arcade.js` + `css/festival-arcade.css`: sảnh ô lớn 2 cột, mỗi ván chạy **toàn màn hình** có nền riêng, bảng kết quả trượt lên; thêm 6 trò (Bịt mắt bắt dê, Bắn bi, Đi cà kheo, Thổi cơm thi, Đua thuyền rồng, Gói bánh chưng) → **20 trò** |
+| 3a | Cài đặt: thêm hiệu ứng nền và âm thanh | `js/audio-plus.js`, `js/settings-plus.js`: âm nền hiện trường theo nơi (+dế đêm, mưa), 5 phong cách nhạc, 4 bộ âm nút, chuông cửa, 6 loại hạt nền + mật độ, công tắc ánh đèn / nền chuyển động / pháo giấy, có nút nghe thử và xem thử |
+| 3b | Hướng dẫn lần đầu chi tiết hơn | `js/guide.js`: hướng dẫn cơ bản 18 bước, từng quầy 7 bước, Hội làng 5 bước, Cài đặt 8 bước; `js/coach.js`: **tham quan giao diện có đèn chiếu** (7 bước) + nút bước kế tiếp tự nhấp nháy trong ca hướng dẫn; xem lại ở Cài đặt → Tham quan lại |
+
+Lưu ý kỹ thuật: ảnh nền gốc có ô caro "trong suốt giả" in sẵn vào pixel; đã tự lấp bằng thuật toán khuếch tán rồi phóng 2×. Trò mới nằm trong `F.GROUPS` nên tự lên sảnh theo nhóm.

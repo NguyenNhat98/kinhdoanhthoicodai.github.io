@@ -28,6 +28,7 @@
   };
   const track = (host, ev, fn, opt) => { host.addEventListener(ev, fn, opt); };
   const mult = (r) => 1 + Math.min(2, Math.floor((r.combo || 0) / 5));
+  F.H = { hud, setScore, comboTxt, shell, loop, track, mult, clamp, rnd };
 
   /* ======================================================================
      1. THẢ DIỀU — giữ để diều bay lên, thả để diều hạ; bám theo luồng gió, ăn sao, né chim
@@ -90,7 +91,7 @@
   F.custom.rongran = (r, host) => {
     Object.assign(r, { score: 0, combo: 0, best: 0, collected: 0, lost: 0 });
     shell(host, 'rongran', `<h3>🐉 Rồng rắn lên mây</h3>${hud(30, '<span id="xKids">🧒 ×1</span>')}<canvas class="dragon-cv" id="dcv"></canvas><p class="muted" style="margin:4px 0 0">Kéo ngón tay để dẫn đầu rồng</p>`);
-    const cv = $('#dcv'), W = Math.min(cv.parentElement.clientWidth - 24, 480) || 320, H = 330, dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cv = $('#dcv'), fgm = cv.closest('.folk-game'), W = Math.min((fgm ? fgm.clientWidth : 360) - 24, 520) || 320, H = fgm && fgm.closest('.fg-stage') ? Math.max(300, fgm.clientHeight - cv.offsetTop - 64) : 330, dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.style.width = W + 'px'; cv.style.height = H + 'px'; cv.width = W * dpr; cv.height = H * dpr; const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const KIDS = ['🧒', '👧', '👦', '🧑', '👶', '🧒'], GAP = 21;
     const segs = [{ x: W * .25, y: H * .5 }]; for (let i = 0; i < 3; i++) segs.push({ x: segs[0].x - (i + 1) * GAP, y: segs[0].y });
@@ -255,7 +256,7 @@
     const keys = Object.keys(SHAPES).sort(() => Math.random() - .5).slice(0, 3);
     Object.assign(r, { score: 0, combo: 0, best: 0, idx: 0, shape: 0, keys, done3: 0, off: 0, frames: 0, drawing: false, stroke: [], shapeScore: 0 });
     shell(host, 'tohe', `<h3>🎨 Nặn tò he</h3>${hud(40, '<span id="thName"></span>')}<div class="tohe-wrap"><canvas class="tohe-cv" id="tcv"></canvas><div class="tohe-done" id="thd"></div></div><p class="muted" style="margin:4px 0 0">Rê ngón tay theo nét chấm, bắt đầu từ chấm xanh</p>`);
-    const cv = $('#tcv'), S = Math.min(cv.parentElement.clientWidth, 340) || 300, dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cv = $('#tcv'), fgt = cv.closest('.folk-game'), availH = fgt && fgt.closest('.fg-stage') ? fgt.clientHeight - cv.offsetTop - 60 : 340, S = Math.floor(Math.min(cv.parentElement.clientWidth, availH, 460)) || 300, dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.style.width = S + 'px'; cv.style.height = S + 'px'; cv.width = S * dpr; cv.height = S * dpr; const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     let pts = [], tol = 24;
     const build = () => {
@@ -297,7 +298,7 @@
   /* ======================================================================
      ĐẾM NGƯỢC 3-2-1 CHO CÁC TRÒ CÓ ĐỒNG HỒ
      ====================================================================== */
-  const TIMED = { dapnieu: 1, batvit: 1, keoco: 1, denlong: 1, baobo: 1, nhaydday: 1, thadieu: 1, rongran: 1, mualan: 1, chuyen: 1, tohe: 1 };
+  const TIMED = F.TIMED = { dapnieu: 1, batvit: 1, keoco: 1, denlong: 1, baobo: 1, nhaydday: 1, thadieu: 1, rongran: 1, mualan: 1, chuyen: 1, tohe: 1 };
   const prevStart = F.start;
   F.start = function (type) {
     if (F.run && !F.run.done) return;
@@ -362,7 +363,7 @@
     ['🌤️', 'Phiêu lưu bầu trời', ['thadieu', 'rongran']],
     ['🧠', 'Trí tuệ dân gian', ['oanquan', 'memory']]
   ];
-  const NEW = { thadieu: 1, rongran: 1, mualan: 1, chuyen: 1, tohe: 1 };
+  F.GROUPS = GROUPS; const NEW = F.NEW = { thadieu: 1, rongran: 1, mualan: 1, chuyen: 1, tohe: 1 };
   const mount = F.mount;
   F.mount = function (host) {
     mount.apply(this, arguments);

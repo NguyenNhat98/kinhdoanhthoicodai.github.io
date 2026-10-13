@@ -72,6 +72,7 @@
     el.classList.add('gone'); setTimeout(() => el.remove(), 350);
     const ws = WS.state(); if (ws) WS.setPause('intro', false);
     arriveAll();
+    if (window.Coach && !skipped) window.Coach.maybeTour(); else if (window.Coach) window.Coach.maybeTour();
     void skipped;
   }
   function intro(id) {
@@ -123,7 +124,7 @@
         else if (st === 'left') c.classList.add('angry');
       }
     });
-    if (newCount && !introEl) sfx('bell');
+    if (newCount && !introEl && !(G.S && G.S.settings.shopBell === false)) sfx('bell');
   }
   function heart(face) {
     if (reduce()) return; const b = face.getBoundingClientRect(), host = document.body;
@@ -138,19 +139,46 @@
   }).observe(document.body, { childList: true, subtree: true });
 
   /* ======================== KHÔNG KHÍ QUẦY ======================== */
+  const BGFX = {
+    petal:   { amb: ['🌸', '🌸', '🌺', '✨'], mode: 'fall' }, leaf: { amb: ['🍃', '🍂', '🌿', '🍃'], mode: 'fall' },
+    firefly: { amb: ['✨', '💛', '✨', '🌟'], mode: 'ember' }, snow: { amb: ['❄️', '✨', '❄️', '🌨️'], mode: 'fall' },
+    lantern: { amb: ['🏮', '✨', '🏮', '🎐'], mode: 'rise' }, rain: { amb: ['💧', '💧', '🌧️', '💧'], mode: 'fall' }
+  };
   function ambient() {
     const st = $('#stall'); if (!st || !st.dataset.shop || reduce()) return;
     const q = quality(); if (q === 0) return;
-    const T = TH(st.dataset.shop), n = q === 1 ? 7 : 13;
+    const cfg = (G.S && G.S.settings) || {}, kind = BGFX[cfg.bgfx], T = TH(st.dataset.shop);
+    const dens = [0.5, 1, 1.7][(cfg.fxDensity || 2) - 1] || 1, n = Math.max(3, Math.round((q === 1 ? 7 : 13) * dens));
+    const set = kind ? kind.amb : T.amb;
+    st.dataset.ambMode = kind ? kind.mode : (st.dataset.shop === 'trada' ? 'fall' : st.dataset.shop === 'mycay' ? 'ember' : 'rise');
     let h = '<div class="st-amb" aria-hidden="true"><i class="st-glow a"></i><i class="st-glow b"></i><i class="st-shaft"></i>';
-    for (let i = 0; i < n; i++) h += `<span style="--x:${rnd(2, 96).toFixed(1)}%;--s:${rnd(14, 28).toFixed(0)}px;--d:${rnd(5, 10).toFixed(1)}s;--dl:${(-rnd(0, 10)).toFixed(1)}s;--w:${rnd(-30, 30).toFixed(0)}px">${T.amb[i % T.amb.length]}</span>`;
+    for (let i = 0; i < n; i++) h += `<span style="--x:${rnd(2, 96).toFixed(1)}%;--s:${rnd(14, 28).toFixed(0)}px;--d:${rnd(5, 10).toFixed(1)}s;--dl:${(-rnd(0, 10)).toFixed(1)}s;--w:${rnd(-30, 30).toFixed(0)}px">${set[i % set.length]}</span>`;
     st.insertAdjacentHTML('beforeend', h + '</div>');
   }
 
-  /* ======================== MÓC VÀO RENDER / BẮT ĐẦU CA ======================== */
+  /* thẻ "Hôm nay" ở màn chuẩn bị: ngày, ánh sáng, danh hiệu, mục tiêu chương, mẹo quầy */
+  const TIPS = {
+    trada: ['Rửa bát sớm để không thiếu bát khi đông khách.', 'Giữ vòi đến sát vạch rồi nhả: rót tràn sẽ mất điểm.', 'Thêm mật đúng theo phiếu, đừng thêm dư.'],
+    trasua: ['Chọn đường và đá trước khi rót để dung tích mục tiêu tính đúng.', 'Giữ vòi trà đúng nền rồi mới rót sữa.', 'Khuấy, ép nắp rồi mới giao để đạt hoàn hảo.'],
+    banhmi: ['Lấy bánh ra khi thanh lò vào vùng vàng, đừng chờ đến sẫm.', 'Rạch bánh trước khi phết pate và thêm nhân.', 'Có khay thì chuẩn bị sẵn một ổ cho giờ cao điểm.'],
+    xoi: ['Hấp mẻ xôi trước ca: nếp là thứ tốn thời gian nhất.', 'Dùng gạt để sửa lượng muỗng xôi cho đúng phiếu.', 'Xôi ngũ sắc cần đủ năm màu, đừng bỏ sót.'],
+    mycay: ['Hạ rổ rồi vớt mì khi thanh chạm vùng xanh.', 'Chốt đúng cấp cay khách yêu cầu, hơn hay kém đều bị trừ.', 'Múc nước dùng đúng số vá theo cỡ tô.']
+  };
+  const LIGHT = ['Trời trong', 'Ban ngày', 'Hoàng hôn', 'Đêm đèn lồng'];
+  function brief() {
+    const st = $('#stall'); if (!st || !st.dataset.shop || st.querySelector('.st-bench') || st.querySelector('.desk-brief')) return;
+    const start = st.querySelector('.pp-start'); if (!start) return;
+    const id = st.dataset.shop, T = TH(id), ch = G.chapterDef && G.chapterDef(), tips = TIPS[id] || [];
+    const light = LIGHT[parseInt(document.body.dataset.light, 10) || 0] || LIGHT[0];
+    const el = document.createElement('div'); el.className = 'pp-info desk-brief';
+    el.innerHTML = `<div class="db-head"><span>${T.icon}</span><b>Hôm nay ở ${T.name}</b></div>
+      <div class="db-chips"><span>📅 Ngày ${G.S.day}</span><span>🌤 ${light}</span><span>🏅 ${G.rankName()}</span></div>
+      ${tips.length ? `<div class="db-tip">💡 ${tips[(G.S.day + id.length) % tips.length]}</div>` : ''}`;
+    start.after(el);
+  }
   if (WUI) {
     const render = WUI.render;
-    WUI.render = function () { render.apply(this, arguments); ambient(); };
+    WUI.render = function () { render.apply(this, arguments); ambient(); brief(); };
   }
   let startedAt = -1e9;
   document.addEventListener('click', (e) => {

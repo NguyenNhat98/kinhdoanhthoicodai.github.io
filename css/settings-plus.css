@@ -1,0 +1,21 @@
+/* Cài đặt nâng cao: giao diện dòng cài đặt + hiệu ứng nền chợ + các công tắc ánh sáng / chuyển động / pháo giấy */
+.sp-seg { flex-wrap: wrap; } .sp-seg button { flex: 1 1 auto; }
+.set-row.col select[data-spsel] { width: 100%; min-height: 42px; border: 1px solid var(--wood); border-radius: 10px; padding: 7px 9px; background: var(--card2); color: var(--text); font: inherit; }
+.sp-line { display: flex; align-items: center; gap: 8px; margin-top: 4px; } .sp-line span { font-size: 12px; color: var(--muted); } .sp-line input[type=range] { flex: 1; min-width: 0; }
+
+/* hạt thời tiết trên bản đồ chợ theo "Loại hạt bay" (ghi đè thời tiết cũ khi đã chọn) */
+body:not([data-bgfx="auto"]) .weather-particle { display: block; top: -30px; background: none; box-shadow: none; width: auto; height: auto; animation-name: weatherFall; }
+body[data-bgfx="petal"] .weather-particle { width: 10px; height: 7px; background: #ffc3d3; border-radius: 80% 0 70% 30%; box-shadow: 0 0 4px #fff2; }
+body[data-bgfx="leaf"] .weather-particle { width: 9px; height: 14px; background: linear-gradient(135deg, #9bd47a, #4f9a3c); border-radius: 0 100% 0 100%; }
+body[data-bgfx="snow"] .weather-particle { width: 7px; height: 7px; background: #fff; border-radius: 50%; box-shadow: 0 0 6px #fff; animation-name: snowFall; }
+body[data-bgfx="rain"] .weather-particle { width: 1px; height: 27px; background: linear-gradient(transparent, #e5f1ffb0); }
+body[data-bgfx="firefly"] .weather-particle { top: auto; bottom: -20px; width: 6px; height: 6px; border-radius: 50%; background: #fff6a0; box-shadow: 0 0 10px 4px rgba(255, 220, 90, .85); animation-name: weatherRise; }
+body[data-bgfx="lantern"] .weather-particle { top: auto; bottom: -30px; width: 14px; height: 18px; border-radius: 6px 6px 8px 8px; background: linear-gradient(#ff9a3d, #d8392b); box-shadow: 0 0 14px 4px rgba(255, 150, 50, .7); animation-name: weatherRise; }
+@keyframes weatherRise { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(40px, -960px); opacity: 0; } }
+@keyframes snowFall { to { transform: translate(-40px, 980px) rotate(360deg); } }
+
+/* công tắc */
+body[data-glow="false"] .st-glow, body[data-glow="false"] .st-shaft, body[data-glow="false"] .st-lan, body[data-glow="false"] .oi-lan, body[data-glow="false"] .pp-start::before, body[data-glow="false"] .pp-start::after { display: none !important; }
+body[data-confetti="false"] .fx-conf, body[data-confetti="false"] .oi-conf { display: none !important; }
+body[data-hero-move="false"] #stall::before, body[data-hero-move="false"] #stall .st-banner::before, body[data-hero-move="false"] #stall.service-desk::before { animation: none !important; }
+body[data-hero-move="false"] .counter-steam { display: none !important; }

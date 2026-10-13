@@ -1,0 +1,157 @@
+/* ============================================================================
+   Quầy v3: toàn bộ công đoạn hiện cùng lúc (không còn thẻ 1-2-3), nền cảnh nét đã xóa ô caro,
+   màn "Mở cửa đón khách" có hero động. Tải SAU service-desk.css nên ghi đè lớp đó.
+   ========================================================================== */
+#stall.service-desk { background: #23140b; animation: none; }
+#stall[data-shop="trada"].service-desk   { --desk-scene: url('../assets/scenes/hd/trada.jpg');  --tone: #3f8f55; --tone2: #d9f2c4; }
+#stall[data-shop="trasua"].service-desk  { --desk-scene: url('../assets/scenes/hd/trasua.jpg'); --tone: #d9578a; --tone2: #ffe0ec; }
+#stall[data-shop="banhmi"].service-desk  { --desk-scene: url('../assets/scenes/hd/banhmi.jpg'); --tone: #c27a1f; --tone2: #ffe6b0; }
+#stall[data-shop="xoi"].service-desk     { --desk-scene: url('../assets/scenes/hd/xoi.jpg');    --tone: #3c9559; --tone2: #fff0b8; }
+#stall[data-shop="mycay"].service-desk   { --desk-scene: url('../assets/scenes/hd/mycay.jpg');  --tone: #c4281a; --tone2: #ffc07a; }
+
+/* nền toàn màn: cùng ảnh cảnh, làm mờ + ấm + vân gỗ; ảnh nét nằm ở hero phía trên */
+#stall.service-desk::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: var(--desk-scene) 50% 62% / 135% auto no-repeat, var(--desk-scene) 50% 62% / cover no-repeat; filter: blur(15px) saturate(1.35) brightness(.78); animation: deskBreath 16s ease-in-out infinite alternate; }
+#stall.service-desk::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .06) 0 2px, transparent 2px 46px), radial-gradient(ellipse at 50% 0, color-mix(in srgb, var(--tone) 30%, transparent), transparent 62%), linear-gradient(rgba(35, 16, 6, .1), rgba(35, 16, 6, .46)); }
+@keyframes deskBreath { from { background-position: 50% 62%; } to { background-position: 56% 70%; } }
+#stall.service-desk > * { position: relative; z-index: 1; }
+#stall.service-desk > .st-amb { position: absolute !important; inset: 0 !important; height: auto !important; z-index: 1 !important; opacity: .7; overflow: hidden; pointer-events: none; }
+#stall.service-desk .st-glow, #stall.service-desk .st-shaft { display: block; }
+#stall.service-desk .st-glow { top: 2%; opacity: .8; } #stall.service-desk .st-shaft { height: 42%; }
+
+/* thanh trên: kính sẫm, chữ vàng kem */
+#stall.service-desk:has(.st-bench) .st-top, #stall.service-desk .st-top { background: linear-gradient(rgba(38, 18, 8, .92), rgba(38, 18, 8, .72)); border-bottom: 2px solid #e9b84c; min-height: 44px; }
+#stall.service-desk .st-top .st-title b { color: #fff0c8; text-shadow: 0 1px 4px #000a; } #stall.service-desk .st-title small { color: #f5d9a0; }
+#stall.service-desk .st-coins { color: #ffe27a; text-shadow: 0 1px 3px #000a; }
+#stall.service-desk .st-back { background: rgba(255, 244, 220, .92); color: #5a3418; }
+
+/* hero: ảnh cảnh nét, ánh đèn + hơi nước + vệt sáng quét */
+#stall.service-desk .st-banner, #stall.service-desk:has(.st-bench) .st-banner { position: relative !important; inset: auto; flex: none; overflow: hidden; border-bottom: 3px solid #e9b84c; background-image: var(--desk-scene) !important; background-size: cover !important; background-position: 50% 40% !important; background-repeat: no-repeat !important; height: clamp(52px, 9dvh, 96px); display: block; box-shadow: 0 6px 18px rgba(0, 0, 0, .4); }
+#stall.service-desk .st-banner::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 36px rgba(255, 190, 90, .3); background: linear-gradient(105deg, transparent 38%, rgba(255, 240, 200, .28) 50%, transparent 62%) 130% 0 / 260% 100%; animation: bannerSweep 7s ease-in-out infinite; }
+#stall.service-desk .st-banner::after { content: ''; position: absolute; inset: auto 0 0 0; height: 55%; z-index: 1; pointer-events: none; background: linear-gradient(transparent, rgba(35, 16, 6, .6)); mask-image: none; -webkit-mask-image: none; aspect-ratio: auto; }
+#stall.service-desk .st-lan { z-index: 2; } #stall.service-desk .counter-steam { display: block; z-index: 2; opacity: .6; }
+#stall.service-desk .st-pills { z-index: 3; }
+#stall.service-desk .st-pills .pill { box-shadow: 0 2px 8px rgba(0, 0, 0, .45); }
+
+/* thanh công cụ + bảng doanh thu */
+#stall.service-desk .stall-tools { background: rgba(35, 16, 6, .62); padding: 4px 6px; border: 0; }
+#stall.service-desk .stall-tools button { background: rgba(255, 246, 226, .94); border: 1px solid rgba(233, 184, 76, .75); color: #4a2a14; }
+#stall.service-desk .shift-dashboard { background: rgba(35, 16, 6, .55); color: #ffe9b8; }
+
+/* khách + phiếu: kính sáng */
+#stall.service-desk .st-queue { padding: 6px 6px 2px; gap: 6px; }
+#stall.service-desk .cust { background: rgba(255, 250, 238, .94); border: 1.5px solid rgba(233, 184, 76, .7); box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+#stall.service-desk .cust.empty { background: rgba(255, 250, 238, .3); border-style: dashed; box-shadow: none; color: #fff0c8; }
+#stall.service-desk .cust.sel { border-color: #ffd54a; box-shadow: 0 0 0 2px #ffd54a, 0 0 14px rgba(255, 200, 60, .75); }
+#stall.service-desk .st-ticket { background: rgba(255, 240, 200, .95); border: 1.5px solid #e1b25b; box-shadow: 0 3px 10px rgba(0, 0, 0, .28); }
+
+/* BÀN LÀM MÓN: tất cả công đoạn cùng hiện */
+#stall.service-desk .desk-tabs { display: none !important; }
+#stall.service-desk .shift-dashboard { padding: 1px 8px; min-height: 16px; }
+#stall.service-desk .st-ticket { max-height: 70px; padding: 4px 8px; margin: 3px 6px; }
+#stall.service-desk .st-bench { background: none; border: 0; padding: 3px 6px; gap: 6px; grid-template-columns: 94px minmax(0, 1fr); overflow: hidden; }
+#stall.service-desk .st-bench::before { content: none; }
+#stall.service-desk .b-left { gap: 5px; align-content: start; }
+#stall.service-desk .prod { height: clamp(86px, 14dvh, 124px); background: radial-gradient(#fffdf5, #ecd3a6); border: 2px solid #e1b25b; box-shadow: 0 4px 12px rgba(0, 0, 0, .35); }
+#stall.service-desk .b-right { display: flex; flex-flow: row wrap; align-content: flex-start; gap: 4px; overflow: hidden; min-height: 0; padding: 0; }
+#stall.service-desk .sec { display: flex; align-items: stretch; gap: 3px; flex: 1 1 128px; min-width: 0; padding: 2px 4px 2px 3px; border-radius: 11px; background: rgba(255, 249, 235, .9); border: 1.5px solid rgba(225, 178, 91, .85); box-shadow: 0 3px 8px rgba(0, 0, 0, .22); }
+#stall.service-desk .sec.wide, #stall.service-desk .sec.three, #stall.service-desk .sec.four, #stall.service-desk .sec.five, #stall.service-desk .sec:has(.oven-bar), #stall.service-desk .sec:has(.cells) { flex: 1 1 100%; }
+#stall.service-desk .sec:has(.oven-bar), #stall.service-desk .sec:has(.cells) { display: block; }
+#stall.service-desk .sec > h5 { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0; width: 12px; flex: none; font-size: 9px; letter-spacing: .3px; text-align: center; color: #7a4a22; white-space: nowrap; overflow: hidden; text-transform: uppercase; font-weight: 800; contain: size; }
+#stall.service-desk .sec:has(.oven-bar) > h5, #stall.service-desk .sec:has(.cells) > h5 { contain: none; writing-mode: horizontal-tb; transform: none; width: auto; margin: 0 0 2px 2px; text-align: left; }
+#stall.service-desk .sec > .grid { flex: 1; min-width: 0; gap: 3px; }
+#stall.service-desk .tr { min-height: clamp(33px, 4.7dvh, 44px); padding: 2px 1px; border-radius: 9px; background: linear-gradient(#fffaf0, #ffecc8); border: 1.5px solid rgba(160, 105, 50, .45); box-shadow: 0 2px 0 rgba(120, 70, 20, .35); }
+#stall.service-desk .tr:active { transform: translateY(2px); box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+#stall.service-desk .tr.on { background: linear-gradient(#ffe27a, #f2b83a); }
+#stall.service-desk .tr span { font-size: 9.5px; } #stall.service-desk .tr i { font-size: 16px; }
+#stall.service-desk .tr i:has(.sprite) { width: 28px; height: 22px; }
+#stall.service-desk .ch { min-height: 26px; font-size: 10px; padding: 3px 6px; }
+#stall.service-desk .gauge { color: #fff0c8; text-shadow: 0 1px 3px #000a; }
+.desk-side button { background: rgba(255, 246, 226, .94); border-color: #e1b25b; }
+
+/* quầy ít nút thì nút to hơn cho dễ bấm, quầy nhiều nút thì gọn */
+#stall[data-shop="trada"].service-desk .tr { min-height: clamp(60px, 15dvh, 134px); }
+#stall[data-shop="trada"].service-desk .b-right { align-content: center; gap: 8px; } #stall[data-shop="trada"].service-desk .tr span { font-size: 12px; } #stall[data-shop="trada"].service-desk .tr i { font-size: 26px; }
+#stall[data-shop="banhmi"].service-desk .tr { min-height: clamp(40px, 7.4dvh, 70px); } #stall[data-shop="banhmi"].service-desk .tr span { font-size: 10.5px; }
+#stall[data-shop="xoi"].service-desk .tr { min-height: clamp(40px, 6.8dvh, 62px); }
+#stall[data-shop="mycay"].service-desk .tr { min-height: clamp(38px, 6.2dvh, 58px); } #stall[data-shop="mycay"].service-desk .tr span { font-size: 10.5px; }
+#stall.service-desk .b-left { display: flex; flex-direction: column; }
+#stall.service-desk .prod { flex: 1 1 auto; height: auto; min-height: 86px; max-height: 280px; }
+#stall.service-desk .desk-side { margin-top: auto; }
+
+/* thanh thao tác dưới cùng */
+#stall.service-desk .st-actions { background: linear-gradient(rgba(35, 16, 6, .55), rgba(35, 16, 6, .9)); border-top: 2px solid #e9b84c; }
+#stall.service-desk .ac { background: linear-gradient(#fffaf0, #ffe9c2); border: 1.5px solid rgba(160, 105, 50, .5); box-shadow: 0 2px 0 rgba(120, 70, 20, .4); }
+#stall.service-desk .ac.go { background: linear-gradient(#8fe39a, #3aa84a); color: #0e3a14; }
+@media (max-height: 760px) {
+  #stall.service-desk .st-banner, #stall.service-desk:has(.st-bench) .st-banner { height: 56px; }
+  #stall.service-desk .shift-dashboard { display: none; }
+  #stall.service-desk .tr { min-height: 34px; } #stall.service-desk .tr i { font-size: 14px; } #stall.service-desk .tr i:has(.sprite) { height: 18px; width: 24px; }
+}
+@media (max-height: 660px) {
+  #stall.service-desk:has(.st-bench) .st-banner { display: none; }
+  #stall.service-desk .b-right { overflow-y: auto; scrollbar-width: none; }
+  #stall.service-desk .stall-tools button { min-height: 26px; }
+  #stall.service-desk .tr { flex-direction: row; gap: 3px; padding: 1px 2px; } #stall.service-desk .tr i { margin: 0; } #stall.service-desk .tr i:has(.sprite) { width: 22px; height: 18px; } #stall.service-desk .tr span { line-height: 1; }
+  #stall.service-desk .sec .tr, #stall[data-shop] .sec .tr { height: 34px; min-height: 0; max-height: 34px; } #stall.service-desk .sec.four .tr i { display: none; }
+  #stall.service-desk .sec:not(.wide) > .grid { grid-auto-rows: 34px; }
+  #stall.service-desk .st-bench { grid-template-columns: 76px minmax(0, 1fr); }
+  #stall.service-desk .st-ticket { max-height: 54px; } #stall.service-desk .tk-hint { font-size: 10.5px; }
+  #stall.service-desk .sec { padding: 1px 3px 1px 2px; } #stall.service-desk .tr span { font-size: 9px; }
+  #stall.service-desk .tr, #stall[data-shop] .tr { min-height: 30px; } #stall.service-desk .tr b { font-size: 8px; }
+  #stall.service-desk .cust { min-height: 52px; } #stall.service-desk .prod { height: 74px; }
+}
+
+/* ===== MÀN MỞ CỬA ĐÓN KHÁCH (chuẩn bị) ===== */
+#stall.service-desk:not(:has(.st-bench)) .st-banner { height: auto; aspect-ratio: 1.73 / 1; max-height: 27dvh; background-position: 50% 30% !important; }
+#stall.service-desk:not(:has(.st-bench)) .st-banner::after { height: 40%; }
+#stall.service-desk:not(:has(.st-bench)) .st-banner .st-pills { display: none; }
+/* biển "ĐÓNG CỬA" treo lắc lư trên hero */
+#stall.service-desk:not(:has(.st-bench)) .st-banner > .counter-steam { left: 46%; bottom: 8%; height: 80px; width: 46px; opacity: .75; }
+#stall.service-desk:not(:has(.st-bench)) .st-top::after { content: 'ĐÓNG CỬA'; position: absolute; right: 12px; top: 100%; z-index: 5; margin-top: 8px; padding: 14px 10px 4px; border-radius: 0 0 8px 8px; background: linear-gradient(#c8301f, #8a1a10); color: #ffe9b8; font: 800 11px 'Noto Serif', serif; letter-spacing: 1px; border: 2px solid #ffd54a; border-top: 0; transform-origin: 50% -8px; animation: signSwing 3.2s ease-in-out infinite alternate; box-shadow: 0 5px 10px rgba(0, 0, 0, .45); }
+#stall.service-desk:not(:has(.st-bench)) .st-top::before { content: ''; position: absolute; right: 36px; top: 100%; width: 2px; height: 10px; background: #ffd54a; z-index: 6; margin-top: -2px; }
+@keyframes signSwing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+#stall.service-desk .st-prep { gap: 8px; padding: 8px 10px; background: none; }
+#stall.service-desk .desk-prep-tabs { padding: 2px 0; gap: 6px; }
+#stall.service-desk .desk-prep-tabs button { background: rgba(255, 246, 226, .92); border: 1.5px solid rgba(233, 184, 76, .8); color: #5a3418; font-size: 11px; padding: 9px 3px; border-radius: 11px; box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+#stall.service-desk .desk-prep-tabs button.on { background: linear-gradient(#a8662e, #6e3e1c); color: #fff3d4; border-color: #ffd54a; }
+#stall.service-desk .pp-start { background: linear-gradient(120deg, rgba(255, 238, 190, .97), rgba(255, 224, 150, .97)); border: 2px solid #ffd54a; box-shadow: 0 6px 20px rgba(0, 0, 0, .35), 0 0 22px rgba(255, 200, 60, .45); padding: 12px 10px; }
+#stall.service-desk .pp-start .btn.big { min-height: 54px; font-size: 14px; }
+#stall.service-desk .pp-info { color: #fff0c8; text-shadow: 0 1px 3px #000a; font-size: 12px; }
+#stall.service-desk .pp-info b { color: #ffe27a; }
+#stall.service-desk .pp-info .btn { background: rgba(255, 246, 226, .94); }
+#stall.service-desk .desk-policy { background: rgba(255, 249, 235, .94); border: 1.5px solid rgba(233, 184, 76, .85); box-shadow: 0 4px 12px rgba(0, 0, 0, .3); }
+#stall.service-desk .pp-item, #stall.service-desk .eq { background: rgba(255, 249, 235, .94); box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+#stall.service-desk .desk-pager { color: #fff0c8; } #stall.service-desk .desk-pager button { background: rgba(255, 246, 226, .94); }
+#stall.service-desk .recipe-guide { background: rgba(255, 249, 235, .94); }
+
+body.reduce-motion #stall.service-desk::before, body.reduce-motion #stall.service-desk .st-banner::before, body.reduce-motion #stall.service-desk .st-top::after { animation: none; }
+#stall.service-desk > .st-top { z-index: 4; }
+
+#stall.service-desk .stall-tools { display: flex; } #stall.service-desk .stall-tools button { flex: 1 1 0; min-width: 0; }
+.desk-brief { display: block !important; padding: 8px 12px; border-radius: 14px; background: rgba(35, 16, 6, .62); border: 1.5px solid rgba(233, 184, 76, .65); color: #fff0c8; text-shadow: none !important; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+.db-head { display: flex; align-items: center; gap: 8px; font: 800 14px 'Noto Serif', serif; color: #ffe27a; } .db-head span { font-size: 22px; animation: emblemBob 1.4s ease-in-out infinite alternate; }
+.db-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; } .db-chips span { padding: 2px 9px; border-radius: 99px; background: rgba(255, 246, 226, .16); border: 1px solid rgba(255, 224, 150, .4); font-size: 11px; font-weight: 700; }
+.db-goal, .db-tip { font-size: 11.5px; line-height: 1.4; margin-top: 4px; } .db-goal b { color: #ffe27a; } .db-tip { color: #cfeec0; }
+#stall.service-desk .st-prep { overflow-y: auto; scrollbar-width: none; }
+
+/* ===== Tham quan giao diện quầy (tour đèn chiếu) + gợi ý sống ===== */
+.coach-layer { position: absolute; inset: 0; z-index: 90; touch-action: manipulation; }
+.co-hole { position: absolute; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(10, 5, 2, .72), 0 0 0 3px #ffd54a, 0 0 22px 6px rgba(255, 200, 60, .85); pointer-events: none; transition: top .35s, left .35s, width .35s, height .35s; animation: coHole 1.3s ease-in-out infinite alternate; }
+@keyframes coHole { to { box-shadow: 0 0 0 9999px rgba(10, 5, 2, .72), 0 0 0 3px #fff3a0, 0 0 34px 10px rgba(255, 210, 80, .95); } }
+.co-card { position: absolute; left: 12px; right: 12px; padding: 12px 14px; border-radius: 16px; background: linear-gradient(#fffaf0, #ffe9c2); border: 2px solid #e9b84c; color: #4a2a14; box-shadow: 0 8px 26px rgba(0, 0, 0, .55); animation: prepIn .35s ease-out; }
+.co-card small { color: #8a6a3a; font-weight: 700; } .co-card h4 { margin: 2px 0 4px; font: 800 16px 'Noto Serif', serif; color: #a53e2b; } .co-card p { margin: 0 0 8px; font-size: 13px; line-height: 1.45; }
+.co-card.below::before, .co-card.above::after { content: ''; position: absolute; left: 50%; width: 16px; height: 16px; margin-left: -8px; background: #fffaf0; border: 2px solid #e9b84c; transform: rotate(45deg); }
+.co-card.below::before { top: -10px; border-right: 0; border-bottom: 0; } .co-card.above::after { bottom: -10px; border-left: 0; border-top: 0; }
+.co-nav { display: flex; gap: 6px; justify-content: flex-end; }
+#stall .coach-lit { z-index: 91 !important; }
+#stall .coach-next { animation: hintGlow .9s ease-in-out infinite !important; z-index: 3; position: relative; }
+.tk-hint.coach-hint { font-weight: 800; animation: hintPulse .9s ease-in-out infinite alternate; }
+body.reduce-motion .co-hole, body.reduce-motion #stall .coach-next { animation: none !important; }
+@media (max-height: 760px) { .desk-brief { display: none !important; } #stall.service-desk:not(:has(.st-bench)) .st-banner { max-height: 22dvh; } }
+@media (max-height: 620px) {
+  #stall.service-desk:not(:has(.st-bench)) .st-banner { max-height: 14dvh; }
+  #stall.service-desk .desk-prep-tabs button { padding: 6px 2px; } #stall.service-desk .pp-start { padding: 6px 8px; } #stall.service-desk .pp-start .btn.big { min-height: 40px; }
+  #stall.service-desk .desk-policy { padding: 6px 8px; gap: 3px; } #stall.service-desk .st-prep { gap: 4px; padding: 4px 8px; }
+  #stall.service-desk .stall-tools { padding: 2px 6px; } #stall.service-desk .stall-tools button { min-height: 26px; }
+  #stall.service-desk .pp-info .btn { padding: 4px 8px; font-size: 11px; }
+}
