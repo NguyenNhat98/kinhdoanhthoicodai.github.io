@@ -1,1 +1,6 @@
 .qa/
+.idea/
+# Generated previews and legacy scene exports (the game uses scenes/hd/*.jpg).
+assets/sprites/contact*.png
+assets/sprites/portraits-review.png
+assets/scenes/*.png

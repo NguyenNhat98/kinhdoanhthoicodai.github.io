@@ -6,6 +6,7 @@ $browser='C:/Program Files/Google/Chrome/Application/chrome.exe'
 if(!(Test-Path $browser)){$browser='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'}
 $profile=Join-Path $qa ('profile-'+[Guid]::NewGuid().ToString('N'))
 $url=([Uri](Join-Path $root $Page)).AbsoluteUri+"?width=$Width&height=$Height&mode=$Mode&shop=$Shop"
+try {
 $args=@('--headless','--no-sandbox','--disable-gpu','--no-first-run','--allow-file-access-from-files',('--user-data-dir="'+$profile+'"'),"--window-size=$Width,$Height",'--virtual-time-budget=7000','--hide-scrollbars',('--screenshot="'+(Join-Path $qa "$Name.png")+'"'),'--dump-dom',$url)
 $process=Start-Process -FilePath $browser -ArgumentList $args -PassThru -WindowStyle Hidden -RedirectStandardOutput (Join-Path $qa "$Name.html") -RedirectStandardError (Join-Path $qa "$Name.log")
 if(!$process.WaitForExit(25000)){Stop-Process -Id $process.Id;throw 'Browser check timed out.'}
@@ -24,3 +25,13 @@ if($Page -eq 'tests/browser.html'){
  if($result.status -ne 'PASS'){$result | ConvertTo-Json -Depth 6;throw 'Browser checks failed.'}
  Write-Output "PASS: $($result.count) checks at ${Width}x${Height}"
 }else {Write-Output "Captured $Page at ${Width}x${Height}"}
+} finally {
+ # Each check uses a disposable browser profile; keep only reports/screenshots.
+ $profilePath=[IO.Path]::GetFullPath($profile)
+ $qaPath=[IO.Path]::GetFullPath($qa)+[IO.Path]::DirectorySeparatorChar
+ if(!$profilePath.StartsWith($qaPath,[StringComparison]::OrdinalIgnoreCase)){throw 'Profile cleanup path is outside .qa.'}
+ if(Test-Path -LiteralPath $profilePath){
+  try {Remove-Item -LiteralPath $profilePath -Recurse -Force -ErrorAction Stop}
+  catch {Write-Warning "Could not remove temporary browser profile: $profilePath"}
+ }
+}
