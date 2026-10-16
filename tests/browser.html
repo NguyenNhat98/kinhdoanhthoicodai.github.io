@@ -5,6 +5,21 @@ document.querySelector('#game').addEventListener('load',async()=>{
 const w=document.querySelector('#game').contentWindow,d=w.document,passed=[];
 w.addEventListener('error',e=>errors.push(e.message));
 const check=(condition,message)=>{if(!condition)throw Error(message);passed.push(message);};
+const checkWorkSurface=shop=>{
+ const panel=d.querySelector('.b-right'),bounds=panel.getBoundingClientRect();
+ const controls=[...panel.querySelectorAll('button')];
+ const clipped=controls.filter(button=>{const r=button.getBoundingClientRect();return r.top<bounds.top-1||r.bottom>bounds.bottom+1||r.left<bounds.left-1||r.right>bounds.right+1;});
+ check(controls.length>0&&!clipped.length,shop+' shows every work control inside the viewport'+(clipped.length?' (panel bottom '+Math.round(bounds.bottom)+', clipped: '+clipped.map(b=>b.textContent.trim()+' @'+Math.round(b.getBoundingClientRect().bottom)).join(', ')+')':''));
+ check(d.querySelector('.st-banner').getBoundingClientRect().height>=50,shop+' keeps the shop scene visible');
+ const ticket=d.querySelector('[data-w-ticket]'),request=ticket.querySelector('.tk-request');
+ if(request){
+   const order=w.WS.waiting().find(o=>o.id===w.WS.state().sel);
+   check(w.R[w.WS.activeShop()].chips(order.spec).every(chip=>request.textContent.includes(chip)),shop+' includes every order requirement');
+   check(ticket.scrollHeight<=ticket.clientHeight+1&&ticket.scrollWidth<=ticket.clientWidth+1,shop+' shows the full order without clipping');
+   const hint=ticket.querySelector('[data-w-hint]');
+   check(ticket.getBoundingClientRect().bottom<=d.querySelector('.st-bench').getBoundingClientRect().top+1&&hint.getBoundingClientRect().bottom<=ticket.getBoundingClientRect().bottom,shop+' keeps the order and hint above the work surface');
+ }
+};
 try{
  const {Game:G,WS,WUI,UI,LivingMarket:L,Festival:F}=w;
  check(!!G.S&&!!L&&!!F,'Game booted with both new modules');
@@ -27,6 +42,7 @@ try{
    check(d.querySelector('.cust img')===customer&&d.querySelector('.b-right .tr')===control,shop.id+' keeps portraits and controls stable across frames');
    for(const tab of [...d.querySelectorAll('[data-desk="stage"]')]){tab.click();const panel=d.querySelector('.b-right');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' stage '+tab.dataset.stage+' fits without scrolling');}
    check(d.querySelector('#stall').scrollHeight<=d.querySelector('#stall').clientHeight+1,shop.id+' fits fixed viewport');
+   checkWorkSurface(shop.id);
    check(d.querySelector('[data-live="door"]'),shop.id+' has door control');
    const ws=WS.state();ws.doorOpen=false;ws.nextSpawn=0;WS.tick(1);check(WS.waiting().length===1,shop.id+' door stops new customers');
    d.querySelector('[data-live="pause"]').click();const clock=ws.clock;WS.tick(1);check(ws.clock===clock,shop.id+' pauses');d.querySelector('[data-live="pause"]').click();
@@ -61,7 +77,25 @@ try{
    G.S.shops[shop.id].level=5;WUI.open(shop.id);
    for(const tab of ['home','stock','equip']){w.ServiceDesk.prepTab=tab;w.ServiceDesk.preparation();const panel=d.querySelector('.st-prep');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' preparation '+tab+' fits');}
    check(WS.start(shop.id).ok,shop.id+' advanced service starts');WUI.tab='work';WUI.render();
+   WS.tick(2);
+   const advanced=WS.waiting()[0];
+   const longOrders={
+     banhmi:{size:'l',pate:1,xaxiu:2,trung:1,dua:1,rau:1,ot:1},
+     trasua:{tea:'olong',milk:'kem',size:'L',tops:{tc_den:1,quylinh:1,pudding:1,hatsen:1},sugar:3,sugarType:'den',ice:100},
+     xoi:{base:'ngusac',size:'l',tops:{hanh:2,dua:2},wrap:'la'},
+     mycay:{size:'l',broth:'thit',tops:{thit:1,nam:1,trung:1},spice:7}
+   };
+   Object.assign(advanced.spec,longOrders[shop.id]||{});WS.select(advanced.id);WUI.renderAll();
    if(shop.id==='xoi'){WS.state().product=w.R.xoi.newProduct();WS.state().product.base='ngusac';WUI.renderAll();}
+   checkWorkSurface(shop.id+' advanced');
+   advanced.p=advanced.max*.15;WUI.update();
+   const bars=[...d.querySelectorAll('[data-p="'+advanced.id+'"]')];
+   check(bars.length===2&&bars.every(b=>b.parentElement.classList.contains('low')&&Math.abs(parseFloat(b.style.width)-15)<.1),shop.id+' updates patience in both customer tab and speech card');
+   WS.state().nextSpawn=0;WS.tick(.1);WUI.update();
+   const nextCustomer=WS.waiting().find(o=>o.id!==advanced.id);
+   check(!!nextCustomer,shop.id+' has another customer to select');
+   d.querySelector('[data-w="pick"][data-id="'+nextCustomer.id+'"]').click();WUI.update();
+   check(d.querySelector('.order-speech .tk-head b').textContent===nextCustomer.who.name&&w.R[shop.id].chips(nextCustomer.spec).every(chip=>d.querySelector('.tk-request').textContent.includes(chip)),shop.id+' switches the full speech card when selecting another customer');
    for(const button of [...d.querySelectorAll('[data-desk="stage"]')]){button.click();const panel=d.querySelector('.b-right');check(panel.scrollHeight<=panel.clientHeight+1,shop.id+' advanced stage '+button.dataset.stage+' fits');}
    WS.finish(true);UI.closeModal();WUI.close();
  }

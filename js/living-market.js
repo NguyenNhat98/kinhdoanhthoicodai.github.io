@@ -47,77 +47,179 @@
     b.dataset.quality = s.quality; b.dataset.hints = s.hints; b.dataset.contrast = s.contrast;
     b.style.setProperty('--text-scale', s.textSize);
     b.classList.toggle('reduce-motion', s.reduce || matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if(b.classList.contains('reduce-motion')){window.MM.cancelMotion();L.stopConversation();}
     b.dataset.light = s.daylight || [1, 2, 3][(G.S.day - 1) % 3]; b.dataset.weather = s.weather;
     if ($('#walkers')) L.buildWalkers();
   };
-  const routes = [
-    [[320, 280], [540, 260], [730, 275], [860, 260]],
-    [[1070, 315], [1235, 350], [1370, 350], [1520, 290]],
-    [[290, 550], [510, 565], [640, 600], [905, 635]],
-    [[1080, 570], [1235, 600], [1320, 575], [1380, 520]],
-    [[610, 827], [805, 863], [1010, 845], [1150, 810]]
-  ];
+  // Road centerlines in map coordinates, connected only at shared junctions.
+  // No shortcut through the banyan, shop roofs, counters or the canal.
+  const world=window.MarketWorld, routes=L.routes=world.routes;
+  L.isWalkable=world.isWalkable;
+  const junctions=new Map(), edges=[];
+  function node(p){const key=p.join(',');if(!junctions.has(key))junctions.set(key,{x:p[0],y:p[1],links:[]});return junctions.get(key);}
+  routes.forEach(path=>path.slice(1).forEach((p,i)=>{const a=node(path[i]),b=node(p);a.links.push(b);b.links.push(a);edges.push([a,b]);}));
+  L.junctions=Array.from(junctions.values());
+  const random=w=>{w.seed=(Math.imul(w.seed,1664525)+1013904223)>>>0;return w.seed/4294967296;};
   L.buildWalkers = () => {
     const host = $('#walkers'); if (!host) return;
-    const n = G.S.settings.crowd;
-    L.walkers = []; host.innerHTML = '';
+    const n = Math.max(0,Math.min(24,Number(G.S.settings.crowd)||0));
+    if(L.host===host&&L.walkers.length===n)return;
+    L.stopConversation();L.host=host;L.walkers = []; host.innerHTML = '';L.chatDue=5;
+    const fragment=document.createDocumentFragment();
     for (let i = 0; i < n; i++) {
-      const path = routes[i % routes.length], start = i % path.length;
-      const e = document.createElement('span'); e.className = 'pedestrian';
-      e.innerHTML = `<span class="walker-shadow"></span><span class="walker-body">${L.customer(i)}</span>`; host.appendChild(e);
-      L.walkers.push({ el: e, path, index: start, x: path[start][0] + (i % 3) * 12, y: path[start][1], dir: 1, speed: 17 + i % 5 * 3, wait: i * 0.65, phase: i * 2 });
+      const edge=edges[Math.floor(i*edges.length/Math.max(1,n))],a=edge[i%2],b=edge[1-i%2],t=.15+(i*.381966% .65);
+      const e = document.createElement('span'); e.className = 'pedestrian';e.setAttribute('aria-hidden','true');
+      e.innerHTML = `<span class="walker-shadow"></span><span class="walker-body"><span class="market-person" style="--person-x:${i%4*100/3}%;--person-y:${Math.floor(i%16/4)*100/3}%"></span></span>`;fragment.appendChild(e);
+      const length=Math.hypot(b.x-a.x,b.y-a.y),hx=(b.x-a.x)/length,hy=(b.y-a.y)/length;
+      L.walkers.push({el:e,body:e.querySelector('.walker-body'),sh:e.querySelector('.walker-shadow'),from:a,to:b,x:a.x+(b.x-a.x)*t-hy*8,y:a.y+(b.y-a.y)*t+hx*8,hx,hy,speed:21+i%5*2,vm:0,wait:i*.09,stride:i*1.7,seed:8731+i*391,face:b.x>=a.x?1:-1,phase:i*2,name:['Tiểu Đào','Hồng Nương','A Minh','Lão Bá','Bác Năm','Linh Chi','Chú Tín','Bé Sen','Cô Liên','Anh Tư','Thanh Mai','Bác Phúc','Ngọc Lan','Hàn Sinh','Bà Tú','Chú Bình'][i%16],chatCooldown:0});
     }
+    host.appendChild(fragment);
     L.walkers.forEach(w => position(w, false));
   };
-  /* Sprite gốc quay mặt sang TRÁI. face: -1 = mặt trái (đang đi trái), +1 = mặt phải (lật ảnh). `turn` nội suy để quay người mượt. */
-  const ease = (t) => t * t * (3 - 2 * t);
   function position(w, moving) {
-    const depth = 0.65 + w.y / 1700, T = L.time, sp = w.vm || 0;
-    const stride = Math.sin(T * (7 + sp * .22) + w.phase), step = Math.abs(stride);
-    const bob = moving ? -step * (2.4 + sp * .05) * depth : Math.sin(T * 1.6 + w.phase) * .5;
-    const lean = moving ? (w.turn || 0) * -3.2 * Math.min(1, sp / 18) + stride * 1.6 : Math.sin(T * 1.2 + w.phase) * .6;
-    const squash = moving ? 1 - step * .035 : 1 + Math.sin(T * 1.8 + w.phase) * .012;
+    const depth=.75+w.y/6500,step=Math.abs(Math.sin(w.stride)),full=G.S.settings.quality>0;
+    const bob=moving&&full?-step*.9:0,lean=moving&&full?Math.sin(w.stride)*.7:0;
     w.el.style.transform = `translate3d(${w.x.toFixed(1)}px,${w.y.toFixed(1)}px,0) scale(${depth.toFixed(3)})`;
-    w.el.style.zIndex = Math.round(w.y);
-    const body = w.body || (w.body = w.el.querySelector('.walker-body')), sh = w.sh || (w.sh = w.el.querySelector('.walker-shadow'));
-    // scaleX đi qua 0 khi đổi hướng → thấy nhân vật quay người thay vì bật lật đột ngột
-    const sx = -(w.turn === undefined ? 1 : w.turn);
-    body.style.transform = `translateY(${bob.toFixed(2)}px) rotate(${lean.toFixed(2)}deg) scale(${(sx * (1 + step * .02)).toFixed(3)},${squash.toFixed(3)})`;
-    if (sh) sh.style.transform = `scale(${(1 - step * .15).toFixed(2)},1)`;
+    const z=Math.round(w.y);if(z!==w.z){w.z=z;w.el.style.zIndex=z;}
+    w.body.style.transform=`translateY(${bob.toFixed(2)}px) rotate(${lean.toFixed(2)}deg) scaleX(${-w.face})`;
+    w.sh.style.transform=`scaleX(${(1-step*.08).toFixed(2)})`;
+  }
+  // Follow arc length on a rounded lane, rather than repeatedly chasing a point
+  // offset from the next junction. Incoming/outgoing tangents join continuously.
+  function prepareLane(w) {
+    const ex=w.to.x-w.from.x,ey=w.to.y-w.from.y,length=Math.hypot(ex,ey);
+    if(!length)return null;
+    const ux=ex/length,uy=ey/length,end={x:w.to.x-uy*8,y:w.to.y+ux*8};
+    const span=Math.hypot(end.x-w.x,end.y-w.y),steps=Math.max(8,Math.ceil(span/3));
+    for(const smoothing of [Math.min(10,span*.2),0]){
+      const p1={x:w.x+(w.hx??ux)*smoothing,y:w.y+(w.hy??uy)*smoothing};
+      const p2={x:end.x-ux*smoothing,y:end.y-uy*smoothing};
+      const points=[{x:w.x,y:w.y,d:0}];let valid=world.isWalkable(w.x,w.y);
+      for(let i=1;i<=steps;i++){
+        const t=i/steps,q=1-t,x=q*q*q*w.x+3*q*q*t*p1.x+3*q*t*t*p2.x+t*t*t*end.x,y=q*q*q*w.y+3*q*q*t*p1.y+3*q*t*t*p2.y+t*t*t*end.y;
+        const previous=points[points.length-1];points.push({x,y,d:previous.d+Math.hypot(x-previous.x,y-previous.y)});
+        if(!world.isWalkable(x,y))valid=false;
+      }
+      if(valid)return {from:w.from,to:w.to,points,length:points[points.length-1].d,distance:0,cursor:0};
+    }
+    return null;
   }
   L.tick = (dt) => {
-    if (!G.S || document.hidden) return;
-    L.time += dt;
-    if (window.WUI.isOpen() || window.UI.page !== 'market' || document.body.classList.contains('reduce-motion')) return;
+    if (!G.S || document.hidden || window.WUI.isOpen() || window.UI.page !== 'market' || document.body.classList.contains('reduce-motion')) return;
+    // Simulate every animation frame. A 16 ms frame used to be discarded by the
+    // 1/60 threshold, turning normal displays into visibly uneven 30 fps motion.
+    dt=Math.min(.1,Math.max(0,dt));L.time+=dt;
+    L.renderClock=(L.renderClock||0)+dt;
+    const draw=G.S.settings.quality>0||L.renderClock>=1/24;
+    if(draw)L.renderClock=0;
+    const buckets=new Map();
+    L.walkers.forEach(w=>{const k=`${Math.floor(w.x/48)},${Math.floor(w.y/48)}`;if(!buckets.has(k))buckets.set(k,[]);buckets.get(k).push(w);});
+    const camera=window.MM,view=camera.view();
+    L.tickConversation(dt);
     L.walkers.forEach(w => {
       if (!w.el.isConnected) return;
-      // quay người mượt về hướng muốn đi (face: -1 trái, +1 phải)
-      if (w.turn === undefined) w.turn = w.face || -1;
-      const want = w.face || -1; if (w.turn !== want) { w.turn += Math.sign(want - w.turn) * Math.min(Math.abs(want - w.turn), dt * 7); }
-      if (w.wait > 0) { w.wait -= dt; w.vm = Math.max(0, (w.vm || 0) - dt * 60); // dừng lại: giảm tốc dần, thỉnh thoảng nhìn ngang
-        if (w.wait > .5 && Math.random() < dt * .35) w.face = -(w.face || -1);
-        position(w, w.vm > 3); return; }
-      let next = w.index + w.dir;
-      if (next < 0 || next >= w.path.length) { w.dir *= -1; next = w.index + w.dir; }
-      if (w.jx === undefined) { w.jx = (Math.random() - .5) * 26; w.jy = (Math.random() - .5) * 12; }
-      const tx = w.path[next][0] + w.jx, ty = w.path[next][1] + w.jy, dx = tx - w.x, dy = ty - w.y, distance = Math.hypot(dx, dy);
-      const blocked = L.walkers.some(other => other !== w && other.path === w.path && other.dir === w.dir && Math.hypot(other.x - w.x, other.y - w.y) < 28 && (other.x - w.x) * dx + (other.y - w.y) * dy > 0);
-      if (!blocked) {
-        // tăng tốc / giảm tốc tự nhiên, đi chậm lại khi sắp tới điểm dừng
-        const goal = w.speed * (1 + Math.sin(L.time * .7 + w.phase) * .12) * (distance < 40 && (next === 0 || next === w.path.length - 1) ? .55 : 1);
-        w.vm = (w.vm || 0) + (goal - (w.vm || 0)) * Math.min(1, dt * 3.2);
-        const stepLen = Math.min(distance, w.vm * dt);
-        if (distance > 0) { w.x += dx / distance * stepLen; w.y += dy / distance * stepLen; if (Math.abs(dx) > 6) w.face = dx > 0 ? 1 : -1; }
-        if (distance < 3) { w.index = next; w.jx = w.jy = undefined; w.wait = next === 0 || next === w.path.length - 1 ? 1.6 + (w.phase % 3) : (Math.random() < .12 ? .8 : 0); }
-      } else w.vm = Math.max(0, (w.vm || 0) - dt * 40);
-      position(w, !blocked && (w.vm || 0) > 3);
+      if(!w.lane||w.lane.from!==w.from||w.lane.to!==w.to)w.lane=prepareLane(w);
+      if(!w.lane){w.vm=0;continueWalker(w);return;}
+      const lane=w.lane,dx=w.to.x-w.x,dy=w.to.y-w.y,distance=lane.length-lane.distance;
+      let clearance=1;
+      const bx=Math.floor(w.x/48),by=Math.floor(w.y/48);
+      for(let xx=bx-1;xx<=bx+1;xx++)for(let yy=by-1;yy<=by+1;yy++)(buckets.get(`${xx},${yy}`)||[]).forEach(other=>{
+        if(other===w||other.to!==w.to)return;
+        const ox=other.x-w.x,oy=other.y-w.y,dist=Math.hypot(ox,oy);
+        if(dist<30&&ox*dx+oy*dy>0)clearance=Math.min(clearance,Math.max(.15,(dist-10)/20));
+      });
+      w.chatCooldown=Math.max(0,w.chatCooldown-dt);
+      const resting=w.wait>0||w.chatting;w.wait=Math.max(0,w.wait-dt);
+      const goal=resting?0:w.speed*clearance*(distance<25&&w.to.links.length===1?.6:1);
+      const previousSpeed=w.vm;w.vm+=(goal-w.vm)*(1-Math.exp(-5*dt));
+      const travel=resting?0:Math.min(distance,(previousSpeed+w.vm)*.5*dt);
+      if(travel>0){
+        const nextDistance=lane.distance+travel;
+        while(lane.cursor<lane.points.length-2&&lane.points[lane.cursor+1].d<nextDistance)lane.cursor++;
+        const a=lane.points[lane.cursor],b=lane.points[lane.cursor+1],t=(nextDistance-a.d)/Math.max(.00001,b.d-a.d);
+        const nx=a.x+(b.x-a.x)*t,ny=a.y+(b.y-a.y)*t;
+        if(world.isWalkable(nx,ny)){
+          lane.distance=nextDistance;const step=Math.hypot(nx-w.x,ny-w.y);
+          if(step>.00001){w.hx=(nx-w.x)/step;w.hy=(ny-w.y)/step;}
+          w.x=nx;w.y=ny;w.stride+=travel*.22;
+          if(Math.abs(w.hx)>.28)w.face=w.hx>0?1:-1;
+        }else w.vm=0;
+      }
+      if(!resting&&lane.length-lane.distance<.00001){
+        const old=w.from;w.from=w.to;const next=w.from.links.filter(n=>n!==old);w.to=next.length?next[Math.floor(random(w)*next.length)]:old;
+        w.lane=null;
+        if(w.from.links.length===1)w.wait=.7+random(w)*1.2;
+      }
+      continueWalker(w,travel>.0001);
+    });
+    function continueWalker(w,moving=false){
+      const sx=w.x*camera.s+camera.x,sy=w.y*camera.s+camera.y;
+      const visible=sx>-80&&sx<view.w+80&&sy>-10&&sy<view.h+90;
+      if(w.visible!==visible){w.visible=visible;w.el.style.visibility=visible?'visible':'hidden';}
+      if(visible&&(draw||!w.painted)){position(w,moving);w.painted=true;}
+    }
+    L.updateChats();
+  };
+  L.dialogues=[
+    ['Trà sữa hôm nay thơm ghê!','Ta gọi thêm trân châu nhé?'],
+    ['Bánh mì vừa ra lò kìa!','Mua hai ổ mang về thôi.'],
+    ['Sen dưới kênh nở đẹp quá!','Đi chậm thôi, ngắm thêm một lát.'],
+    ['Xôi ngũ sắc còn nóng đấy!','Ta ghé mua một phần nhé.'],
+    ['Chợ hôm nay đông vui thật!','Quầy nào cũng thơm, khó chọn quá!'],
+    ['Hôm nay ăn mì cay cấp mấy?','Cấp một thôi, còn phải dạo chợ!'],
+    ['Tối nay đi hội làng chứ?','Có chứ, hẹn nhau ở cổng nhé!'],
+    ['Mang giỏ đi chợ mà sắp đầy rồi!','Chừa chỗ cho bánh mì nữa nhé!']
+  ];
+  L.stopConversation=()=>{
+    if(L.conversation)L.conversation.people.forEach(w=>{w.chatting=false;w.chatCooldown=24;});
+    L.conversation=null;const host=$('.market-chats');if(host)host.replaceChildren();
+  };
+  L.startConversation=(a,b,index=0)=>{
+    const host=$('.market-chats');
+    if(!host||L.conversation||a===b||!a?.el.isConnected||!b?.el.isConnected||Math.hypot(a.x-b.x,a.y-b.y)>100||!world.isWalkable(a.x,a.y)||!world.isWalkable(b.x,b.y)||document.body.classList.contains('reduce-motion'))return false;
+    const line=L.dialogues[index%L.dialogues.length],people=[a,b],bubbles=[];
+    people.forEach((person,i)=>{
+      person.chatting=true;person.vm=0;person.face=(i===0?b.x-a.x:a.x-b.x)>=0?1:-1;
+      const bubble=document.createElement('div');bubble.className='market-chat';
+      const name=document.createElement('b'),text=document.createElement('span');name.textContent=person.name;text.textContent=line[i];
+      bubble.append(name,text);host.appendChild(bubble);bubbles.push(bubble);
+    });
+    L.conversation={people,bubbles,elapsed:0};L.chatCount=(L.chatCount||0)+1;L.updateChats();return true;
+  };
+  L.tickConversation=dt=>{
+    if(L.conversation){
+      L.conversation.elapsed+=dt;
+      if(L.conversation.elapsed>=7){L.stopConversation();L.chatDue=6;}
+      return;
+    }
+    L.chatDue-=dt;if(L.chatDue>0)return;
+    const camera=window.MM,view=camera.view();
+    const crowd=L.walkers.filter(w=>{const x=w.x*camera.s+camera.x,y=w.y*camera.s+camera.y;return w.visible&&!w.chatCooldown&&!w.chatting&&x>20&&x<view.w-20&&y>170&&y<view.h-90;});
+    for(let i=0;i<crowd.length;i++)for(let j=i+1;j<crowd.length;j++){
+      const a=crowd[i],b=crowd[j],distance=Math.hypot(a.x-b.x,a.y-b.y);
+      if(distance>22&&distance<90&&L.startConversation(a,b,(L.chatCount||0)%L.dialogues.length))return;
+    }
+    L.chatDue=1.5;
+  };
+  L.updateChats=()=>{
+    const talk=L.conversation;if(!talk)return;
+    const camera=window.MM,view=camera.view();
+    talk.people.forEach((person,i)=>{
+      const bubble=talk.bubbles[i],x=person.x*camera.s+camera.x,y=person.y*camera.s+camera.y;
+      const onScreen=x>10&&x<view.w-10&&y>130&&y<view.h-70;
+      // One speaker at a time keeps both lines readable even on narrow screens.
+      bubble.hidden=!onScreen||(i===0?talk.elapsed>=3.1:talk.elapsed<3.1);
+      const width=Math.min(172,view.w-24),left=Math.max(12,Math.min(view.w-width-12,x-width/2));
+      const top=Math.max(145,Math.min(view.h-150,y-80*camera.s-(i===1?10:0)));
+      bubble.style.width=width+'px';bubble.style.transform=`translate3d(${left.toFixed(1)}px,${top.toFixed(1)}px,0)`;
+      bubble.style.setProperty('--tail-x',Math.max(12,Math.min(width-12,x-left))+'px');
     });
   };
   const mount = window.MM.mount;
   window.MM.mount = function (host) {
     mount(host);
     const stage = $('#mapStage');
-    stage.insertAdjacentHTML('beforeend', `<div class="market-atmosphere" aria-hidden="true">${[150,455,735,975,1205].map((x,i) => `<span class="stall-steam" style="left:${x}px;top:${210 + i % 2 * 12}px"></span>`).join('')}${Array.from({length:18},(_,i)=>`<i class="weather-particle" style="left:${i * 5.7}%;--delay:-${i * .7}s;--speed:${3 + i % 4}s"></i>`).join('')}</div>`);
+    stage.insertAdjacentHTML('beforeend', `<div class="market-atmosphere" aria-hidden="true">${C.shops.map(s => `<span class="stall-steam" style="left:${s.map[0]}px;top:${s.map[1]-40}px"></span>`).join('')}${Array.from({length:18},(_,i)=>`<i class="weather-particle" style="left:${i * 5.7}%;--delay:-${i * .7}s;--speed:${3 + i % 4}s"></i>`).join('')}</div>`);
     $('#map').insertAdjacentHTML('beforeend', `<div class="market-heading"><small>PHỐ CHỢ • LÀNG CỔ</small><b>Một ngày ở chợ</b><span data-market-day></span></div><div class="market-dock"><button data-live="stalls">🏪 Các quầy</button><button data-live="festival">🪁 Hội làng</button><button data-dev-open="decor">🏗️ Phát triển</button><button data-live="stock-market">🧺 Nhập hàng</button></div>`);
     L.applySettings();
     window.MM.refresh();
@@ -125,7 +227,7 @@
   const refresh = window.MM.refresh;
   window.MM.refresh = function () {
     refresh();
-    if ($('#walkers') && ($('#walkers .wk') || !$('#walkers .pedestrian') && G.S.settings.crowd > 0)) L.buildWalkers();
+    if ($('#walkers') && L.host !== $('#walkers')) L.buildWalkers();
     const day = $('[data-market-day]'); if (day) day.textContent = `Ngày ${G.S.day} · ${['','Nắng trong','Hoàng hôn','Đêm hoa đăng'][Number(document.body.dataset.light) || 1]}`;
   };
   document.addEventListener('change', e => {

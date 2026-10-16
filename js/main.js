@@ -38,7 +38,7 @@
   function loop(t) {
     const dt = Math.min(0.1, (t - last) / 1000); last = t; frame++;
     if (G.S) {
-      G.tick(dt); window.WS.tick(dt); window.LivingMarket.tick(dt);
+      G.tick(dt); window.WS.tick(dt); window.MM.tick(dt); window.LivingMarket.tick(dt);
       if (frame % 2 === 0) { window.WUI.update(); window.UI.refresh(); }
       achT += dt; if (achT >= 1) { achT = 0; G.checkAchievements(); }
       saveT += dt; if (saveT >= G.S.settings.autosave) { saveT = 0; G.save(); }

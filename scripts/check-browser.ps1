@@ -17,7 +17,7 @@ for($attempt=0;$attempt -lt 50;$attempt++){
  if($html.Contains('</html>')){break}
  Start-Sleep -Milliseconds 100
 }
-if($Page -eq 'tests/browser.html'){
+if($Page -in @('tests/browser.html','tests/market.html')){
  $match=[regex]::Match($html,'<pre id="result">([\s\S]*?)</pre>')
  if(!$match.Success){throw 'No browser result.'}
  $result=[System.Net.WebUtility]::HtmlDecode($match.Groups[1].Value) | ConvertFrom-Json

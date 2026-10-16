@@ -100,10 +100,9 @@
     cards.forEach((o) => {
       const frac = Math.max(0, Math.min(1, o.p / o.max)), low = frac < 0.2, st = o.status;
       const face = st === 'done' ? (o.mood >= 2 ? '🤩' : o.mood === 1 ? '😊' : o.mood === -2 ? '😠' : '🙂') : st === 'left' ? '💨' : (low ? '😤' : frac < 0.5 ? '😐' : '🙂');
-      const brief = o.spec.name || ({ trada: () => R.trada.chips(o.spec).slice(0, 2).join(' · '), banhmi: () => R.banhmi.chips(o.spec).slice(0, 2).join(' · '), xoi: () => R.xoi.chips(o.spec).slice(0, 2).join(' · '), mycay: () => R.mycay.chips(o.spec).slice(-1)[0] })[ws.shop]();
-      h += `<button class="cust ${ws.sel === o.id ? 'sel' : ''} ${st !== 'wait' ? 'gone ' + st : ''} ${WUI.delivering && st === 'wait' ? 'target' : ''}" data-w="pick" data-id="${o.id}" ${st !== 'wait' ? 'disabled' : ''}>
+      h += `<button class="cust ${ws.sel === o.id ? 'sel' : ''} ${st !== 'wait' ? 'gone ' + st : ''} ${WUI.delivering && st === 'wait' ? 'target' : ''}" data-w="pick" data-id="${o.id}" aria-pressed="${ws.sel === o.id}" aria-label="${esc(o.who.name)}${st === 'wait' ? ': xem đơn gọi món' : st === 'done' ? ': đã phục vụ' : ': đã rời quầy'}" ${st !== 'wait' ? 'disabled' : ''}>
         <span class="c-face">${window.LivingMarket.customer(o.id, ws.shop)}<i>${face}</i></span><span class="c-name">${esc(o.who.name)}${o.vip ? ' <em>VIP</em>' : ''}${o.who.regular ? ' <em class="reg">❤</em>' : ''}</span>
-        <small>${esc(brief || '')}</small><div class="pbar ${low ? 'low' : ''}"><i data-p="${o.id}" style="width:${ws.tutorial ? 100 : frac * 100}%"></i></div></button>`;
+        <div class="pbar ${low ? 'low' : ''}"><i data-p="${o.id}" style="width:${ws.tutorial ? 100 : frac * 100}%"></i></div></button>`;
     });
     for (let i = cards.length; i < 3; i++) h += '<div class="cust empty"><span class="c-face">⋯</span><small>Chờ khách ghé</small></div>';
     syncHtml(el, h);
@@ -112,8 +111,10 @@
     const el = $('[data-w-ticket]'); if (!el) return;
     const o = ws.orders.find((x) => x.id === ws.sel && x.status === 'wait'), mod = R[ws.shop];
     const hint = mod.hint(ws, ws.product, o);
-    syncHtml(el, o ? `<div class="tk-head"><span>🎫 Đơn của <b>${esc(o.who.name)}</b></span>${ws.tutorial ? '<em>Ca hướng dẫn · không phạt</em>' : ''}</div><div class="tk-chips">${mod.chips(o.spec).map((c) => `<span>${esc(c)}</span>`).join('')}</div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`
-      : `<div class="tk-head"><span>🎫 Chưa chọn đơn</span></div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`);
+    const patience = o ? (ws.tutorial ? 100 : Math.max(0, Math.min(100, o.p / o.max * 100))) : 0;
+    el.classList.toggle('has-order', !!o);
+    syncHtml(el, o ? `<div class="order-portrait" aria-hidden="true">${window.LivingMarket.customer(o.id, ws.shop)}</div><div class="order-speech"><div class="tk-head"><b>${esc(o.who.name)}</b><em>${ws.tutorial ? 'Học việc · không phạt' : o.vip ? 'Khách VIP' : o.who.regular ? 'Khách quen ❤' : 'Gọi món'}</em></div><p class="tk-request">Cho mình ${mod.chips(o.spec).map(esc).join(', ')}.</p><div class="order-patience"><span>Kiên nhẫn</span><div class="pbar ${patience < 20 ? 'low' : ''}" role="progressbar" aria-label="Kiên nhẫn của ${esc(o.who.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(patience)}"><i data-p="${o.id}" style="width:${patience}%"></i></div></div></div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`
+      : `<div class="tk-head"><span>🎫 Chọn khách để xem lời gọi món</span></div><div class="tk-hint" data-w-hint>▸ ${esc(hint)}</div>`);
   }
 
   /* ---------------- hình sản phẩm (SVG) ---------------- */
@@ -333,7 +334,7 @@
     if (sig !== lastSig && !ws.hold) { lastSig = sig; WUI.renderAll(); }
     else if (ws.hold) { const pr = $('[data-w-prod]'); if (pr) syncHtml(pr, productHtml(ws)); }
     // thanh kiên nhẫn
-    ws.orders.forEach((o) => { const b = $(`[data-p="${o.id}"]`); if (b && !ws.tutorial) { const f = Math.max(0, Math.min(1, o.p / o.max)); b.style.width = (f * 100) + '%'; b.parentElement.classList.toggle('low', f < 0.2); } });
+    ws.orders.forEach((o) => { if (!ws.tutorial) { const f = Math.max(0, Math.min(1, o.p / o.max)); $$(`[data-p="${o.id}"]`).forEach(b=>{b.style.width = (f * 100) + '%'; b.parentElement.classList.toggle('low', f < 0.2); if(b.parentElement.hasAttribute('role'))b.parentElement.setAttribute('aria-valuenow',Math.round(f*100));}); } });
     // đồng hồ lò / trụng / kim cay (không dựng lại cả bàn)
     const p = ws.product;
     if (p) {

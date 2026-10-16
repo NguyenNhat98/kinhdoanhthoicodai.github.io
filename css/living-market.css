@@ -75,4 +75,74 @@ button:focus-visible,select:focus-visible {outline:3px solid #3e9b83;outline-off
 /* người đi chợ: bóng đổ + chuyển động tự nhiên */
 .walker-body { will-change: transform; backface-visibility: hidden; } .walker-shadow { transition: none; } .pedestrian { contain: layout; }
 
+/* A readable camera HUD, leaving shop signs and footpaths visible. */
+.map { background: #b9bd95; isolation: isolate; }
+.map::before { content: ''; position: absolute; inset: -25px; background: linear-gradient(#e5cf9e44, #5d715a66), url('../assets/market.jpg') center / cover; filter: blur(18px); opacity: .75; pointer-events: none; }
+.map-img { user-select: none; }
+.map-vig { background: radial-gradient(ellipse at 50% 45%, transparent 65%, #241b1933); }
+.market-heading { top: 12px; left: 12px; padding: 8px 12px; border: 1px solid #fff2c85c; border-radius: 14px; background: #322b209c; text-shadow: 0 1px 3px #21170b; }
+.market-heading small { font-size: 8px; letter-spacing: 1.5px; }
+.market-heading b { font-size: 21px; line-height: 1.2; }
+.market-heading span { font-size: 10px; margin-top: 2px; }
+.map-chap { top: 99px; left: 12px; right: 12px; gap: 2px 6px; padding: 7px 10px; font-size: 11px; border-radius: 12px; background: #332a20e6; backdrop-filter: none; }
+.map-chap small { font-size: 10px; line-height: 1.35; }
+.map-ctl { right: 10px; bottom: 76px; gap: 5px; }
+.map-ctl button { width: 38px; height: 38px; font-size: 21px; border: 1px solid #dfc790; border-radius: 12px; background: #fff5dfee; color: #67482a; box-shadow: 0 3px 9px #231d2733; }
+.map-ctl button:disabled { opacity: .45; }
+.map-card { bottom: 75px; right: 58px; left: 10px; max-height: calc(100% - 180px); border-width: 2px; background: var(--card); }
+.market-dock { left: 10px; right: 10px; bottom: 12px; gap: 5px; }
+.market-dock button { min-height: 44px; font-size: 10px; border-radius: 12px; box-shadow: 0 3px 8px #26160a44; }
+.map-mini { position: absolute; z-index: 5; bottom: 78px; left: 12px; width: 68px; height: 100px; overflow: hidden; padding: 0; border: 2px solid #f6e5b4; border-radius: 9px; background: #8d977a; box-shadow: 0 3px 12px #241d2055; touch-action: manipulation; }
+.map-mini img { width: 100%; height: 100%; object-fit: fill; display: block; pointer-events: none; }
+.map-mini .mini-window { position: absolute; border: 1.5px solid #fff7bf; background: #ffe98a22; box-shadow: 0 0 0 80px #201b2944; pointer-events: none; }
+.map-mini small { position: absolute; left: 3px; bottom: 2px; font-size: 7px; letter-spacing: .8px; color: #fff8d6; text-shadow: 0 1px 2px #211; pointer-events: none; }
+.map-help { position: absolute; left: 12px; bottom: 186px; z-index: 5; padding: 4px 7px; color: #fff5d5; background: #302820bd; font-size: 9px; border-radius: 6px; pointer-events: none; }
+.map:has(.map-card:not([hidden])) .map-mini, .map:has(.map-card:not([hidden])) .map-help { visibility: hidden; }
+.map .hs { min-width: 44px; min-height: 44px; gap: 1px; border: 0; background: none; border-radius: 8px; }
+.map .hs-pin { width: 30px; height: 30px; border: 1.5px solid #8f5d31; background: #fff3d8f5; box-shadow: 0 2px 4px #39240e55; animation: none; }
+.map .hs-pin::after { width: 7px; height: 7px; bottom: -5px; margin-left: -3.5px; background: #8f5d31; }
+.map .hs-pin i { font-size: 17px; }
+.map .hs-name { padding: 2px 7px; border-color: #e7c784; font-size: 10px; line-height: 1.2; background: #46311de8; }
+.map .hs.npc .hs-pin { width: 24px; height: 24px; border-width: 1px; }
+.map .hs.npc .hs-pin i { font-size: 14px; }
+.map .hs.npc .hs-name { font-size: 9px; }
+.map .hs.selected .hs-pin, .map .hs.live .hs-pin { border-color: #32844b; box-shadow: 0 0 0 2px #a9e4a7cc, 0 2px 5px #30271566; }
+.map .hs.selected .hs-name { background: #285536; color: #fff7ca; }
+.map .hs-q { width: 17px; min-width: 17px; height: 17px; font-size: 10px; border-width: 1px; animation: none; top: -3px; right: 0; }
+.map[data-zoom="overview"] .hs.npc { visibility: hidden; }
+.map[data-zoom="overview"] .hs-pin { width: 24px; height: 24px; }
+.map[data-zoom="overview"] .hs-name { font-size: 9px; }
+.map .pedestrian { width: 56px; height: 64px; margin: -64px 0 0 -28px; contain: layout style; }
+.map .walker-shadow { left: 15px; width: 26px; height: 6px; filter: none; background: #34291b42; }
+.map .walker-body { width: 64px; height: 64px; margin-left: -4px; }
+.market-person { display: block; width: 64px; height: 64px; background-image: url('../assets/market/people-atlas.png'); background-size: 400% 400%; background-position: var(--person-x) var(--person-y); background-repeat: no-repeat; }
+body[data-light="2"] .map .walker-body { filter: brightness(.93) sepia(.12); }
+body[data-light="3"] .map .walker-body { filter: brightness(.8) saturate(.85); }
+.map .market-atmosphere { opacity: .5; }
+@media (max-height: 650px) {
+  .market-heading { padding: 6px 9px; }
+  .market-heading b { font-size: 18px; }
+  .map-chap { top: 87px; padding: 5px 8px; }
+  .map-mini { width: 54px; height: 79px; }
+  .map-help { bottom: 165px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .map-card { animation: none; } }
+.market-chats { position: absolute; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.market-chat { position: absolute; left: 0; top: 0; padding: 7px 9px; border: 1px solid #d7ae60; border-radius: 12px; background: #fff9e9f5; color: #57391f; box-shadow: 0 3px 9px #2e211b33; font-size: 11px; line-height: 1.35; }
+.market-chat[hidden] { display: none; }
+.market-chat b { display: block; margin-bottom: 2px; font-size: 9px; color: #a05224; }
+.market-chat::after { content: ''; position: absolute; bottom: -5px; left: var(--tail-x, 50%); width: 8px; height: 8px; background: #fff9e9; border-right: 1px solid #d7ae60; border-bottom: 1px solid #d7ae60; transform: rotate(45deg); }
+.map:has(.map-card:not([hidden])) .market-chats { visibility: hidden; }
+body.reduce-motion .market-chats { display: none; }
+@keyframes weatherFall { to { transform: translate(-90px,1600px) rotate(45deg); } }
+
+/* Small, translucent corner HUD; only the resume link intercepts map gestures. */
+.market-heading { top: 8px; left: 8px; padding: 4px 7px; border: 0; border-radius: 8px; background: #30271825; box-shadow: none; }
+.market-heading small { font-size: 7px; letter-spacing: .8px; }
+.market-heading b { font-size: 14px; line-height: 1.2; }
+.market-heading span { font-size: 8px; margin-top: 1px; }
+.map-chap { top: 59px; left: 8px; right: auto; width: min(225px, 65%); padding: 5px 7px; gap: 1px 4px; background: #30271832; border: 1px solid #fff1c326; border-radius: 8px; backdrop-filter: none; color: #fff3cf; text-shadow: 0 1px 3px #24160c; font-size: 9px; line-height: 1.3; pointer-events: none; }
+.map-chap small { font-size: 8px; color: #fff3cf; line-height: 1.35; }
+.map-chap .resume { width: auto; max-width: 100%; margin-top: 3px; padding: 4px 7px; min-height: 24px; border: 1px solid #d9f0b655; border-radius: 6px; background: #29643c88; color: #f0ffdc; font-size: 9px; line-height: 1.2; text-shadow: 0 1px 2px #173c22; pointer-events: auto; touch-action: manipulation; }
+
 html[data-theme="daituong"] body[data-contrast="true"], html[data-theme="dahoi"] body[data-contrast="true"] { --muted: #f3d9b0; --line: rgba(255, 224, 150, .6); --text: #fff7e6; --card: var(--card); --card2: var(--card2); }

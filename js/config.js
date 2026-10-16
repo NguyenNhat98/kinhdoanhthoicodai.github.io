@@ -17,33 +17,33 @@ window.CFG = {
   /* ---- 5 quầy: kế thừa mã tiệm bản cũ để nối tiến trình ---- */
   shops: [
     { id: 'trada',  name: 'Trà Tửu Góc Cây Đa',    short: 'Trà đá', icon: '🍵', unlock: 0,     upBase: 15,   price: 1,   baseCPS: 1,   staffBase: 50,    itemCost: 0.4, pack: 20,
-      map: [1205, 190], patience: [45, 60], spawn: [18, 26],
+      map: [820, 530], patience: [45, 60], spawn: [18, 26],
       desc: 'Bàn trà thấp bên gốc đa. Chính tay lấy bát, thêm đá, rót trà rồi mời khách.' },
     { id: 'trasua', name: 'Cổ Phương Trà Quán',    short: 'Trà sữa', icon: '🧋', unlock: 100,   upBase: 60,   price: 15,  baseCPS: 8,   staffBase: 500,   itemCost: 2.5, pack: 10,
-      map: [150, 150], patience: [65, 85], spawn: [22, 32],
+      map: [300, 430], patience: [65, 85], spawn: [22, 32],
       desc: 'Trà cổ phương pha cùng trân châu. Lấy ly, thêm topping, rót trà, sữa, đường, đá rồi ép nắp.' },
     { id: 'banhmi', name: 'Cổ Phong Tráp Bánh Mì', short: 'Bánh mì', icon: '🥖', unlock: 500,   upBase: 300,  price: 45,  baseCPS: 25,  staffBase: 2500,  itemCost: 8,   pack: 10,
-      map: [735, 125], patience: [70, 90], spawn: [24, 34],
+      map: [300, 585], patience: [70, 90], spawn: [24, 34],
       desc: 'Bánh mì nướng lò than. Canh độ chín, rạch bánh, phết pate, thêm nhân rồi gói giấy.' },
     { id: 'xoi',    name: 'Bát Tấm Xôi Trang',     short: 'Xôi', icon: '🍚', unlock: 2500,  upBase: 1500, price: 150, baseCPS: 80,  staffBase: 12000, itemCost: 25,  pack: 10,
-      map: [975, 150], patience: [60, 80], spawn: [22, 32],
+      map: [690, 450], patience: [60, 80], spawn: [22, 32],
       desc: 'Hấp mẻ xôi trước ca, đơm từng muỗng lên lá chuối, thêm topping rồi gói lá buộc lạt.' },
     { id: 'mycay',  name: 'Thất Cấp Hỏa Ma Đường', short: 'Mỳ cay', icon: '🍜', unlock: 10000, upBase: 6000, price: 500, baseCPS: 260, staffBase: 60000, itemCost: 70,  pack: 10,
-      map: [455, 140], patience: [80, 100], spawn: [28, 40],
+      map: [150, 820], patience: [80, 100], spawn: [28, 40],
       desc: 'Trụng mỳ, múc nước dùng, thêm topping rồi nêm cay đúng cấp 1–7 của từng vị khách.' },
   ],
 
-  /* ---- điểm chạm khác trên bản đồ (tọa độ ảnh nền 1672×941) ---- */
+  /* ---- điểm chạm khác trên bản đồ dọc 1024×1536 ---- */
   npcs: [
-    { id: 'batu',   name: 'Bà Tư',   avatar: '👵', at: [860, 430], role: 'Bà bán xôi, người dẫn đường', kind: 'npc' },
-    { id: 'tholo',  name: 'Thợ Lỗ',  avatar: '🧑‍🔧', at: [540, 385], role: 'Thợ sửa máy ép, dựng quầy', kind: 'npc' },
-    { id: 'hanmac', name: 'Hàn Mặc', avatar: '🧑‍🎓', at: [175, 440], role: 'Thư sinh, khách quen', kind: 'npc' },
-    { id: 'duocsu', name: 'Dược sư', avatar: '🧙', at: [1190, 440], role: 'Gian thảo mộc (chưa khai trương)', kind: 'npc' },
-    { id: 'cong',   name: 'Cổng Chợ', avatar: '🏮', at: [1520, 120], role: 'Bảng sự kiện', kind: 'gate' },
-    { id: 'nl1',    name: 'Nhập hàng', avatar: '🧺', at: [410, 720], role: 'Gian thủy sản', kind: 'supply' },
-    { id: 'nl2',    name: 'Nhập hàng', avatar: '🧺', at: [800, 720], role: 'Gian thịt tươi', kind: 'supply' },
-    { id: 'nl3',    name: 'Nhập hàng', avatar: '🧺', at: [1170, 735], role: 'Gian hoa tươi', kind: 'supply' },
-    { id: 'nl4',    name: 'Nhập hàng', avatar: '🧺', at: [1510, 730], role: 'Gian nông sản', kind: 'supply' },
+    { id: 'batu',   name: 'Bà Tư',   avatar: '👵', at: [400, 940], role: 'Bà bán xôi, người dẫn đường', kind: 'npc' },
+    { id: 'tholo',  name: 'Thợ Lỗ',  avatar: '🧑‍🔧', at: [430, 570], role: 'Thợ sửa máy ép, dựng quầy', kind: 'npc' },
+    { id: 'hanmac', name: 'Hàn Mặc', avatar: '🧑‍🎓', at: [510, 310], role: 'Thư sinh, khách quen', kind: 'npc' },
+    { id: 'duocsu', name: 'Dược sư', avatar: '🧙', at: [630, 980], role: 'Gian thảo mộc (chưa khai trương)', kind: 'npc' },
+    { id: 'cong',   name: 'Cổng Chợ', avatar: '🏮', at: [520, 200], role: 'Bảng sự kiện', kind: 'gate' },
+    { id: 'nl1',    name: 'Nhập hàng', avatar: '🧺', at: [790, 1100], role: 'Gian thủy sản', kind: 'supply' },
+    { id: 'nl2',    name: 'Nhập hàng', avatar: '🧺', at: [870, 840], role: 'Gian thịt nướng', kind: 'supply' },
+    { id: 'nl3',    name: 'Nhập hàng', avatar: '🧺', at: [530, 1220], role: 'Gian hoa tươi', kind: 'supply' },
+    { id: 'nl4',    name: 'Nhập hàng', avatar: '🧺', at: [850, 1310], role: 'Gian vải lụa', kind: 'supply' },
   ],
 
   /* ---- vật tư / nguyên liệu mỗi quầy (đơn vị = một phần). w = hệ số giá, start = tồn khi mở quầy ---- */

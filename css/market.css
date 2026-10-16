@@ -36,9 +36,6 @@
 
 /* người đi chợ */
 .map-walkers { position: absolute; inset: 0; pointer-events: none; }
-.wk { position: absolute; left: var(--x0); top: var(--y0); font-size: 30px; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, .4)); animation: walkTo var(--d) ease-in-out var(--dl) infinite alternate, stepBob .6s ease-in-out infinite; }
-@keyframes walkTo { from { transform: translate(0, 0); } to { transform: translate(var(--dx), var(--dy)); } }
-@keyframes stepBob { 50% { margin-top: -5px; } }
 
 /* thẻ chương + điều khiển + thẻ thông tin */
 .map-chap { position: absolute; left: 8px; right: 8px; top: 8px; z-index: 6; padding: 6px 10px; border-radius: 12px; background: rgba(40, 20, 10, .82); color: #ffe9b0; border: 1.5px solid #c8902a; font-size: 12.5px; line-height: 1.35; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
@@ -55,5 +52,4 @@
 .mc-b { display: flex; gap: 8px; } .mc-b .btn { flex: 1; font-size: 13px; padding: 6px 8px; } .mc-b.wrap { flex-wrap: wrap; } .mc-b.wrap .btn { flex: 1 1 40%; }
 .mc-need { color: var(--muted); }
 @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } }
-@media (prefers-reduced-motion: reduce), (hover: none) and (max-width: 0px) { .wk { animation: none; } }
-body.reduce-motion .wk, body.reduce-motion .hs-pin { animation: none !important; }
+body.reduce-motion .hs-pin { animation: none !important; }

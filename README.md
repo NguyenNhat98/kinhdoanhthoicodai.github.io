@@ -1,5 +1,7 @@
 # Xuyên Không Cổ Đại — Chợ Cổ sống động
 
+Bản đồ chợ làng: xem [map dọc, giới hạn đường đi và hội thoại](docs/CHO-LANG-DOC-VA-HOI-THOAI.md). Kiểm tra riêng bằng `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-browser.ps1 -Page tests/market.html`.
+
 Mở `index.html` để chơi. Bản mới thêm người đi chợ bằng sprite, ánh sáng/ngày/đêm và thời tiết, cảnh riêng cho năm quầy, bảng điều hành ca, cài đặt mở rộng và Hội làng (ném còn, ô ăn quan, tìm đôi nguyên liệu). Tiến trình cũ được giữ và bổ sung các tùy chọn mặc định.
 
 - [Phân tích và kịch bản thiết kế chi tiết](docs/THIET-KE-CHO-VA-QUAY.md)

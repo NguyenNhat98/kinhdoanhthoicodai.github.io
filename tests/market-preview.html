@@ -1,0 +1,24 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Xem trước chợ làng</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#e5d7b7}iframe{border:0;width:100%;height:100%}</style>
+<iframe id="game" src="../index.html"></iframe><script>
+const params=new URLSearchParams(location.search),frame=document.querySelector('#game');
+frame.style.width=(params.get('width')||390)+'px';frame.style.height=(params.get('height')||844)+'px';
+frame.onload=()=>{
+ const w=frame.contentWindow,d=w.document;
+ d.querySelector('#splash').hidden=true;w.UI.closeModal();
+ Object.assign(w.Game.S.settings,{crowd:Number(params.get('crowd')||16),daylight:Number(params.get('light')||(params.get('mode')==='night'?3:1)),weather:Number(params.get('weather')||0)});
+ w.LivingMarket.applySettings();
+ if(params.get('mode')==='resume'){w.Game.S.tut.trada=true;w.WS.start('trada');w.WS.setPause('away',true);w.MM.refresh();}
+ if(['overview','routes','chat'].includes(params.get('mode')))w.MM.overview();
+ else w.MM.focus(...w.Game.shopDef(params.get('shop')||'trada').map,false);
+ if(params.get('routes')==='1'||params.get('mode')==='routes'){
+   const svg=d.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox',`0 0 ${w.MM.W} ${w.MM.H}`);
+   svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none';
+   svg.innerHTML=w.MarketWorld.ground.map(p=>`<polygon points="${p.map(a=>a.join(',')).join(' ')}" fill="#00ffb522" stroke="#00cf92" stroke-width="2"/>`).join('')+w.LivingMarket.routes.map((r,i)=>`<polyline points="${r.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${['#f22','#00d5ff','#ff1fe8','#20ff50'][i]}" stroke-width="5" opacity=".8"/>`).join('');
+   d.querySelector('#mapStage').appendChild(svg);
+ }
+ if(params.get('mode')==='chat')setTimeout(()=>{
+   const L=w.LivingMarket;L.stopConversation();L.chatDue=0;L.tickConversation(.01);
+ },4000);
+};
+</script></html>

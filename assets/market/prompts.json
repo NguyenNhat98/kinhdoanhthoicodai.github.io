@@ -1,0 +1,17 @@
+{
+  "tool": "Built-in image_gen.imagegen for the people atlas only; the current scene is supplied by the user",
+  "scene": {
+    "output": "assets/market.jpg",
+    "input": "../Anh/Chợ Làng Cổ Bên Kênh Nước.png",
+    "prompt": null,
+    "encoding": "User-provided 1024x1536 portrait PNG encoded as JPEG quality 90 without resizing or changing its composition"
+  },
+  "people": {
+    "output": "assets/market/people-atlas.png",
+    "input": "../Anh/Chợ làng cổ phong cách hoạt hình 2D.png",
+    "transparent_background": true,
+    "prompt": "Use case: background-extraction. Asset type: transparent game character sprite atlas based on the walking people in the reference. Create ONE square 1024x1024 transparent PNG containing EXACTLY 16 distinct full-body ancient Vietnamese chibi villagers in an EXACT uniform 4-column by 4-row grid, equal 256x256 cells. Each character is fully isolated in their own cell with clear transparent margins on every side, NO overlap. Bottoms of all feet at y=232 within each cell, top of hats around y=40. All characters same overall height, front three-quarter view facing LEFT, one relaxed mid-stride walking pose, feet separated. Match the reference's warm detailed colorful 2D game illustration, black clean outlines, expressive cute faces and ancient clothing. A varied crowd of women and men, young scholar, elderly man, market merchant with baskets, girl in red, woman in purple, boy in blue, man in green, woman with conical hat, farmer in ochre, lady in pink, man in black hat, child in yellow, older lady in blue, young woman in teal, trader in brown. ONLY these 16 characters. Remove ALL scenery, props not carried by people, ground, checkerboard, text, tile boundaries and cast shadows. Background must be genuine transparent alpha, NOT a drawn checkerboard. No labels. Precise grid spacing is essential for CSS sprite indexing.",
+    "actual_dimensions": [1254, 1254],
+    "layout": "4x4, selected using relative CSS background positions"
+  }
+}

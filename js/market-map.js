@@ -1,32 +1,40 @@
 /* ============================================================================
-   BẢN ĐỒ CHỢ CỔ: ảnh nền 1672×941, camera kéo + hai ngón phóng to, điểm chạm quầy/NPC/nhập hàng,
-   thẻ thông tin gian, chợ đổi theo tiến trình (quầy khóa tối, NPC đông dần).
+   BẢN ĐỒ CHỢ CỔ: ảnh nền dọc, camera kéo/quán tính/hai ngón, bản đồ nhỏ,
+   điểm chạm quầy/NPC/nhập hàng và thẻ thông tin theo tiến trình.
    ========================================================================== */
 (function () {
   'use strict';
   const G = window.Game, C = window.CFG;
-  const MM = { x: 0, y: 0, s: 0.8, min: 0.45, max: 1.7, W: 1672, H: 941, drag: null, pts: new Map(), sel: null };
+  const MM = { x: 0, y: 0, s: 0.8, min: 0.3, max: 2, W: window.MarketWorld.width, H: window.MarketWorld.height, drag: null, pts: new Map(), sel: null, vx: 0, vy: 0, motion: null };
   window.MM = MM;
   const $ = (q, r) => (r || document).querySelector(q);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const sfx = (t) => window.Audio2.sfx(t);
 
   MM.mount = function (host) {
-    host.innerHTML = `<div class="map" id="map">
+    if (MM.events) MM.events.abort();
+    if (MM.observer) MM.observer.disconnect();
+    MM.events = new AbortController(); MM.pts.clear(); MM.drag = null; MM.motion = null; MM.vx = MM.vy = 0;MM.suppressClick=false;
+    host.innerHTML = `<div class="map" id="map" tabindex="0" aria-label="Bản đồ chợ làng. Kéo để khám phá, dùng hai ngón hoặc nút cộng trừ để thu phóng. Phím mũi tên để di chuyển.">
       <div class="map-stage" id="mapStage" style="width:${MM.W}px;height:${MM.H}px">
         <img class="map-img" src="assets/market.jpg" alt="Chợ làng cổ" draggable="false">
-        <div class="map-glow"></div><div class="map-walkers" id="walkers"></div><div class="map-hs" id="hs"></div>
+        <div class="map-glow"></div><div class="map-walkers" id="walkers"></div>
+        <div class="map-hs" id="hs"></div>
       </div>
       <div class="map-vig"></div>
       <div class="map-chap" id="mapChap"></div>
-      <div class="map-ctl"><button data-m="zi" aria-label="Phóng to">＋</button><button data-m="zo" aria-label="Thu nhỏ">－</button><button data-m="home" aria-label="Về quán đang chọn">⌖</button><button data-m="find" aria-label="Tìm quầy">🔎</button></div>
+      <div class="map-ctl"><button data-m="zi" aria-label="Phóng to">＋</button><button data-m="zo" aria-label="Thu nhỏ">－</button><button data-m="home" aria-label="Về quán đang chọn">⌖</button><button data-m="overview" aria-label="Xem toàn cảnh chợ">▧</button></div>
+      <button class="map-mini" data-m="minimap" aria-label="Bản đồ nhỏ: chạm để đến một vị trí, Enter để xem toàn cảnh"><img src="assets/market.jpg" alt="" draggable="false"><span class="mini-window"></span><small>CHỢ LÀNG</small></button>
+      <div class="map-help">Kéo để dạo chợ · Chạm biển để vào quầy</div>
+      <div class="market-chats" aria-hidden="true"></div>
       <div class="map-card" id="mapCard" hidden></div></div>`;
     MM.stage = $('#mapStage'); MM.el = $('#map');
-    buildHotspots(); buildWalkers(); bind(); MM.fit(true); MM.refresh();
+    MM._view = null; buildHotspots(); buildWalkers(); bind(); MM.fit(true); MM.refresh();
+    MM.observer = new ResizeObserver(() => MM.fit(false)); MM.observer.observe(MM.el);
   };
 
   /* ---------- camera ---------- */
-  MM.view = () => ({ w: MM.el.clientWidth, h: MM.el.clientHeight });
+  MM.view = () => MM._view || (MM._view = { w: MM.el.clientWidth, h: MM.el.clientHeight });
   MM.clampCam = function () {
     const v = MM.view(), W = MM.W * MM.s, H = MM.H * MM.s;
     MM.x = W <= v.w ? (v.w - W) / 2 : Math.max(v.w - W, Math.min(0, MM.x));
@@ -34,24 +42,51 @@
   };
   MM.apply = function () {
     MM.clampCam();
-    MM.stage.style.transform = `translate(${MM.x}px,${MM.y}px) scale(${MM.s})`;
-    MM.stage.style.setProperty('--inv', (1 / Math.max(0.6, MM.s)).toFixed(3));
+    MM.stage.style.transform = `translate3d(${MM.x.toFixed(2)}px,${MM.y.toFixed(2)}px,0) scale(${MM.s.toFixed(4)})`;
+    MM.stage.style.setProperty('--inv', (1 / MM.s).toFixed(4));
+    MM.el.dataset.zoom = MM.s < .5 ? 'overview' : MM.s < .85 ? 'district' : 'street';
+    const v = MM.view(), mini = $('.mini-window', MM.el);
+    if (mini) {
+      const left = Math.max(0, -MM.x / MM.s), top = Math.max(0, -MM.y / MM.s);
+      mini.style.cssText = `left:${left/MM.W*100}%;top:${top/MM.H*100}%;width:${Math.min(MM.W-left,v.w/MM.s)/MM.W*100}%;height:${Math.min(MM.H-top,v.h/MM.s)/MM.H*100}%`;
+    }
+    if(window.LivingMarket?.updateChats)window.LivingMarket.updateChats();
   };
   MM.fit = function (initial) {
-    const v = MM.view(); MM.min = Math.max(0.3, v.h / MM.H);
-    if (initial) { MM.s = Math.max(MM.min, 0.85); MM.focus(...G.shopDef(MM.sel && MM.sel.id || 'trada').map, false); } else { MM.s = Math.max(MM.min, MM.s); MM.apply(); }
+    const old = MM._view, center = old ? [(old.w/2-MM.x)/MM.s,(old.h/2-MM.y)/MM.s] : null;
+    MM._view = { w: MM.el.clientWidth, h: MM.el.clientHeight };
+    const v = MM.view(); if (!v.w || !v.h) return;
+    // Leave vertical travel even at the smallest zoom: the street is a place to
+    // explore, rather than a small image locked in the middle of the viewport.
+    MM.min = Math.max(v.w / MM.W, (v.h + 120) / MM.H);
+    MM.max = Math.max(2, Math.max(v.w/MM.W,v.h/MM.H)*1.8);
+    if (initial) { MM.s = Math.min(MM.max,Math.max(v.w/MM.W,v.h/MM.H)*1.35); MM.focus(...G.shopDef(MM.sel && MM.sel.id || 'trada').map, false); }
+    else { MM.cancelMotion(); MM.s = Math.max(MM.min,Math.min(MM.max,MM.s)); if(center){MM.x=v.w/2-center[0]*MM.s;MM.y=v.h/2-center[1]*MM.s;} MM.apply(); }
   };
+  MM.cancelMotion = () => { MM.motion = null; MM.vx = MM.vy = 0; };
   MM.focus = function (px, py, anim) {
+    MM.cancelMotion();
     const v = MM.view(), tx = v.w / 2 - px * MM.s, ty = v.h * 0.42 - py * MM.s;
-    if (!anim) { MM.x = tx; MM.y = ty; MM.apply(); return; }
-    const x0 = MM.x, y0 = MM.y, t0 = performance.now();
-    const f = (n) => { const k = Math.min(1, (n - t0) / 500), e = 1 - Math.pow(1 - k, 3); MM.x = x0 + (tx - x0) * e; MM.y = y0 + (ty - y0) * e; MM.apply(); if (k < 1) requestAnimationFrame(f); };
-    requestAnimationFrame(f);
+    if (!anim || document.body.classList.contains('reduce-motion')) { MM.x = tx; MM.y = ty; MM.apply(); return; }
+    MM.motion = { x0: MM.x, y0: MM.y, tx, ty, elapsed: 0 };
   };
   MM.zoom = function (f, cx, cy) {
+    MM.cancelMotion();
     const v = MM.view(); cx = cx == null ? v.w / 2 : cx; cy = cy == null ? v.h / 2 : cy;
     const ns = Math.max(MM.min, Math.min(MM.max, MM.s * f)), k = ns / MM.s;
     MM.x = cx - (cx - MM.x) * k; MM.y = cy - (cy - MM.y) * k; MM.s = ns; MM.apply();
+  };
+  MM.overview = function () { MM.cancelMotion(); MM.s = MM.min; const v=MM.view(); MM.x=(v.w-MM.W*MM.s)/2;MM.y=(v.h-MM.H*MM.s)/2;MM.apply(); };
+  MM.tick = function (dt) {
+    if (!MM.el?.isConnected || document.hidden || window.UI.page!=='market' || window.WUI.isOpen()) { MM.cancelMotion(); return; }
+    if (MM.motion) {
+      const m=MM.motion;m.elapsed+=dt;const t=Math.min(1,m.elapsed/.42),e=1-(1-t)**3;
+      MM.x=m.x0+(m.tx-m.x0)*e;MM.y=m.y0+(m.ty-m.y0)*e;MM.apply();if(t===1)MM.motion=null;
+    } else if (!MM.drag && (Math.abs(MM.vx)>2 || Math.abs(MM.vy)>2)) {
+      const decay=Math.exp(-7*dt),x=MM.x,y=MM.y;
+      MM.x+=MM.vx*(1-decay)/7;MM.y+=MM.vy*(1-decay)/7;MM.vx*=decay;MM.vy*=decay;MM.apply();
+      if(MM.x===x)MM.vx=0;if(MM.y===y)MM.vy=0;
+    }
   };
 
   /* ---------- điểm chạm ---------- */
@@ -62,11 +97,7 @@
     $('#hs').innerHTML = h;
   }
   function buildWalkers() {
-    const un = C.shops.filter((s) => G.S.shops[s.id].unlocked).length, n = G.S.settings.reduce ? 2 : Math.min(12, 3 + un * 2);
-    const av = ['🚶', '🚶‍♀️', '🧑‍🌾', '👧', '🧓', '🛒'], paths = [[[520, 330], [1100, 350]], [[200, 600], [700, 560]], [[900, 560], [1400, 600]], [[300, 330], [800, 300]], [[600, 800], [1300, 780]], [[1000, 330], [1450, 420]]];
-    let h = '';
-    for (let i = 0; i < n; i++) { const p = paths[i % paths.length], dur = 26 + (i * 7) % 18; h += `<span class="wk" style="--x0:${p[0][0]}px;--y0:${p[0][1]}px;--dx:${p[1][0] - p[0][0]}px;--dy:${p[1][1] - p[0][1]}px;--d:${dur}s;--dl:-${(i * 5) % dur}s">${av[i % av.length]}</span>`; }
-    $('#walkers').innerHTML = h;
+    if(window.LivingMarket)window.LivingMarket.buildWalkers();
   }
   MM.refresh = function () {
     $$('.hs.shop').forEach((b) => {
@@ -106,6 +137,7 @@
         card.innerHTML = `<button class="x" data-m="close">✕</button><div class="mc-h"><span class="mc-i">🏮</span><div><b>Cổng Chợ Làng Cổ</b><small>Bảng sự kiện</small></div></div><p>Mỗi ca bán có thể gặp <b>giờ đông khách</b>. Quầy có trang bị mới đủ năng lực phục vụ. Hoàn thành các chương để chợ lên đèn.</p>`;
       } else card.innerHTML = `<button class="x" data-m="close">✕</button><div class="mc-h"><span class="mc-i">${n.avatar}</span><div><b>${esc(n.name)}</b><small>${esc(n.role)}</small></div></div><p>${esc(MM.npcLine(n))}</p><small class="mc-need">Quan hệ: ${'❤'.repeat(G.S.rel[n.id] || 0)}${'♡'.repeat(5 - (G.S.rel[n.id] || 0))}</small>`;
     }
+    $$('.hs.shop',MM.el).forEach(b=>{const selected=kind==='shop'&&b.dataset.id===id;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',selected);});
     sfx('click'); window.Game.buzz(8);
   };
   MM.npcLine = function (n) {
@@ -123,33 +155,69 @@
   function bind() {
     const el = MM.el;
     el.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('.map-card,.map-ctl,.map-chap,.market-dock')) return;
+      if (e.button>0 || e.target.closest('.map-card,.map-ctl,.map-chap .resume,.market-dock,.map-mini')) return;
+      MM.cancelMotion();
       MM.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      MM.drag = { x: MM.x, y: MM.y, sx: e.clientX, sy: e.clientY, moved: false, pinch: null };
-      if (MM.pts.size === 2) { const [a, b] = Array.from(MM.pts.values()); MM.drag.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s: MM.s }; }
+      if(MM.pts.size===1){MM.suppressClick=false;MM.drag = { x: MM.x, y: MM.y, sx: e.clientX, sy: e.clientY, moved: false, pinch: null, lastX:e.clientX,lastY:e.clientY,time:e.timeStamp };}
+      if (MM.pts.size === 2) {
+        const [a,b]=Array.from(MM.pts.values()),r=el.getBoundingClientRect(),cx=(a.x+b.x)/2-r.left,cy=(a.y+b.y)/2-r.top;
+        MM.drag.pinch={d:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),s:MM.s,wx:(cx-MM.x)/MM.s,wy:(cy-MM.y)/MM.s};MM.drag.moved=true;
+        MM.pts.forEach((_,id)=>{try{el.setPointerCapture(id);}catch(_){}});
+      }
     });
     el.addEventListener('pointermove', (e) => {
       if (!MM.pts.has(e.pointerId) || !MM.drag) return;
       MM.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (MM.pts.size === 2 && MM.drag.pinch) {
         const [a, b] = Array.from(MM.pts.values()), d = Math.hypot(a.x - b.x, a.y - b.y), r = el.getBoundingClientRect();
-        const ns = Math.max(MM.min, Math.min(MM.max, MM.drag.pinch.s * (d / MM.drag.pinch.d)));
-        MM.zoom(ns / MM.s, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top); MM.drag.moved = true; return;
+        const pinch=MM.drag.pinch;
+        MM.s=Math.max(MM.min,Math.min(MM.max,pinch.s*d/pinch.d));
+        MM.x=(a.x+b.x)/2-r.left-pinch.wx*MM.s;MM.y=(a.y+b.y)/2-r.top-pinch.wy*MM.s;
+        MM.apply();return;
       }
       const dx = e.clientX - MM.drag.sx, dy = e.clientY - MM.drag.sy;
       if (!MM.drag.moved && Math.abs(dx) + Math.abs(dy) > 8) { MM.drag.moved = true; try { el.setPointerCapture(e.pointerId); } catch (er) { /* bỏ qua */ } }
-      if (MM.drag.moved) { MM.x = MM.drag.x + dx; MM.y = MM.drag.y + dy; MM.apply(); }
+      if (MM.drag.moved) {
+        const drag=MM.drag,seconds=Math.max(.008,(e.timeStamp-drag.time)/1000);
+        MM.vx=MM.vx*.35+(e.clientX-drag.lastX)/seconds*.65;MM.vy=MM.vy*.35+(e.clientY-drag.lastY)/seconds*.65;
+        MM.x=drag.x+dx;MM.y=drag.y+dy;MM.apply();
+        drag.lastX=e.clientX;drag.lastY=e.clientY;drag.time=e.timeStamp;
+      }
     });
-    const end = (e) => { MM.pts.delete(e.pointerId); if (MM.pts.size < 2 && MM.drag) MM.drag.pinch = null; if (MM.pts.size === 0) setTimeout(() => { MM.drag = null; }, 30); };
+    const end = (e) => {
+      if(!MM.pts.has(e.pointerId))return;
+      const drag=MM.drag;MM.pts.delete(e.pointerId);
+      if(drag?.moved)MM.suppressClick=true;
+      if(MM.pts.size===1){const p=Array.from(MM.pts.values())[0];MM.drag={x:MM.x,y:MM.y,sx:p.x,sy:p.y,lastX:p.x,lastY:p.y,time:e.timeStamp,moved:true,pinch:null};MM.vx=MM.vy=0;}
+      else if(!MM.pts.size){
+        if(e.type==='pointercancel'||!drag?.moved||e.timeStamp-drag.time>90||document.body.classList.contains('reduce-motion'))MM.vx=MM.vy=0;
+        MM.vx=Math.max(-1400,Math.min(1400,MM.vx));MM.vy=Math.max(-1400,Math.min(1400,MM.vy));MM.drag=null;
+      }
+      try{if(el.hasPointerCapture(e.pointerId))el.releasePointerCapture(e.pointerId);}catch(_){}
+    };
     el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
-    el.addEventListener('wheel', (e) => { e.preventDefault(); const r = el.getBoundingClientRect(); MM.zoom(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+    window.addEventListener('pointerup',end,{signal:MM.events.signal});
+    window.addEventListener('pointercancel',end,{signal:MM.events.signal});
+    el.addEventListener('lostpointercapture',e=>{if(MM.pts.has(e.pointerId))end(e);});
+    el.addEventListener('wheel', (e) => { if(e.target.closest('.map-card'))return;e.preventDefault(); const r = el.getBoundingClientRect(); MM.zoom(Math.exp(-Math.max(-100,Math.min(100,e.deltaY*(e.deltaMode===1?16:1)))*.002), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+    el.addEventListener('keydown',e=>{
+      if(e.target!==el)return;
+      const keys={ArrowLeft:[80,0],ArrowRight:[-80,0],ArrowUp:[0,80],ArrowDown:[0,-80]};
+      if(keys[e.key]){e.preventDefault();MM.cancelMotion();MM.x+=keys[e.key][0];MM.y+=keys[e.key][1];MM.apply();}
+      else if(e.key==='+'||e.key==='='){e.preventDefault();MM.zoom(1.2);}
+      else if(e.key==='-'){e.preventDefault();MM.zoom(1/1.2);}
+      else if(e.key==='Home'){e.preventDefault();MM.overview();}
+      else if(e.key==='Escape')$('#mapCard').hidden=true;
+    });
     el.addEventListener('click', (e) => {
       window.Audio2.unlock();
       const hs = e.target.closest('.hs'), m = e.target.closest('[data-m]');
-      if (hs) { if (MM.drag && MM.drag.moved) return; MM.showCard(hs.dataset.hs, hs.dataset.id); return; }
+      if (hs) { if (e.detail!==0 && MM.suppressClick) { MM.suppressClick=false; return; } MM.showCard(hs.dataset.hs, hs.dataset.id); return; }
       if (!m) return;
       const a = m.dataset.m, id = m.dataset.id;
       if (a === 'zi') MM.zoom(1.25); else if (a === 'zo') MM.zoom(0.8);
+      else if (a === 'overview') MM.overview();
+      else if (a === 'minimap') { if(!e.detail)MM.overview();else{const r=m.getBoundingClientRect(),x=(e.clientX-r.left-m.clientLeft)/m.clientWidth,y=(e.clientY-r.top-m.clientTop)/m.clientHeight;MM.focus(Math.max(0,Math.min(1,x))*MM.W,Math.max(0,Math.min(1,y))*MM.H,true);} }
       else if (a === 'home') { const sid = (MM.sel && MM.sel.id) || 'trada'; MM.focus(...G.shopDef(sid).map, true); }
       else if (a === 'find') MM.findMenu();
       else if (a === 'close') $('#mapCard').hidden = true;
@@ -160,7 +228,8 @@
       else if (a === 'resume') { const ws = window.WS.state(); if (ws) window.WUI.open(ws.shop); }
       else if (a === 'go') { $('#mapCard').hidden = true; MM.focus(...G.shopDef(id).map, true); MM.showCard('shop', id); }
     });
-    window.addEventListener('resize', () => { MM.fit(false); });
+    window.addEventListener('blur',()=>{MM.pts.clear();MM.drag=null;MM.cancelMotion();},{signal:MM.events.signal});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){MM.pts.clear();MM.drag=null;MM.cancelMotion();}},{signal:MM.events.signal});
   }
   MM.findMenu = function () {
     const card = $('#mapCard'); card.hidden = false;
