@@ -60,7 +60,10 @@
         const gr = c.createRadialGradient(0, 0, 0, 0, 0, s * 2.4); gr.addColorStop(0, 'rgba(255,190,90,' + 0.6 * g + ')'); gr.addColorStop(1, 'rgba(255,140,40,0)');
         c.fillStyle = gr; c.beginPath(); c.arc(0, 0, s * 2.4, 0, 6.3); c.fill();
         c.fillStyle = '#ffb347'; c.strokeStyle = '#c8622a'; c.lineWidth = 1;
-        c.beginPath(); c.moveTo(-s * 0.55, -s * 0.5); c.lineTo(s * 0.55, -s * 0.5); c.lineTo(s * 0.7, s * 0.55); c.lineTo(-s * 0.7, s * 0.55); c.closePath(); c.fill(); c.stroke();
+        const gr2 = c.createLinearGradient(0, -s * .6, 0, s * .6); gr2.addColorStop(0, '#ffd27a'); gr2.addColorStop(.55, '#ff9a3d'); gr2.addColorStop(1, '#d8502a'); c.fillStyle = gr2;
+        c.beginPath(); c.moveTo(-s * .28, -s * .55); c.quadraticCurveTo(-s * .85, -s * .1, -s * .5, s * .5); c.lineTo(s * .5, s * .5); c.quadraticCurveTo(s * .85, -s * .1, s * .28, -s * .55); c.closePath(); c.fill(); c.stroke();
+        c.strokeStyle = 'rgba(255,240,180,.7)'; c.beginPath(); c.moveTo(0, -s * .55); c.lineTo(0, s * .5); c.stroke();
+        c.fillStyle = 'rgba(255,250,200,.95)'; c.beginPath(); c.ellipse(0, s * .5, s * .28, s * .12, 0, 0, 6.3); c.fill();
       }
       c.restore();
     }

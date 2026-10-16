@@ -69,11 +69,21 @@
     }
     L.walkers.forEach(w => position(w, false));
   };
+  /* Sprite gốc quay mặt sang TRÁI. face: -1 = mặt trái (đang đi trái), +1 = mặt phải (lật ảnh). `turn` nội suy để quay người mượt. */
+  const ease = (t) => t * t * (3 - 2 * t);
   function position(w, moving) {
-    const depth = 0.65 + w.y / 1700, bounce = moving ? Math.sin(L.time * 10 + w.phase) * 1.5 : 0;
-    w.el.style.transform = `translate(${w.x}px,${w.y}px) scale(${depth})`;
+    const depth = 0.65 + w.y / 1700, T = L.time, sp = w.vm || 0;
+    const stride = Math.sin(T * (7 + sp * .22) + w.phase), step = Math.abs(stride);
+    const bob = moving ? -step * (2.4 + sp * .05) * depth : Math.sin(T * 1.6 + w.phase) * .5;
+    const lean = moving ? (w.turn || 0) * -3.2 * Math.min(1, sp / 18) + stride * 1.6 : Math.sin(T * 1.2 + w.phase) * .6;
+    const squash = moving ? 1 - step * .035 : 1 + Math.sin(T * 1.8 + w.phase) * .012;
+    w.el.style.transform = `translate3d(${w.x.toFixed(1)}px,${w.y.toFixed(1)}px,0) scale(${depth.toFixed(3)})`;
     w.el.style.zIndex = Math.round(w.y);
-    w.el.querySelector('.walker-body').style.transform = `translateY(${bounce}px) scaleX(${w.face || 1}) rotate(${moving ? Math.sin(L.time * 5 + w.phase) * 1.2 : 0}deg)`;
+    const body = w.body || (w.body = w.el.querySelector('.walker-body')), sh = w.sh || (w.sh = w.el.querySelector('.walker-shadow'));
+    // scaleX đi qua 0 khi đổi hướng → thấy nhân vật quay người thay vì bật lật đột ngột
+    const sx = -(w.turn === undefined ? 1 : w.turn);
+    body.style.transform = `translateY(${bob.toFixed(2)}px) rotate(${lean.toFixed(2)}deg) scale(${(sx * (1 + step * .02)).toFixed(3)},${squash.toFixed(3)})`;
+    if (sh) sh.style.transform = `scale(${(1 - step * .15).toFixed(2)},1)`;
   }
   L.tick = (dt) => {
     if (!G.S || document.hidden) return;
@@ -81,17 +91,26 @@
     if (window.WUI.isOpen() || window.UI.page !== 'market' || document.body.classList.contains('reduce-motion')) return;
     L.walkers.forEach(w => {
       if (!w.el.isConnected) return;
-      if (w.wait > 0) { w.wait -= dt; position(w, false); return; }
+      // quay người mượt về hướng muốn đi (face: -1 trái, +1 phải)
+      if (w.turn === undefined) w.turn = w.face || -1;
+      const want = w.face || -1; if (w.turn !== want) { w.turn += Math.sign(want - w.turn) * Math.min(Math.abs(want - w.turn), dt * 7); }
+      if (w.wait > 0) { w.wait -= dt; w.vm = Math.max(0, (w.vm || 0) - dt * 60); // dừng lại: giảm tốc dần, thỉnh thoảng nhìn ngang
+        if (w.wait > .5 && Math.random() < dt * .35) w.face = -(w.face || -1);
+        position(w, w.vm > 3); return; }
       let next = w.index + w.dir;
       if (next < 0 || next >= w.path.length) { w.dir *= -1; next = w.index + w.dir; }
-      const [x, y] = w.path[next], dx = x - w.x, dy = y - w.y, distance = Math.hypot(dx, dy);
+      if (w.jx === undefined) { w.jx = (Math.random() - .5) * 26; w.jy = (Math.random() - .5) * 12; }
+      const tx = w.path[next][0] + w.jx, ty = w.path[next][1] + w.jy, dx = tx - w.x, dy = ty - w.y, distance = Math.hypot(dx, dy);
       const blocked = L.walkers.some(other => other !== w && other.path === w.path && other.dir === w.dir && Math.hypot(other.x - w.x, other.y - w.y) < 28 && (other.x - w.x) * dx + (other.y - w.y) * dy > 0);
       if (!blocked) {
-        const step = Math.min(distance, w.speed * dt);
-        if (distance > 0) { w.x += dx / distance * step; w.y += dy / distance * step; w.face = dx < 0 ? -1 : 1; }
-        if (distance < 2) { w.index = next; w.wait = next === 0 || next === w.path.length - 1 ? 2 + (w.phase % 3) : 0.15; }
-      }
-      position(w, !blocked);
+        // tăng tốc / giảm tốc tự nhiên, đi chậm lại khi sắp tới điểm dừng
+        const goal = w.speed * (1 + Math.sin(L.time * .7 + w.phase) * .12) * (distance < 40 && (next === 0 || next === w.path.length - 1) ? .55 : 1);
+        w.vm = (w.vm || 0) + (goal - (w.vm || 0)) * Math.min(1, dt * 3.2);
+        const stepLen = Math.min(distance, w.vm * dt);
+        if (distance > 0) { w.x += dx / distance * stepLen; w.y += dy / distance * stepLen; if (Math.abs(dx) > 6) w.face = dx > 0 ? 1 : -1; }
+        if (distance < 3) { w.index = next; w.jx = w.jy = undefined; w.wait = next === 0 || next === w.path.length - 1 ? 1.6 + (w.phase % 3) : (Math.random() < .12 ? .8 : 0); }
+      } else w.vm = Math.max(0, (w.vm || 0) - dt * 40);
+      position(w, !blocked && (w.vm || 0) > 3);
     });
   };
   const mount = window.MM.mount;

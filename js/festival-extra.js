@@ -89,7 +89,7 @@
       if (r.nextSpawn <= 0 && r.ducks.length < 7) {
         const gold = Math.random() < 0.2, dir = Math.random() < 0.5 ? 1 : -1, el = document.createElement('button');
         el.className = 'duck' + (gold ? ' gold' : ''); el.textContent = '🦆'; el.dataset.xduck = '1'; el.style.top = rnd(6, 78) + '%'; el.style.left = '0';
-        el.style.scale = `${-dir} 1`; pond.appendChild(el);
+        el.style.scale = `${dir} 1`; pond.appendChild(el); /* hình vịt quay mặt phải */
         r.ducks.push({ el, x: dir > 0 ? -12 : 112, dir, v: rnd(14, 24) * (gold ? 1.7 : 1), gold, bob: rnd(0, 6) });
         r.nextSpawn = rnd(0.35, 0.8);
       }
@@ -106,7 +106,7 @@
     }
   }
   function drawRope(r) {
-    const m = $('#ropeMark'); if (m) m.style.left = r.pos + '%';
+    const m = $('#ropeMark'); if (m) m.style.left = (100 - r.pos) + '%'; /* kéo → cờ chạy về phía BẠN (trái) */
     const s = $('#xScore'); if (s) s.textContent = r.pos > 58 ? 'Bạn đang thắng thế!' : r.pos < 42 ? 'Máy đang áp đảo!' : 'Ngang sức';
   }
   function hud(r) {

@@ -73,7 +73,7 @@
       r.next -= dt; if (r.next <= 0) { spawn(); r.next = rnd(.7, 1.3); }
       r.items = r.items.filter((it) => {
         it.x -= it.v * dt; it.e.style.translate = (it.x / 100 * sw) + 'px ' + (-(it.y / 100 * sh)) + 'px';
-        if (it.kind === 'bird') it.e.style.transform = `translate(-50%, 50%) translateY(${Math.sin(r.t * 9 + it.y) * 5}px)`;
+        if (it.kind === 'bird') it.e.style.transform = `translate(-50%, 50%) translateY(${Math.sin(r.t * 9 + it.y) * 5}px) scaleX(-1)`; /* chim bay sang trái */
         const hit = Math.abs(it.x - kx) < 6.5 && Math.abs(it.y - r.y) < 8.5;
         if (hit) {
           if (it.kind === 'star') { r.score += 3; setScore(r); FX.at(kt, '+3 ⭐', 'gold'); FX.boom(kt.getBoundingClientRect().left + 20, kt.getBoundingClientRect().top + 20, ['✨', '⭐'], 6); sfx('coin'); }
@@ -139,7 +139,8 @@
       ctx.strokeStyle = 'rgba(176,115,58,.9)'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.beginPath(); segs.forEach((s, i) => { if (i) ctx.lineTo(s.x, s.y); else ctx.moveTo(s.x, s.y); }); ctx.stroke();
       candies.forEach((c) => { c.p += dt * 4; emoji(c.icon, c.x, c.y + Math.sin(c.p) * 3, 24); });
       for (let i = segs.length - 1; i >= 1; i--) emoji(KIDS[i % KIDS.length], segs[i].x, segs[i].y + Math.sin(r.t * 8 + i) * 1.6, 22);
-      ctx.save(); ctx.shadowColor = 'rgba(255,180,40,.9)'; ctx.shadowBlur = 14; emoji('🐉', h.x, h.y, 34, Math.sin(r.t * 6) * .12); ctx.restore();
+      r.face = Math.abs(Math.cos(r.ang || 0)) > .15 ? (Math.cos(r.ang) < 0 ? -1 : 1) : (r.face || 1);
+      ctx.save(); ctx.shadowColor = 'rgba(255,180,40,.9)'; ctx.shadowBlur = 14; ctx.translate(h.x, h.y); ctx.scale(r.face, 1); emoji('🐉', 0, 0, 34, Math.sin(r.t * 6) * .12 + (r.face > 0 ? Math.sin(r.ang || 0) : -Math.sin(r.ang || 0)) * .5 * (r.face > 0 ? 1 : -1)); ctx.restore();
       ctx.globalAlpha = wiz.stun > 0 ? .6 : 1; emoji('🧙', wiz.x, wiz.y, 30); ctx.globalAlpha = 1; if (wiz.stun > 0) emoji('💫', wiz.x, wiz.y - 20, 18);
     }, 30);
   };

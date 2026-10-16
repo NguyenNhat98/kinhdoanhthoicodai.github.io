@@ -71,3 +71,8 @@ button:focus-visible,select:focus-visible {outline:3px solid #3e9b83;outline-off
 @media(max-height:740px) {.st-banner {height:78px;}.c-face .customer-sprite {height:44px;}.stall-tools button {min-height:29px;}.shift-dashboard {padding:2px 7px;}}
 @media(max-width:375px) {.stall-tools button {font-size:9px;}.festival-hero>span {font-size:65px;right:5px;}.memory-board button {height:62px;}.market-heading b {font-size:22px;}}
 @media(prefers-reduced-motion:reduce) {*,*::before,*::after {animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;}}
+
+/* người đi chợ: bóng đổ + chuyển động tự nhiên */
+.walker-body { will-change: transform; backface-visibility: hidden; } .walker-shadow { transition: none; } .pedestrian { contain: layout; }
+
+html[data-theme="daituong"] body[data-contrast="true"], html[data-theme="dahoi"] body[data-contrast="true"] { --muted: #f3d9b0; --line: rgba(255, 224, 150, .6); --text: #fff7e6; --card: var(--card); --card2: var(--card2); }

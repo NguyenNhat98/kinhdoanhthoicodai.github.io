@@ -53,3 +53,6 @@
 .day-stage .cook-bar { width: 90%; margin-top: 8px; z-index: 2; } .day-stage .cook-bar i { background: linear-gradient(90deg, #fff, #ffe9b8); } .day-stage .cook-bar span { color: #5a3a14; }
 
 body.reduce-motion .bg-fish, body.reduce-motion .fish-sky::after, body.reduce-motion .fish-water::before { animation: none; }
+
+/* cá nền bơi sang phải: hình cá có đầu bên trái nên lật lại */
+.bg-fish { animation-name: bgSwim2 !important; } @keyframes bgSwim2 { from { transform: translateX(0) scale(calc(var(--s, 1) * -1), var(--s, 1)); } to { transform: translateX(120vw) scale(calc(var(--s, 1) * -1), var(--s, 1)); } }
