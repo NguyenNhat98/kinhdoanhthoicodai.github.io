@@ -21,7 +21,7 @@
     ['⭐', 'Điểm và thưởng', 'Mỗi món được chấm theo từng thành phần: <b>hoàn hảo</b> (≥ 95%) nhận tiền cao + tiền boa + hiệu ứng ✦; <b>tạm được</b> nhận ít hơn; dưới 50% khách <b>từ chối</b>. Giao 5 đơn chuẩn liên tiếp được <b>thưởng gấp đôi</b>.'],
     ['🔥', 'Giờ cao điểm & điều khiển ca', 'Có lúc xuất hiện <b>“Giờ đông khách”</b>: khách đến nhanh và trả nhiều hơn. Dùng <b>🚪 Ngưng đón</b> để tạm dừng nhận khách mới, <b>⏸ Tạm dừng</b> để nghỉ, <b>🤝 Mời khách</b> (khi có trang bị) để kéo dài thời gian chờ của khách.'],
     ['🏆', 'Kết thúc ca & phát triển', 'Hết giờ, bạn thấy <b>tổng kết ca</b>: doanh thu, chi phí, lãi ròng, số sao, nhận xét khách. Dùng xu để <b>nâng cấp quầy</b>, <b>thuê tiểu nhị</b> (tự kiếm xu khi bạn vắng mặt), <b>mua trang bị</b> và mở quầy mới.'],
-    ['🎓', 'Ca hướng dẫn & mọi thứ còn lại', 'Lần đầu vào mỗi quầy là <b>ca hướng dẫn</b>: khách chờ vô hạn, sai không bị phạt, kèm <b>tham quan giao diện</b> có đèn chiếu. Giữa các ca hãy ghé <b>Hội làng</b> (20 trò dân gian), làm <b>Nhiệm vụ</b>, chỉnh <b>Cài đặt</b> (nhiều hiệu ứng nền & âm thanh). Chúc bạn thành Đại Phú Hào!']
+    ['🎓', 'Ca hướng dẫn & mọi thứ còn lại', 'Lần đầu vào mỗi quầy là <b>ca hướng dẫn</b>: khách chờ vô hạn, sai không bị phạt, kèm <b>tham quan giao diện</b> có đèn chiếu. Giữa các ca hãy ghé <b>Hội làng</b> (26 trò dân gian), làm <b>Nhiệm vụ</b>, chỉnh <b>Cài đặt</b> (nhiều hiệu ứng nền & âm thanh). Chúc bạn thành Đại Phú Hào!']
   ];
   const SHOPS = {
     trada: ['🍵', 'Trà đá', ['<b>Chọn khách</b> đầu hàng, đọc phiếu: cỡ bát (nhỏ/lớn), đá, có mật hay không.', 'Ở mục <b>Bát</b> chạm <b>Nhỏ</b> hoặc <b>Lớn</b> đúng cỡ để lấy bát (số trên nút là bát còn lại).', 'Mục <b>Thêm</b>: chạm <b>Đá</b> đúng số viên theo phiếu (chạm nhiều lần = thêm nhiều).', 'Mục <b>Rót trà</b>: <b>nhấn giữ</b> “Giữ để rót”, nhìn vạch xanh “Vừa đủ”, <b>thả tay</b> khi nước chạm vạch.', 'Nếu phiếu có mật, chạm <b>Mật</b> để thêm đúng lượng.', 'Bấm <b>Giao</b> rồi chạm đúng khách. Bát bẩn: chạm <b>Rửa bát</b> ở mục Dọn dẹp để dùng lại khi đông khách.', 'Mẹo: rửa bát sớm, đừng để hết bát giữa giờ cao điểm.']],
@@ -31,11 +31,11 @@
     mycay: ['🌶️', 'Mỳ cay', ['Mục <b>Tô</b>: chọn tô nhỏ hoặc lớn.', '<b>Trụng mỳ</b>: chạm <b>Hạ rổ mỳ</b>, nhìn thanh chín, chạm <b>Nhấc rổ</b> khi kim nằm trong vùng xanh.', '<b>Nước dùng</b>: chọn đúng loại (nấm, thịt…) và số vá theo cỡ tô.', '<b>Topping</b>: thịt, nấm, rau, trứng đúng số phần.', '<b>Nêm cay</b>: bấm cấp 1–7 đúng yêu cầu phiếu (hơn hay kém đều bị trừ). Trang bị muỗng ớt cấp 3 cho phép chọn trực tiếp.', 'Chạm <b>Đặt đũa</b> rồi <b>Giao</b>.', 'Mẹo: mỳ chín quá bị nhão, đừng để rổ dưới nước quá lâu.']]
   };
   const FEST = [
-    ['🪁', 'Hội làng là gì?', 'Tab <b>Hội làng</b> có <b>20 trò chơi dân gian</b> chia 4 nhóm: Vận động & phản xạ · Nhịp điệu & khéo tay · Phiêu lưu bầu trời · Trí tuệ dân gian. Chạm vào ô trò chơi để vào ván <b>toàn màn hình</b>.'],
+    ['🪁', 'Hội làng là gì?', 'Tab <b>Hội làng</b> có <b>26 trò chơi dân gian</b> chia 4 nhóm: Vận động & phản xạ · Nhịp điệu & khéo tay · Phiêu lưu bầu trời · Trí tuệ dân gian. Chạm vào ô trò chơi để vào ván <b>toàn màn hình</b>.'],
     ['🎁', 'Thưởng mỗi ngày', 'Mỗi ngày có <b>5 lượt nhận thưởng</b> (xu + nguyên liệu cho quầy đã mở). Điểm càng cao thưởng càng nhiều. Hết lượt vẫn chơi luyện tập được. Lượt làm mới lúc 0 giờ Việt Nam.'],
     ['🔢', 'Đếm ngược & điểm', 'Trò có đồng hồ sẽ <b>đếm ngược 3-2-1</b> kèm tóm tắt cách chơi. Thanh thời gian đỏ nhấp nháy ở 5 giây cuối. Kết thúc nhận tối đa <b>3 sao</b> và ghi <b>kỷ lục</b> riêng từng trò.'],
     ['❓', 'Xem hướng dẫn từng trò', 'Bấm nút <b>?</b> ở góc ô trò chơi, hoặc mở mục <b>Cách chơi</b> ở đầu mỗi ván. Muốn thoát giữa chừng bấm <b>Rời trò chơi</b> ở góc trái.'],
-    ['🎯', 'Các trò', 'Đập niêu · Bắt vịt · Kéo co · Nhảy bao bố · Nhảy dây · Hứng lồng đèn · Đi cà kheo · Đua thuyền rồng · Múa lân · Chơi chuyền · Nặn tò he · Ném còn · Thổi cơm thi · Bắn bi · Thả diều · Rồng rắn lên mây · Bịt mắt bắt dê · Ô ăn quan · Tìm đôi · Gói bánh chưng.']
+    ['🎯', 'Các trò', 'Đập niêu · Bắt vịt · Kéo co · Nhảy bao bố · Nhảy dây · Hứng lồng đèn · Đi cà kheo · Đua thuyền rồng · Múa lân · Chơi chuyền · Nặn tò he · Ném còn · Thổi cơm thi · Bắn bi · Thả diều · Rồng rắn lên mây · Bịt mắt bắt dê · Đánh đáo · Đánh quay · Câu cá · Giã bánh dày · Thả đỉa ba ba · Rước đèn ông sao · Ô ăn quan · Tìm đôi · Gói bánh chưng.']
   ];
   const SETTINGS = [
     ['🔊', 'Âm thanh cơ bản', 'Nhạc nền và hiệu ứng có thanh trượt riêng. Chạm màn hình lần đầu để trình duyệt cho phép bật âm thanh.'],

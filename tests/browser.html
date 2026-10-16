@@ -14,8 +14,8 @@ try{
  const x=L.walkers[0].x;for(let i=0;i<30;i++)L.tick(.1);check(L.walkers[0].x!==x,'Pedestrians move along the street');
  G.S.settings.reduce=true;L.applySettings();const paused=L.walkers[0].x;L.tick(.5);check(L.walkers[0].x===paused,'Reduced motion stops pedestrians');G.S.settings.reduce=false;L.applySettings();
  G.S.settings.crowd=0;L.applySettings();w.MM.lastUn=-1;w.MM.refresh();check(d.querySelectorAll('.pedestrian,.wk').length===0,'Zero crowd remains empty after market unlock refresh');G.S.settings.crowd=10;L.applySettings();
- UI.showPage('settings');check(d.querySelectorAll('[data-pref]').length===11,'All advanced settings rendered');
- const select=d.querySelector('[data-pref="shiftLength"]');select.value='120';select.dispatchEvent(new w.Event('change',{bubbles:true}));check(G.S.settings.shiftLength===120,'Setting change persists into game state');
+ UI.showPage('settings');check(d.querySelectorAll('[data-hub],[data-hubsel]').length>=60&&d.querySelectorAll('.sh-sec').length===7&&!d.querySelector('#nav [data-page="theme"]'),'Settings hub merges theme and all option groups');
+ d.querySelector('[data-sec="shift"]').open=true;d.querySelector('[data-hub="shiftLength"][data-v="120"]').click();check(G.S.settings.shiftLength===120,'Setting change persists into game state');
  G.S.settings.autoSelect=true;G.S.coins=100000;
  for(const shop of w.CFG.shops){
    G.S.shops[shop.id].unlocked=true;G.S.shops[shop.id].level=1;G.S.tut[shop.id]=true;

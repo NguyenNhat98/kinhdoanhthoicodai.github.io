@@ -88,7 +88,7 @@
       r.nextSpawn -= dt;
       if (r.nextSpawn <= 0 && r.ducks.length < 7) {
         const gold = Math.random() < 0.2, dir = Math.random() < 0.5 ? 1 : -1, el = document.createElement('button');
-        el.className = 'duck' + (gold ? ' gold' : ''); el.textContent = '🦆'; el.dataset.xduck = '1'; el.style.top = rnd(6, 78) + '%';
+        el.className = 'duck' + (gold ? ' gold' : ''); el.textContent = '🦆'; el.dataset.xduck = '1'; el.style.top = rnd(6, 78) + '%'; el.style.left = '0';
         el.style.scale = `${-dir} 1`; pond.appendChild(el);
         r.ducks.push({ el, x: dir > 0 ? -12 : 112, dir, v: rnd(14, 24) * (gold ? 1.7 : 1), gold, bob: rnd(0, 6) });
         r.nextSpawn = rnd(0.35, 0.8);
@@ -96,7 +96,7 @@
       r.ducks = r.ducks.filter((d) => {
         if (d.caught) return false;
         d.x += d.dir * d.v * dt; d.bob += dt * 6; const out = d.x < -15 || d.x > 115;
-        if (out) d.el.remove(); else { d.el.style.left = d.x + '%'; d.el.style.marginTop = Math.sin(d.bob) * 3 + 'px'; }
+        if (out) d.el.remove(); else d.el.style.translate = (d.x / 100 * (r.pw || (r.pw = pond.clientWidth || 300))) + 'px ' + (Math.sin(d.bob) * 3) + 'px';
         return !out;
       });
     } else {

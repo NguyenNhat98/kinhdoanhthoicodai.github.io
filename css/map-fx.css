@@ -1,0 +1,35 @@
+/* ===== Hiệu ứng màn hình chính (bản đồ chợ) ===== */
+#mfx { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+#mfx > i { position: absolute; display: block; will-change: transform, opacity; }
+body[data-quality="0"] #mfx, body.reduce-motion #mfx { display: none; }
+
+/* bóng mây */
+.mfx-shadow { left: -800px; width: var(--w); height: var(--h); border-radius: 50%; background: radial-gradient(ellipse, rgba(20, 20, 50, .3), rgba(20, 20, 50, .12) 55%, transparent 72%); filter: blur(14px); animation: mfxShadow var(--d) linear var(--dl) infinite; mix-blend-mode: multiply; }
+@keyframes mfxShadow { to { transform: translateX(calc(1672px + 1600px)); } }
+body[data-light="3"] .mfx-shadow { opacity: .35; }
+/* tia nắng */
+.mfx-shaft { top: -10%; width: 220px; height: 130%; background: linear-gradient(180deg, rgba(255, 240, 180, .38), rgba(255, 240, 180, 0)); transform: rotate(-24deg); transform-origin: 50% 0; mix-blend-mode: screen; animation: mfxShaft 7s ease-in-out infinite alternate; }
+.mfx-shaft.a { left: 12%; } .mfx-shaft.b { left: 46%; width: 150px; animation-delay: -3.5s; opacity: .8; } @keyframes mfxShaft { from { opacity: .25; transform: rotate(-24deg) translateX(0); } to { opacity: 1; transform: rotate(-22deg) translateX(40px); } }
+.mfx-sunglow { left: 4%; top: -6%; width: 520px; height: 420px; border-radius: 50%; background: radial-gradient(rgba(255, 236, 160, .45), transparent 66%); mix-blend-mode: screen; animation: glowPulse 5s ease-in-out infinite alternate; }
+body[data-light="2"] .mfx-sunglow { background: radial-gradient(rgba(255, 150, 80, .5), transparent 66%); }
+/* chim */
+.mfx-bird { left: -60px; transform: scale(var(--s, 1)); animation: mfxBird var(--d) linear var(--dl) infinite; } .mfx-bird .wl { transform-origin: 50% 60%; animation: mfxFlap .35s ease-in-out infinite alternate; }
+@keyframes mfxBird { 0% { transform: translate(0, 0) scale(var(--s)); } 50% { transform: translate(900px, var(--dy)) scale(var(--s)); } 100% { transform: translate(1800px, calc(var(--dy) * -.6)) scale(var(--s)); } } @keyframes mfxFlap { to { transform: scaleY(.45); } }
+/* bướm */
+.mfx-bfly { animation: mfxBfly var(--d) ease-in-out var(--dl) infinite alternate; } .mfx-bfly .bw { transform-origin: 50% 50%; animation: mfxWing .22s ease-in-out infinite alternate; }
+@keyframes mfxBfly { 0% { transform: translate(0, 0) rotate(-8deg); } 33% { transform: translate(var(--x1), var(--y1)) rotate(10deg); } 66% { transform: translate(var(--x2), var(--y2)) rotate(-6deg); } 100% { transform: translate(calc(var(--x1) * -1), calc(var(--y2) * -1)) rotate(8deg); } } @keyframes mfxWing { to { transform: scaleX(.35); } }
+/* khói */
+.mfx-puff { width: 26px; height: 26px; margin-left: -13px; border-radius: 50%; background: radial-gradient(rgba(255, 255, 255, .78), rgba(255, 255, 255, 0) 70%); filter: blur(3px); opacity: 0; animation: mfxPuff var(--d) ease-out var(--dl) infinite; } @keyframes mfxPuff { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 15% { opacity: .75; } 100% { transform: translate(var(--dx), -110px) scale(2.6); opacity: 0; } }
+body[data-light="3"] .mfx-puff { background: radial-gradient(rgba(255, 220, 170, .55), rgba(255, 200, 140, 0) 70%); }
+/* đom đóm */
+.mfx-ff { width: 7px; height: 7px; border-radius: 50%; background: #fff6a0; box-shadow: 0 0 10px 4px rgba(255, 224, 90, .85); animation: mfxFF var(--d) ease-in-out var(--dl) infinite alternate, mfxTw 1.6s ease-in-out infinite alternate; } @keyframes mfxFF { to { transform: translate(var(--x), var(--y)); } } @keyframes mfxTw { from { opacity: .2; } to { opacity: 1; } }
+/* đèn trời */
+.mfx-lan { bottom: -60px; transform: scale(var(--s)); filter: drop-shadow(0 0 12px rgba(255, 150, 50, .9)); animation: mfxLan var(--d) linear var(--dl) infinite; } @keyframes mfxLan { 0% { transform: translate(0, 0) scale(var(--s)); opacity: 0; } 8% { opacity: 1; } 50% { transform: translate(var(--sw), -520px) scale(var(--s)); } 100% { transform: translate(calc(var(--sw) * -.6), -1100px) scale(calc(var(--s) * .8)); opacity: 0; } }
+/* sao băng + gợn sáng khi chạm (gắn vào body) */
+.mfx-shoot { position: fixed; z-index: 9985; width: 130px; height: 2px; border-radius: 99px; background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff); transform: rotate(28deg); pointer-events: none; box-shadow: 0 0 10px 2px rgba(255, 255, 255, .7); animation: mfxShoot 1.2s ease-in forwards; } @keyframes mfxShoot { from { transform: translate(-60px, -30px) rotate(28deg); opacity: 1; } to { transform: translate(300px, 150px) rotate(28deg); opacity: 0; } }
+.mfx-ripple { position: fixed; z-index: 9985; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 2px solid rgba(255, 244, 190, .95); box-shadow: 0 0 12px rgba(255, 220, 120, .9); pointer-events: none; animation: mfxRip .75s ease-out forwards; } @keyframes mfxRip { to { transform: scale(7); opacity: 0; } }
+.mfx-spark { position: fixed; z-index: 9985; font-style: normal; font-size: 18px; margin: -10px 0 0 -9px; pointer-events: none; animation: mfxSp .9s ease-out forwards; } @keyframes mfxSp { to { transform: translateY(-46px) rotate(40deg) scale(1.4); opacity: 0; } }
+/* ghim quầy lung linh hơn */
+.hs:not(.locked) .hs-pin { animation: pinGlow 2.8s ease-in-out infinite alternate; } @keyframes pinGlow { to { filter: drop-shadow(0 0 10px rgba(255, 210, 100, .9)) brightness(1.08); } }
+body[data-glow="false"] .hs:not(.locked) .hs-pin { animation: none; }
+body[data-mfx-sun="false"] .mfx-shaft { display: none; }

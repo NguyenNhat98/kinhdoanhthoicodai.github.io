@@ -106,17 +106,38 @@
   const svcLeft = (shop, id) => ((flags().svc || {})[shop] || {})[id] || 0;
   const donateCost = () => Math.ceil(300 * Math.pow(1.35, Math.floor(G.S.flags.donated || 0)));
 
+  /* ======================== 5. NGHIÊN CỨU (chạy theo ca, áp dụng mọi quầy) ======================== */
+  const RESEARCH = [
+    { id: 'recipe', name: 'Công thức bí truyền', icon: '📜', k: 1, tiers: ['Giá món +3%', 'Giá món +6%', 'Giá món +10%'], fx: (l) => ({ price: [0, .03, .06, .10][l] }) },
+    { id: 'supplier', name: 'Hợp đồng nhà cung cấp', icon: '🤝', k: .8, tiers: ['Giá nhập hàng −8%', 'Giá nhập hàng −15%', 'Giá nhập hàng −25%'], pack: (l) => [1, .92, .85, .75][l] },
+    { id: 'training', name: 'Đào tạo nhân viên', icon: '🎓', k: 1.2, tiers: ['Hiệu quả nhân viên +15%', 'Hiệu quả nhân viên +30%', 'Hiệu quả nhân viên +50%'], staff: (l) => [1, 1.15, 1.3, 1.5][l] },
+    { id: 'survey', name: 'Khảo sát thị trường', icon: '📊', k: 1.1, tiers: ['Khách +4%', 'Khách +8%', 'Khách +14%'], fx: (l) => ({ spawn: [0, .04, .08, .14][l] }) },
+    { id: 'lean', name: 'Quy trình tinh gọn', icon: '⚙️', k: 1.4, tiers: ['Thao tác nhanh +4%', 'Thao tác nhanh +8%', 'Thao tác nhanh +12%'], fx: (l) => ({ speed: [0, .04, .08, .12][l] }) },
+    { id: 'hygiene', name: 'Quy trình vệ sinh chuẩn', icon: '🧼', k: 1, tiers: ['Quầy bẩn chậm hơn 15%', 'Chậm hơn 30%', 'Chậm hơn 45%'], hyg: (l) => [1, .85, .7, .55][l] },
+    { id: 'drill', name: 'Diễn tập an toàn', icon: '🚨', k: 1.3, tiers: ['Thiệt hại sự cố −15%', 'Thiệt hại sự cố −30%', 'Thiệt hại sự cố −50%'], loss: (l) => [1, .85, .7, .5][l] },
+    { id: 'brand', name: 'Xây dựng thương hiệu', icon: '🏷️', k: 1.6, tiers: ['Uy tín +1 mỗi ca', 'Uy tín +1 mỗi ca, thưởng +5%', 'Uy tín +2 mỗi ca, thưởng +10%'], fx: (l) => ({ rep: [0, 1, 1, 2][l], tip: [0, 0, .05, .10][l] }) }
+  ];
+  const resLv = (id) => ((flags().res || {})[id] || 0);
+  const resBusy = () => flags().resBusy || null;
+  const resCost = (r, l) => Math.ceil(6000 * r.k * Math.pow(5, l));
+  const resShifts = (l) => [2, 3, 5][l];
+  const resNeed = (l) => [2, 5, 8][l];
+  const topLevel = () => Math.max.apply(null, C.shops.map((s) => G.S.shops[s.id].level));
+  D.rfx = () => { const o = { pack: 1, staff: 1, hyg: 1, loss: 1 }; RESEARCH.forEach((r) => { const l = resLv(r.id); if (r.pack) o.pack *= r.pack(l); if (r.staff) o.staff *= r.staff(l); if (r.hyg) o.hyg *= r.hyg(l); if (r.loss) o.loss *= r.loss(l); }); return o; };
+  const packCost0 = G.packCost; G.packCost = function (shop, item) { return Math.max(1, Math.ceil(packCost0.apply(this, arguments) * D.rfx().pack)); };
+
   /* ======================== TỔNG HỢP HIỆU QUẢ ======================== */
   function fx(shop) {
     const o = { price: 0, tip: 0, pat: 0, spawn: 0, speed: 0, rep: 0 }, add = (f) => { if (f) Object.keys(f).forEach((k) => { o[k] += f[k]; }); };
     if (!G.S || !shop || !G.S.shops[shop]) return o;
     Object.keys(EQFX).forEach((id) => add(EQFX[id](G.eqLv(shop, id))));
     [].concat(decorList('market'), decorList(shop)).forEach((d) => { if (decorOwned(d.id)) add(d.fx); });
-    ROLES.forEach((r) => { if (staffOf(shop)[r.id] === 1) add(r.fx); });
+    const sm = D.rfx().staff; ROLES.forEach((r) => { if (staffOf(shop)[r.id] === 1 && r.fx) { const f = {}; Object.keys(r.fx).forEach((k) => { f[k] = r.fx[k] * sm; }); add(f); } });
+    RESEARCH.forEach((r) => { if (r.fx) add(r.fx(resLv(r.id))); });
     const sv = (flags().svc || {})[shop] || {}; SERVICES.forEach((s) => { if (sv[s.id] > 0) add(s.fx); });
     return o;
   }
-  D.fx = fx; D.payroll = payroll;
+  D.fx = fx; D.payroll = payroll; D.RESEARCH = RESEARCH; D.resBusy = resBusy;
   const eqPrice = G.eqPrice, eqTip = G.eqTip, pb = G.patienceBonus;
   G.eqPrice = (id) => eqPrice(id) * (1 + fx(id).price);
   G.eqTip = (id) => eqTip(id) * (1 + fx(id).tip);
@@ -144,6 +165,7 @@
       if (G.buyPack(s.shop, it.id)) { G.S.coins -= cost; UI.toast(`🛒 Nhân viên đi chợ mua thêm ${it.name}`, 'ok'); window.Audio2.sfx('buy'); break; }
     }
   }
+  function completeRes() { const rb = resBusy(); if (!rb) return; const r = RESEARCH.find((x) => x.id === rb.id); (flags().res = flags().res || {})[rb.id] = rb.to; flags().resBusy = null; UI.toast(`🔬 Nghiên cứu xong: ${r.name} (bậc ${rb.to})!`, 'ok'); window.Audio2.sfx('levelup'); if (UI.vfx) UI.vfx.burst(innerWidth / 2, innerHeight * .4); }
   G.on('shiftEnd', (sum) => {
     const shop = sum && sum.shop; if (!shop) return;
     const f = fx(shop); if (f.rep) G.S.rep += f.rep;
@@ -151,6 +173,7 @@
     const mine = staffOf(shop); let paid = 0, left = [];
     ROLES.forEach((r) => { if (mine[r.id] !== 1) return; const w = salary(shop, r); if (G.S.coins >= w) { G.S.coins -= w; paid += w; } else { mine[r.id] = 2; left.push(r.title); } });
     const sv = (flags().svc || {})[shop]; if (sv) Object.keys(sv).forEach((k) => { if (sv[k] > 0) sv[k]--; });
+    const rb = resBusy(); if (rb) { rb.left--; if (rb.left <= 0) completeRes(); }
     if (paid) UI.toast(`💰 Đã trả lương nhân viên: −${G.fmt(paid)}`, 'ok');
     if (left.length) UI.toast(`⚠️ Thiếu tiền trả lương: ${left.join(', ')} nghỉ việc, vào Phát triển để thuê lại.`, 'err');
     G.save();
@@ -163,15 +186,22 @@
     const f = fx(shop), pc = (v) => (v ? '+' + Math.round(v * 100) + '%' : '—');
     return `<div class="dv-sum"><span title="Giá món">💰 ${pc(f.price)}</span><span title="Tiền thưởng">🎁 ${pc(f.tip)}</span><span title="Lượng khách">👥 ${pc(f.spawn)}</span><span title="Tốc độ thao tác">⚡ ${pc(f.speed)}</span><span title="Kiên nhẫn">⏳ ${f.pat ? '+' + f.pat + 's' : '—'}</span><span title="Uy tín mỗi ca">⭐ ${f.rep ? '+' + f.rep + '/ca' : '—'}</span></div>`;
   }
-  function equipTab() {
-    const id = D.shop, st = G.S.shops[id];
-    const cards = G.eqList(id).map((e) => {
+  function eqCards(id, keep) {
+    const st = G.S.shops[id];
+    return G.eqList(id).filter(keep).map((e) => {
       const lv = G.eqLv(id, e.id), max = lv >= 3, need = G.eqNeed(id, e.id), cost = max ? 0 : G.eqCost(id, e.id), can = !max && st.level >= need, afford = G.S.coins >= cost;
       const now = lv ? e.tiers[lv - 1] : 'Chưa sở hữu', next = max ? '' : e.tiers[lv];
       return `<article class="dv-card ${max ? 'max' : ''}"><div class="dv-ic">${e.icon}</div><div class="dv-bd"><h4>${esc(e.name)} <em>C${lv}</em></h4><p class="dv-now">${esc(now)}</p>${max ? '' : `<p class="dv-next">▸ Bậc ${lv + 1}: ${esc(next)}</p>`}<div class="dv-bar">${[1, 2, 3].map((i) => `<i class="${i <= lv ? 'on' : ''}"></i>`).join('')}</div></div>
         <div class="dv-act">${max ? '<span class="dv-done">Đã tối đa</span>' : `<button class="btn gold sm" data-dx="eq" data-eq="${e.id}" ${can && afford ? '' : 'disabled'}>${can ? `Lên C${lv + 1}<small>${coin(cost)}</small>` : `Cần quầy cấp ${need}`}</button>`}</div></article>`;
     }).join('');
-    return `<p class="dv-hint">Quầy <b>${esc(shopDef(id).short)}</b> cấp ${st.level}. Trang bị bậc 1/2/3 mở ở quầy cấp 1/3/5.</p>${summary(id)}<div class="dv-list">${cards}</div>`;
+  }
+  function equipTab() {
+    const id = D.shop, st = G.S.shops[id];
+    return `<p class="dv-hint">Quầy <b>${esc(shopDef(id).short)}</b> cấp ${st.level}. Trang bị bậc 1/2/3 mở ở quầy cấp 1/3/5.</p>${summary(id)}<div class="dv-list">${eqCards(id, (e) => e.cat !== 'safe')}</div>`;
+  }
+  function safeTab() {
+    const id = D.shop, E = window.Events;
+    return `${E ? E.panelHtml(id) : ''}<h4 class="dv-sec">🛡️ Thiết bị & giấy phép</h4><div class="dv-list">${eqCards(id, (e) => e.cat === 'safe')}</div>${E ? E.logHtml(id) : ''}`;
   }
   function decorCard(d, shop) {
     const own = decorOwned(d.id), st = shop ? G.S.shops[shop] : null, lvOk = !d.lv || (st && st.level >= d.lv), isGold = d.gold != null;
@@ -200,6 +230,16 @@
       <h4 class="dv-sec">👥 Nhân viên của quầy (${hired.length})</h4>${hired.length ? hired.map(card).join('') : '<p class="dv-empty">Chưa có ai. Hãy tuyển nhân viên đầu tiên bên dưới.</p>'}
       <h4 class="dv-sec">➕ Tuyển thêm nhân viên mới (${pool.length})</h4>${pool.map(card).join('')}`;
   }
+  function researchTab() {
+    const rb = resBusy(), top = topLevel();
+    const busy = rb ? (() => { const r = RESEARCH.find((x) => x.id === rb.id); const gold = rb.left * 2; return `<div class="rs-busy"><div class="rs-lab"><i>🔬</i><div><b>Đang nghiên cứu: ${esc(r.name)} → bậc ${rb.to}</b><small>Còn ${rb.left} ca bán (mỗi ca bán xong tính 1 ca)</small></div></div><div class="dv-bar rs-prog">${Array.from({ length: rb.total }, (_, i) => `<i class="${i < rb.total - rb.left ? 'on' : ''}"></i>`).join('')}</div><button class="btn gold sm" data-dx="rush" ${G.S.gold >= gold ? '' : 'disabled'}>⚡ Hoàn thành ngay · ${Art.gold(13)} ${gold}</button></div>`; })() : '<p class="dv-hint">Phòng nghiên cứu đang rảnh. Chọn một đề tài bên dưới, hiệu quả áp dụng cho <b>mọi quầy</b>.</p>';
+    const cards = RESEARCH.map((r) => {
+      const l = resLv(r.id), max = l >= 3, cost = max ? 0 : resCost(r, l), need = resNeed(l), okLv = top >= need, doing = rb && rb.id === r.id;
+      return `<article class="dv-card ${max ? 'max' : ''}"><div class="dv-ic big">${r.icon}</div><div class="dv-bd"><h4>${esc(r.name)} <em>R${l}</em></h4><p class="dv-now">${l ? esc(r.tiers[l - 1]) : 'Chưa nghiên cứu'}</p>${max ? '' : `<p class="dv-next">▸ Bậc ${l + 1}: ${esc(r.tiers[l])} · ${resShifts(l)} ca</p>`}<div class="dv-bar">${[1, 2, 3].map((i) => `<i class="${i <= l ? 'on' : ''}"></i>`).join('')}</div></div>
+        <div class="dv-act">${max ? '<span class="dv-done">Hoàn tất</span>' : doing ? '<span class="dv-done">Đang làm…</span>' : `<button class="btn gold sm" data-dx="research" data-id="${r.id}" ${rb || !okLv || G.S.coins < cost ? 'disabled' : ''}>${okLv ? `Nghiên cứu<small>${coin(cost)}</small>` : `Cần quầy cấp ${need}`}</button>`}</div></article>`;
+    }).join('');
+    return `${busy}<div class="dv-list">${cards}</div>`;
+  }
   function servicesTab() {
     const id = D.shop, sv = (flags().svc || {})[id] || {};
     const cards = SERVICES.map((s) => { const cost = svcCost(id, s), left = sv[s.id] || 0; return `<article class="dv-card"><div class="dv-ic big">${s.icon}</div><div class="dv-bd"><h4>${esc(s.name)} ${left ? `<em class="gold">Còn ${left} ca</em>` : ''}</h4><p class="dv-now">✨ ${esc(s.desc)}</p></div><div class="dv-act"><button class="btn gold sm" data-dx="svc" data-id="${s.id}" ${G.S.coins >= cost ? '' : 'disabled'}>${left ? 'Gia hạn' : 'Mua'}<small>${coin(cost)}</small></button></div></article>`; }).join('');
@@ -207,13 +247,13 @@
       <article class="dv-card"><div class="dv-ic big">🛕</div><div class="dv-bd"><h4>Quyên góp xây đình <em>${Math.floor(G.S.flags.donated || 0)} lần</em></h4><p class="dv-now">✨ Uy tín +3 vĩnh viễn (mỗi điểm uy tín tăng 0,5% giá món, tối đa 300). Giá tăng dần mỗi lần.</p></div><div class="dv-act"><button class="btn gold sm" data-dx="donate" ${G.S.coins >= donateCost() ? '' : 'disabled'}>Quyên góp<small>${coin(donateCost())}</small></button></div></article></div>`;
   }
   D.html = function () {
-    const tabs = [['equip', '🛠️', 'Trang bị'], ['decor', '🏡', 'Trang trí'], ['staff', '👥', 'Nhân viên'], ['svc', '📣', 'Dịch vụ']];
+    const tabs = [['equip', '🛠️', 'Trang bị'], ['safe', '🛡️', 'An toàn'], ['decor', '🏡', 'Trang trí'], ['staff', '👥', 'Nhân viên'], ['res', '🔬', 'Nghiên cứu'], ['svc', '📣', 'Dịch vụ']];
     if (!G.S.shops[D.shop].unlocked) D.shop = 'trada';
-    const needShop = D.tab !== 'decor';
+    const needShop = D.tab !== 'decor' && D.tab !== 'res';
     return `<section class="page dv-page"><div class="dv-head"><div><h2>🏗️ Phát Triển</h2><small>Dùng xu để nâng cấp, trang trí, tuyển người</small></div><div class="dv-money">${Art.coin(18)} <b>${G.fmt(G.S.coins)}</b><span>${Art.gold(14)} ${G.S.gold}</span></div></div>
       <div class="dv-tabs">${tabs.map(([k, i, l]) => `<button class="${D.tab === k ? 'on' : ''}" data-dx="tab" data-id="${k}"><i>${i}</i>${l}</button>`).join('')}</div>
       ${needShop ? `<div class="dv-chips">${SHOPCHIP()}</div>` : ''}
-      <div class="dv-body">${D.tab === 'equip' ? equipTab() : D.tab === 'decor' ? decorTab() : D.tab === 'staff' ? staffTab() : servicesTab()}</div></section>`;
+      <div class="dv-body">${D.tab === 'equip' ? equipTab() : D.tab === 'safe' ? safeTab() : D.tab === 'decor' ? decorTab() : D.tab === 'staff' ? staffTab() : D.tab === 'res' ? researchTab() : servicesTab()}</div></section>`;
   };
   function rerender() { const v = $('#view'); if (!v || UI.page !== 'dev') return; const y = v.scrollTop; v.innerHTML = D.html(); v.scrollTop = y; }
   D.rerender = rerender;
@@ -239,6 +279,8 @@
       if (G.S.coins < fee(sh, r)) return fail('Chưa đủ xu.'); G.S.coins -= fee(sh, r); staffOf(sh)[r.id] = 1; ok(`${person(sh, ROLES.indexOf(r))} đã nhận việc!`, 'cheer');
     } else if (a === 'fire') { const r = ROLES.find((x) => x.id === b.dataset.role); staffOf(D.shop)[r.id] = 2; ok(`${person(D.shop, ROLES.indexOf(r))} được cho nghỉ.`, 'click'); }
     else if (a === 'svc') { const s = SERVICES.find((x) => x.id === id), cost = svcCost(D.shop, s); if (G.S.coins < cost) return fail('Chưa đủ xu.'); G.S.coins -= cost; const m = (flags().svc = flags().svc || {}); (m[D.shop] = m[D.shop] || {})[s.id] = (m[D.shop][s.id] || 0) + s.shifts; ok(`Đã mua “${s.name}”`); }
+    else if (a === 'research') { const r = RESEARCH.find((x) => x.id === id), l = resLv(id), c = resCost(r, l); if (resBusy() || G.S.coins < c || topLevel() < resNeed(l)) return fail('Chưa đủ điều kiện.'); G.S.coins -= c; flags().resBusy = { id, to: l + 1, left: resShifts(l), total: resShifts(l) }; ok(`Bắt đầu nghiên cứu “${r.name}”`, 'levelup'); }
+    else if (a === 'rush') { const rb = resBusy(); if (!rb) return; const g = rb.left * 2; if (G.S.gold < g) return fail('Chưa đủ nguyên bảo.'); G.S.gold -= g; completeRes(); ok('', 'levelup'); }
     else if (a === 'donate') { const c = donateCost(); if (G.S.coins < c) return fail('Chưa đủ xu.'); G.S.coins -= c; G.S.rep += 3; flags().donated = (flags().donated || 0) + 1; ok('Cảm ơn tấm lòng! Uy tín +3', 'cheer'); }
   });
 

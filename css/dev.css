@@ -1,14 +1,14 @@
 /* ===== Tab Phát triển: trang bị, trang trí, nhân viên, dịch vụ ===== */
-#nav { grid-template-columns: repeat(7, minmax(0, 1fr)); padding-left: 2px; padding-right: 2px; }
-#nav button { font-size: 9.5px; padding: 5px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+#nav { grid-template-columns: repeat(6, minmax(0, 1fr)); padding-left: 2px; padding-right: 2px; }
+#nav button { font-size: 10.5px; padding: 5px 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 
 .dv-page { gap: 8px; padding-bottom: 20px; }
 .dv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 16px; color: #fff1cf; background: linear-gradient(125deg, #5a2f1f, #a95c30 70%, #d9a24e); box-shadow: 0 4px 14px rgba(100, 50, 10, .3); position: relative; overflow: hidden; }
 .dv-head::after { content: '🏗️'; position: absolute; right: -6px; bottom: -14px; font-size: 64px; opacity: .15; }
 .dv-head h2 { margin: 0; font-size: 20px; color: #fff1cf; } .dv-head small { font-size: 11px; opacity: .85; }
 .dv-money { text-align: right; font-size: 15px; z-index: 1; } .dv-money b { font-size: 17px; } .dv-money span { display: block; font-size: 12px; opacity: .9; }
-.dv-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-.dv-tabs button { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px; border-radius: 12px; font-size: 11px; font-weight: 700; background: var(--card); border: 1.5px solid var(--line); color: var(--muted); transition: transform .12s, background .2s; }
+.dv-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.dv-tabs button { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 1px; border-radius: 12px; font-size: 10.5px; font-weight: 700; background: var(--card); border: 1.5px solid var(--line); color: var(--muted); transition: transform .12s, background .2s; }
 .dv-tabs button i { font-style: normal; font-size: 19px; } .dv-tabs button.on { background: linear-gradient(#e9a14a, #c4702a); color: #fff; border-color: #8a4a14; box-shadow: 0 3px 0 rgba(90, 40, 8, .35); transform: translateY(-1px); }
 .dv-chips { display: flex; gap: 5px; overflow-x: auto; padding: 2px 1px 4px; scrollbar-width: none; } .dv-chips::-webkit-scrollbar { display: none; }
 .dv-chip { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 99px; background: var(--card); border: 1.5px solid var(--line); font-size: 12px; font-weight: 700; color: var(--text); }
@@ -53,3 +53,8 @@ body.reduce-motion .dd-items b, body.reduce-motion .dv-card, body.reduce-motion 
 .cd-icon .gi { margin: 0 auto; width: 72px; height: 72px; }
 .game-guide summary .gi { display: inline-block; vertical-align: -4px; width: 18px; height: 18px; margin: 0 3px; }
 .dv-head small { color: #ffe9c0 !important; opacity: 1; }
+
+.dv-tabs { grid-template-columns: repeat(6, 1fr); gap: 3px; } .dv-tabs button { min-width: 0; font-size: 9.5px; padding: 6px 0; } .dv-tabs button i { font-size: 17px; }
+.rs-busy { padding: 10px 12px; border-radius: 16px; background: linear-gradient(#e6f0ff, #cfe0fa); border: 1.5px solid #5a8ae0; display: flex; flex-direction: column; gap: 7px; }
+.rs-lab { display: flex; gap: 9px; align-items: center; text-align: left; } .rs-lab i { font-style: normal; font-size: 30px; animation: evPulse 1.2s ease-in-out infinite alternate; } .rs-lab b { font-size: 13px; display: block; } .rs-lab small { color: #4a5a7a; }
+.rs-prog i { height: 8px; } .rs-prog i.on { background: linear-gradient(90deg, #5a8ae0, #7ab8ff); }

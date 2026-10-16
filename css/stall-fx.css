@@ -112,3 +112,43 @@ body.reduce-motion .cust.arrive, body.reduce-motion .c-face .customer-sprite, bo
 
 /* màn thấp (≤700px): vẫn giữ ảnh nền nét thay vì ẩn banner */
 @media (max-height: 700px) { #stall:has(.st-bench) .st-banner { display: block; } }
+
+/* ===== Mở cửa đón khách v2: trời, đèn lồng, kiểm tra an toàn, băng khánh thành, biển lật, khách xếp hàng ===== */
+.oi-sky { position: absolute; inset: 0; z-index: 0; background: linear-gradient(#ffd9a8, #ffb878 55%, #6a3a2a); overflow: hidden; }
+.oi[data-light="3"] .oi-sky { background: linear-gradient(#0e1230, #3a2a7a 60%, #2a1a40); } .oi[data-light="2"] .oi-sky { background: linear-gradient(#ff9a6a, #d8603a 55%, #5a2a2a); }
+.oi-sun { position: absolute; left: 50%; top: 18%; width: 110px; height: 110px; margin-left: -55px; border-radius: 50%; background: radial-gradient(#fff6c0, #ffd860 55%, transparent 72%); animation: oiSun 3.6s ease-out both; filter: blur(1px); } @keyframes oiSun { from { transform: translateY(80px) scale(.5); opacity: 0; } }
+.oi[data-light="3"] .oi-sun { background: radial-gradient(#fffbe0, #dfe6ff 50%, transparent 70%); }
+.oi-cloud { position: absolute; width: 130px; height: 44px; border-radius: 99px; background: rgba(255, 255, 255, .8); filter: blur(2px); animation: oiCloud 6s linear infinite; } .oi-cloud::before, .oi-cloud::after { content: ''; position: absolute; background: inherit; border-radius: 50%; } .oi-cloud::before { width: 54px; height: 54px; left: 18px; top: -24px; } .oi-cloud::after { width: 40px; height: 40px; right: 22px; top: -16px; }
+.oi-cloud.c1 { top: 14%; left: -30%; } .oi-cloud.c2 { top: 30%; left: -60%; animation-duration: 8s; opacity: .7; transform: scale(.7); } @keyframes oiCloud { to { transform: translateX(160vw); } }
+.oi-lamps { position: absolute; left: 0; right: 0; top: 0; z-index: 4; display: flex; justify-content: space-around; pointer-events: none; }
+.oi-lamps i { font-style: normal; font-size: 38px; transform-origin: 50% 0; filter: grayscale(1) brightness(.6); animation: lampOn .4s ease-out both, lanternSway 2.4s ease-in-out infinite alternate; animation-delay: calc(.35s + var(--k) * .16s), calc(var(--k) * -.4s); } @keyframes lampOn { 40% { filter: grayscale(0) brightness(1.7) drop-shadow(0 0 22px #ffb030); transform: scale(1.25); } to { filter: grayscale(0) brightness(1) drop-shadow(0 0 12px #ff9a30); } }
+.oi-lan { display: none; }
+.oi-checks { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px auto 0; max-width: 340px; }
+.oi-checks span { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px 4px 7px; border-radius: 99px; background: rgba(35, 16, 6, .78); border: 1.5px solid rgba(255, 224, 150, .6); color: #fff0c8; font-size: 12px; font-weight: 700; opacity: 0; transform: scale(2.2) rotate(-10deg); }
+.oi.checking .oi-checks span { animation: oiStamp .35s cubic-bezier(.2, 1.8, .4, 1) both; animation-delay: calc(.1s + var(--i) * .26s); } @keyframes oiStamp { to { opacity: 1; transform: none; } }
+.oi-checks i { font-style: normal; font-size: 15px; } .oi-checks em { font-style: normal; font-weight: 900; } .oi-checks .ok { border-color: #6ae08a; } .oi-checks .ok em { color: #8bf0a6; } .oi-checks .no { border-color: #ffb04a; } .oi-checks .no em { color: #ffb04a; }
+.oi-sign { position: absolute; left: 50%; top: 56%; margin-left: -64px; width: 128px; height: 44px; z-index: 5; perspective: 400px; pointer-events: none; }
+.oi-sign::before { content: ''; position: absolute; left: 50%; top: -34px; width: 2px; height: 34px; background: #ffd54a; box-shadow: -48px 0 #ffd54a, 48px 0 #ffd54a; }
+.oi-sign-in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3, 1.6, .5, 1); } .oi.flip .oi-sign-in { transform: rotateX(180deg); }
+.oi-sign b { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 8px; backface-visibility: hidden; font: 800 17px 'Noto Serif', serif; letter-spacing: 1px; border: 2px solid #ffd54a; box-shadow: 0 6px 14px rgba(0, 0, 0, .5); }
+.oi-sign b.f { background: linear-gradient(#c8301f, #8a1a10); color: #ffe9b8; } .oi-sign b.b { background: linear-gradient(#3aa84a, #1f6a2a); color: #fff; transform: rotateX(180deg); }
+.oi.open .oi-sign { transition: transform .6s, opacity .6s; transform: translateY(-60px); opacity: 0; }
+.oi-ribbon { position: absolute; left: 0; right: 0; top: 66%; height: 26px; z-index: 6; pointer-events: none; }
+.oi-ribbon .rl, .oi-ribbon .rr { position: absolute; top: 0; height: 26px; width: 50%; background: linear-gradient(#ff5a4a, #c8201a); border-top: 2px solid #ffb0a0; border-bottom: 2px solid #8a1010; box-shadow: 0 4px 10px rgba(0, 0, 0, .4); transform-origin: 50% 0; }
+.oi-ribbon .rl { left: 0; border-radius: 0 0 0 0; transform-origin: 0 0; } .oi-ribbon .rr { right: 0; transform-origin: 100% 0; }
+.oi-ribbon .bow { position: absolute; left: 50%; top: -14px; margin-left: -20px; font-size: 40px; text-decoration: none; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); }
+.oi-ribbon .scis { position: absolute; top: -4px; left: -12%; font-size: 40px; text-decoration: none; transform: rotate(90deg); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .5)); }
+.oi.checking .oi-ribbon .scis { animation: scisIn 1.2s cubic-bezier(.3, .8, .4, 1) .7s both; } @keyframes scisIn { from { left: -14%; } to { left: 46%; } }
+.oi.cut .oi-ribbon .scis { animation: scisCut .25s steps(2) 3, scisFade .4s .75s forwards; left: 46%; } @keyframes scisCut { 50% { transform: rotate(90deg) scaleX(.5); } } @keyframes scisFade { to { opacity: 0; } }
+.oi.cut .oi-ribbon .rl { animation: ribL .9s ease-in forwards; } .oi.cut .oi-ribbon .rr { animation: ribR .9s ease-in forwards; } .oi.cut .oi-ribbon .bow { animation: bowFall .8s ease-in forwards; }
+@keyframes ribL { to { transform: rotate(75deg) translateY(160px); opacity: 0; } } @keyframes ribR { to { transform: rotate(-75deg) translateY(160px); opacity: 0; } } @keyframes bowFall { to { transform: translateY(220px) rotate(40deg); opacity: 0; } }
+.oi-walkers { position: absolute; left: 0; right: 0; bottom: 5%; height: 100px; z-index: 5; pointer-events: none; }
+.oi-walk { position: absolute; bottom: 0; width: 44px; height: 70px; animation: oiWalkIn 1.8s cubic-bezier(.3, .6, .4, 1) both; animation-delay: calc(var(--k) * .18s + .1s); } .oi-walk img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .45)); animation: oiStep .38s ease-in-out infinite alternate; animation-delay: calc(var(--w) * -.05s); }
+.oi-walk.l { left: -60px; --to: calc(50vw - 150px + var(--k) * 54px); } .oi-walk.r { right: -60px; --to: calc(50vw - 150px + var(--k) * 54px); animation-name: oiWalkInR; }
+@keyframes oiWalkIn { to { transform: translateX(var(--to)); } } @keyframes oiWalkInR { to { transform: translateX(calc(var(--to) * -1)); } } @keyframes oiStep { to { transform: translateY(-5px) rotate(2deg); } }
+.oi.open .oi-walk { animation: oiEnter .8s ease-in forwards; } @keyframes oiEnter { from { transform: translateX(var(--to)); opacity: 1; } to { transform: translateX(var(--to)) scale(1.6) translateY(-30px); opacity: 0; } }
+.oi.open .oi-walk.r { animation-name: oiEnterR; } @keyframes oiEnterR { from { transform: translateX(calc(var(--to) * -1)); } to { transform: translateX(calc(var(--to) * -1)) scale(1.6) translateY(-30px); opacity: 0; } }
+.oi-door { z-index: 3; } .oi-center { margin-top: -18vh; }
+.oi.open .oi-sky { transition: opacity .8s; opacity: .0; } .oi.open .oi-lamps i { transition: transform .8s, opacity .8s; transform: translateY(-80px); opacity: 0; }
+body[data-glow="false"] .oi-lamps i { animation: none; filter: none; }
+body.reduce-motion .oi-cloud, body.reduce-motion .oi-sun, body.reduce-motion .oi-walk, body.reduce-motion .oi-walk img { animation: none; }

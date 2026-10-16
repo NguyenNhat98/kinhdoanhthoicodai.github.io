@@ -45,12 +45,14 @@
     lf.addEventListener('pointerdown', (e) => { mv(e); lf.setPointerCapture && lf.setPointerCapture(e.pointerId); r.drag = true; });
     lf.addEventListener('pointermove', (e) => { if (r.drag) mv(e); }); lf.addEventListener('pointerup', () => { r.drag = false; });
     r.end = () => F.finish(r, Math.min(30, Math.round(r.score * 0.7)), `Hứng được ${r.score} điểm (combo cao nhất ${r.best}).`);
+    let fw = lf.clientWidth, fh = lf.clientHeight;
     loop(r, (dt) => {
+      if (r.t % 1 < dt) { fw = lf.clientWidth; fh = lf.clientHeight; }
       bk.style.left = r.x + '%'; r.next -= dt;
-      if (r.next <= 0) { const k = Math.random(), kind = k < .16 ? 'bomb' : k < .34 ? 'gold' : 'red', e = document.createElement('span'); e.className = 'lant ' + kind; e.textContent = kind === 'bomb' ? '💣' : '🏮'; const x = rnd(8, 92); e.style.left = x + '%'; lf.appendChild(e); r.items.push({ e, x, y: -10, v: rnd(34, 52) + (25 - r.left) * 1.4, kind, rot: rnd(-2, 2) }); r.next = rnd(.35, .75); }
+      if (r.next <= 0) { const k = Math.random(), kind = k < .16 ? 'bomb' : k < .34 ? 'gold' : 'red', e = document.createElement('span'); e.className = 'lant ' + kind; e.textContent = kind === 'bomb' ? '💣' : '🏮'; const x = rnd(8, 92); e.style.left = '0'; e.style.top = '0'; lf.appendChild(e); r.items.push({ e, x, y: -10, v: rnd(34, 52) + (25 - r.left) * 1.4, kind, rot: rnd(-2, 2) }); r.next = rnd(.35, .75); }
       r.items = r.items.filter((it) => {
-        it.y += it.v * dt; it.e.style.top = it.y + '%'; it.e.style.transform = `translateX(-50%) rotate(${Math.sin(it.y / 8 + it.rot) * 14}deg)`;
-        const hit = it.y > 78 && it.y < 96 && Math.abs(it.x - r.x) < 11, b = it.e.getBoundingClientRect();
+        it.y += it.v * dt; it.e.style.transform = `translate3d(${it.x / 100 * fw}px, ${it.y / 100 * fh}px, 0) translateX(-50%) rotate(${Math.sin(it.y / 8 + it.rot) * 14}deg)`;
+        const hit = it.y > 78 && it.y < 96 && Math.abs(it.x - r.x) < 11, b = hit ? it.e.getBoundingClientRect() : null;
         if (hit) {
           if (it.kind === 'bomb') { r.score = Math.max(0, r.score - 3); r.combo = 0; FX.boom(b.left + b.width / 2, b.top, ['💥', '🔥', '💨'], 10); FX.shake(lf); sfx('error'); window.Game.buzz(50); FX.at(it.e, '−3', 'bad'); const c = $('#xCombo'); if (c) c.textContent = ''; }
           else { FX.combo(r, it.e); const pts = (it.kind === 'gold' ? 3 : 1) * FX.mult(r); r.score += pts; FX.at(it.e, '+' + pts, it.kind === 'gold' ? 'gold' : ''); sfx('coin'); FX.pulse(bk); }

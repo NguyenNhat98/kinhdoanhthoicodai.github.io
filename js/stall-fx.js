@@ -85,10 +85,22 @@
     o.className = 'oi' + (lite ? ' lite' : ''); o.dataset.shop = id;
     o.style.setProperty('--c1', T.c1); o.style.setProperty('--c2', T.c2);
     const title = 'Mở cửa đón khách!'.split('').map((ch, i) => `<span style="--i:${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
-    o.innerHTML = `<div class="oi-door l"><i class="oi-slat"></i><i class="oi-ring-h"></i></div><div class="oi-door r"><i class="oi-slat"></i><i class="oi-ring-h"></i></div>
-      <div class="oi-rays"></div><div class="oi-lan l">🏮</div><div class="oi-lan r">🏮</div>
+    const lv = (k) => G.eqLv(id, k), hy = window.Events ? Math.round(window.Events.hyg(id)) : 90;
+    const checks = [['🔌', 'Điện', lv('gen') > 0], ['📜', 'Giấy phép', lv('lic') > 0], ['🧪', 'ATTP', lv('attp') > 0], ['🧼', 'Vệ sinh ' + hy + '%', hy >= 60]];
+    const hired = (G.S.flags.staff && G.S.flags.staff[id]) || {}, staffN = Object.keys(hired).filter((k) => hired[k] === 1).length;
+    const walkers = Array.from({ length: 6 }, (_, i) => `<span class="oi-walk ${i % 2 ? 'r' : 'l'}" style="--k:${Math.floor(i / 2)};--w:${(i * 7 + 3) % 10}">${window.LivingMarket && window.LivingMarket.customer ? window.LivingMarket.customer(i * 3 + 1, id) : ''}</span>`).join('');
+    const light = Number(document.body.dataset.light) || 1; o.dataset.light = light;
+    o.innerHTML = `<div class="oi-sky"><i class="oi-sun"></i><i class="oi-cloud c1"></i><i class="oi-cloud c2"></i></div>
+      <div class="oi-door l"><i class="oi-slat"></i><i class="oi-ring-h"></i></div><div class="oi-door r"><i class="oi-slat"></i><i class="oi-ring-h"></i></div>
+      <div class="oi-rays"></div>
+      <div class="oi-lamps"><i style="--k:0">🏮</i><i style="--k:1">🏮</i><i style="--k:2">🏮</i><i style="--k:3">🏮</i><i style="--k:4">🏮</i></div>
       <div class="oi-center"><div class="oi-emblem"><i class="oi-ring a"></i><i class="oi-ring b"></i><span>${T.icon}</span></div>
-      <h2 class="oi-title">${title}</h2><p class="oi-sub">${T.line}</p><small class="oi-tip">Ca ${ws && ws.tutorial ? 'hướng dẫn' : min + ' phút'} · chạm để bỏ qua</small></div>
+      <h2 class="oi-title">${title}</h2><p class="oi-sub">${T.line}</p>
+      <div class="oi-checks">${checks.map((c, i) => `<span class="${c[2] ? 'ok' : 'no'}" style="--i:${i}"><i>${c[0]}</i><b>${c[1]}</b><em>${c[2] ? '✔' : '!'}</em></span>`).join('')}</div>
+      <small class="oi-tip">Ca ${ws && ws.tutorial ? 'hướng dẫn' : min + ' phút'}${staffN ? ' · ' + staffN + ' nhân viên chào khách' : ''} · chạm để bỏ qua</small></div>
+      <div class="oi-sign"><div class="oi-sign-in"><b class="f">ĐÓNG CỬA</b><b class="b">MỞ CỬA</b></div></div>
+      <div class="oi-ribbon"><i class="rl"></i><i class="rr"></i><u class="bow">🎀</u><u class="scis">✂️</u></div>
+      <div class="oi-walkers">${walkers}</div>
       <div class="oi-fx"></div>`;
     host.appendChild(o);
     if (ws) WS.setPause('intro', true);
@@ -96,12 +108,17 @@
     const fx = $('.oi-fx', o), r = host.getBoundingClientRect(), cx = r.width / 2, cy = r.height * 0.4;
     const at = (ms, fn) => introTimers.push(setTimeout(fn, ms));
     if (lite) { at(900, () => endIntro()); return; }
-    at(80, () => sfx('whoosh'));
+    const vf = window.UI && window.UI.vfx;
+    at(60, () => sfx('whoosh'));
     at(250, () => { sfx('gong'); for (let i = 0; i < 14; i++) { const a = (i / 14) * 6.283, m = rnd(70, 150); particle(fx, T.burst[i % T.burst.length], cx, cy, Math.cos(a) * m, Math.sin(a) * m, 'burst', 1.1); } });
-    at(700, () => { sfx('tick'); sfx('bell'); G.buzz && G.buzz([20, 30, 50]); confetti(fx, r.width, [T.c1, T.c2, '#ffd54a', '#ff6b6b', '#ffffff'], 36); });
-    at(1250, () => { o.classList.add('open'); sfx('whoosh'); });
-    at(1500, () => { for (let i = 0; i < 16; i++) particle(fx, T.burst[i % T.burst.length], rnd(20, r.width - 20), r.height * 0.85, rnd(-30, 30), -rnd(260, 520), 'rise', rnd(1.2, 1.9), rnd(18, 30)); sfx('cheer'); });
-    at(2350, () => endIntro());
+    at(650, () => { o.classList.add('checking'); sfx('tick'); });
+    checks.forEach((c, i) => at(750 + i * 260, () => { sfx(c[2] ? 'coin' : 'tap'); const e = $(`.oi-checks span:nth-child(${i + 1})`, o); if (e) { const b = e.getBoundingClientRect(); particle(fx, c[2] ? '✨' : '⚠️', b.left - host.getBoundingClientRect().left + b.width / 2, b.top - host.getBoundingClientRect().top, 0, -30, 'rise', .9, 16); } }));
+    at(1000, () => { sfx('tick'); sfx('bell'); G.buzz && G.buzz([20, 30, 50]); confetti(fx, r.width, [T.c1, T.c2, '#ffd54a', '#ff6b6b', '#ffffff'], 30); });
+    at(1850, () => { o.classList.add('cut'); sfx('snip' in {} ? 'snip' : 'tick'); sfx('pop'); });
+    at(2000, () => { o.classList.add('flip'); sfx('whoosh'); if (vf && vf.fireworks) vf.fireworks(cx, r.height * .28); });
+    at(2150, () => { o.classList.add('open'); sfx('gong'); if (vf && vf.sparkle) vf.sparkle(cx, r.height * .5, 24); });
+    at(2300, () => { for (let i = 0; i < 16; i++) particle(fx, T.burst[i % T.burst.length], rnd(20, r.width - 20), r.height * 0.85, rnd(-30, 30), -rnd(260, 520), 'rise', rnd(1.2, 1.9), rnd(18, 30)); sfx('cheer'); if (vf && vf.spawnCoins) vf.spawnCoins(cx, r.height * .6, 8); });
+    at(3300, () => endIntro());
   }
 
   /* ======================== KHÁCH VÀO QUẦY ======================== */

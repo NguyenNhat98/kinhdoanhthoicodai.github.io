@@ -1,0 +1,64 @@
+/* ===== Sự kiện & an toàn: lớp hiệu ứng trên màn quầy, nhãn vệ sinh, bảng chuẩn bị, bảng trong Phát triển ===== */
+#stall #evfx, #stall.service-desk > #evfx { position: absolute !important; inset: 0 !important; z-index: 60 !important; pointer-events: none; overflow: hidden; height: auto !important; }
+#evfx::before, #evfx::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.ev-badge { position: absolute; top: 96px; left: 10px; right: 10px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: linear-gradient(#fffaf0, #ffe9c2); border: 2px solid #e9b84c; color: #4a2a14; box-shadow: 0 8px 24px rgba(0, 0, 0, .45); animation: evIn .45s cubic-bezier(.2, 1.3, .4, 1) both; z-index: 5; }
+.ev-badge i { font-style: normal; font-size: 34px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3)); animation: evPulse 1s ease-in-out infinite alternate; } .ev-badge b { display: block; font-size: 15px; } .ev-badge small { display: block; font-size: 12px; line-height: 1.35; color: #6a4a2a; } .ev-badge em { font-style: normal; margin-left: auto; font: 800 18px 'Noto Serif', serif; color: #c8301f; }
+.ev-badge img { width: 44px; height: 54px; object-fit: contain; border-radius: 10px; background: #fff3d6; border: 1px solid #e8b878; }
+.ev-badge.dark { background: linear-gradient(#2a2a3a, #14141e); border-color: #ffd54a; color: #ffe9b8; } .ev-badge.dark small { color: #cfc0a0; }
+.ev-badge.good { background: linear-gradient(#e9ffe9, #bff0c4); border-color: #3aa84a; } .ev-badge.bad { background: linear-gradient(#ffeceb, #ffc6c0); border-color: #c8301f; }
+.ev-badge.storm { background: linear-gradient(#e6f0ff, #b8d0f0); border-color: #4a7ac8; } .ev-badge.inspect { background: linear-gradient(#fffbe6, #fff0b0); }
+.ev-badge.out { animation: evOut .4s ease-in forwards; }
+@keyframes evIn { from { transform: translateY(-40px) scale(.9); opacity: 0; } } @keyframes evOut { to { transform: translateY(-30px); opacity: 0; } } @keyframes evPulse { to { transform: scale(1.12) rotate(4deg); } }
+.ev-scan { height: 6px; margin-top: 5px; border-radius: 99px; background: rgba(0, 0, 0, .12); overflow: hidden; } .ev-scan i { display: block; width: 100%; height: 100%; font-size: 0; background: linear-gradient(90deg, #4a7ac8, #6ac8ff); transform-origin: 0 50%; animation: evScan 5.1s linear forwards; filter: none; } @keyframes evScan { from { transform: scaleX(0); } }
+
+/* mất điện */
+#stall[data-ev="blackout"] #evfx::before { opacity: calc(.82 - var(--evg, 0) * .55); background: radial-gradient(circle at 50% 38%, rgba(255, 220, 140, .0) 0, rgba(6, 6, 18, .85) 70%); animation: evFlicker 2.4s steps(1) infinite; }
+#stall[data-ev="blackout"] #evfx::after { opacity: 1; background: radial-gradient(circle 120px at var(--mx, 50%) var(--my, 45%), rgba(255, 230, 160, .22), transparent 70%); mix-blend-mode: screen; }
+@keyframes evFlicker { 0%, 100% { filter: brightness(1); } 8% { filter: brightness(1.7); } 12% { filter: brightness(.7); } 40% { filter: brightness(1.3); } 44% { filter: brightness(1); } }
+/* bão */
+#stall[data-ev="storm"] #evfx::before { opacity: .85; background: repeating-linear-gradient(105deg, transparent 0 14px, rgba(200, 225, 255, .55) 14px 15px, transparent 15px 34px); background-size: 120px 120px; animation: evRain .45s linear infinite; }
+#stall[data-ev="storm"] #evfx::after { opacity: 1; background: linear-gradient(rgba(30, 50, 90, .5), rgba(30, 50, 90, .18) 60%, transparent); }
+@keyframes evRain { to { background-position: -40px 120px; } }
+/* cháy */
+#stall[data-ev="fire"] #evfx::before { opacity: 1; background: radial-gradient(ellipse at 50% 120%, rgba(255, 90, 20, .95), rgba(255, 150, 20, .5) 40%, transparent 70%); animation: evFire .35s ease-in-out infinite alternate; }
+#stall[data-ev="fire"] #evfx::after { opacity: 1; background: linear-gradient(transparent 60%, rgba(60, 10, 0, .45)); }
+@keyframes evFire { to { transform: scaleY(1.12) translateY(-12px); opacity: .85; } }
+/* ngộ độc */
+#stall[data-ev="poison"] #evfx::before { opacity: 1; background: radial-gradient(circle, transparent 35%, rgba(90, 200, 70, .55)); animation: evGreen 1s ease-in-out 3; }
+@keyframes evGreen { 50% { opacity: .35; } }
+
+.ev-flash { position: absolute; inset: 0; animation: evFl .7s ease-out forwards; }
+.ev-flash.lightning { background: #fff; animation-name: evLight; } .ev-flash.red { background: rgba(255, 40, 20, .5); } .ev-flash.green { background: rgba(110, 220, 80, .5); } .ev-flash.fire { background: rgba(255, 140, 30, .6); } .ev-flash.camera { background: #fff; animation-name: evCam; }
+.ev-flash.rumble { background: transparent; animation: evRumble .9s linear; }
+@keyframes evFl { from { opacity: 1; } to { opacity: 0; } } @keyframes evLight { 0% { opacity: .95; } 20% { opacity: .1; } 35% { opacity: .85; } 100% { opacity: 0; } } @keyframes evCam { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes evRumble { 0%, 100% { transform: translate(0); } 20% { transform: translate(-2px, 1px); } 40% { transform: translate(2px, -1px); } 60% { transform: translate(-1px, 2px); } 80% { transform: translate(1px, -2px); } }
+.ev-stamp { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%) rotate(-12deg); z-index: 8; padding: 12px 26px; border: 6px double; border-radius: 12px; text-align: center; animation: evStamp .5s cubic-bezier(.2, 2, .4, 1) both; background: rgba(255, 255, 255, .92); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+.ev-stamp b { display: block; font: 900 40px 'Noto Serif', serif; letter-spacing: 3px; } .ev-stamp small { font-size: 13px; font-weight: 800; }
+.ev-stamp.ok { color: #1f8a3a; border-color: #1f8a3a; } .ev-stamp.bad { color: #c8201a; border-color: #c8201a; } .ev-stamp.out { animation: evOut .5s forwards; }
+@keyframes evStamp { from { transform: translate(-50%, -50%) rotate(-12deg) scale(3); opacity: 0; } }
+.ev-thief { position: absolute; top: 130px; left: -60px; font-size: 44px; animation: evThief 3s linear forwards; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .5)); } @keyframes evThief { 0% { transform: translateX(0) translateY(0); } 25% { transform: translateX(26vw) translateY(-10px); } 50% { transform: translateX(52vw) translateY(0); } 75% { transform: translateX(78vw) translateY(-10px); } 100% { transform: translateX(110vw); } }
+.ev-sweep { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .75) 50%, transparent 70%); animation: evSweep 1s ease-out forwards; } @keyframes evSweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* nhãn vệ sinh */
+.hyg-pill { pointer-events: auto; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 99px; background: rgba(40, 20, 10, .85); color: #d8f5d0; border: 1.5px solid #5ac86a; font-weight: 800; font-size: 12px; cursor: pointer; position: relative; overflow: hidden; }
+.hyg-pill b { min-width: 30px; text-align: left; } .hp-bar { width: 38px; height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .2); overflow: hidden; } .hp-bar u { display: block; height: 100%; text-decoration: none; background: linear-gradient(90deg, #7fe08a, #3aa84a); transition: width .4s; }
+.hyg-pill.mid { border-color: #ffd54a; color: #ffeaa0; } .hyg-pill.mid u { background: linear-gradient(90deg, #ffd54a, #f0a020); } .hyg-pill.low { border-color: #ff6a4a; color: #ffc0b0; animation: lowBlink .6s ease-in-out infinite alternate; } .hyg-pill.low u { background: linear-gradient(90deg, #ff8a5a, #d8301f); }
+.hyg-pill.cool { opacity: .6; } .hyg-pill:not(.cool):active { transform: scale(.94); }
+.hp-bar.big { flex: 1; width: auto; height: 9px; }
+/* bảng chuẩn bị */
+.safety-card { padding: 9px 11px; border-radius: 14px; background: rgba(35, 16, 6, .62); border: 1.5px solid rgba(233, 184, 76, .65); color: #fff0c8; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); font-size: 12px; }
+.sc-head { display: flex; align-items: center; justify-content: space-between; } .sc-head b { font: 800 13.5px 'Noto Serif', serif; color: #ffe27a; } .sc-go { font-size: 11px; font-weight: 800; color: #1a1a1a; background: linear-gradient(#ffe27a, #e9b84c); padding: 3px 9px; border-radius: 99px; }
+.sc-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 6px 0; } .sc-i { display: flex; flex-direction: column; align-items: center; padding: 4px 0; border-radius: 10px; background: rgba(255, 255, 255, .08); opacity: .55; } .sc-i.on { opacity: 1; background: rgba(110, 230, 140, .18); outline: 1px solid rgba(110, 230, 140, .5); }
+.sc-i i { font-style: normal; font-size: 18px; } .sc-i b { font-size: 10.5px; } .sc-i small { font-size: 9px; color: #e9d6a8; line-height: 1; }
+.sc-hyg { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; } .sc-hyg span { font-weight: 700; white-space: nowrap; }
+.sc-fc { line-height: 1.7; } .sc-fc em { font-style: normal; display: inline-block; padding: 0 8px; border-radius: 99px; background: rgba(255, 255, 255, .14); margin-right: 3px; font-weight: 700; } .sc-fc em.calm { background: rgba(110, 230, 140, .22); }
+.sc-warn { margin-top: 5px; padding: 5px 8px; border-radius: 9px; background: rgba(255, 90, 60, .22); color: #ffd0c8; line-height: 1.4; }
+@media (max-height: 800px) { .safety-card .sc-i small { display: none; } .safety-card { padding: 6px 9px; } .sc-row { margin: 3px 0; } }
+@media (max-height: 700px) { .safety-card { display: none; } }
+/* trong tab Phát triển */
+.ev-panel { padding: 10px 12px; border-radius: 16px; background: linear-gradient(#fff6dc, #ffe9b8); border: 1.5px solid #e1b25b; display: flex; flex-direction: column; gap: 7px; }
+.evp-hyg { display: flex; align-items: center; gap: 8px; } .evp-hyg > div:first-child { flex: none; max-width: 52%; } .evp-hyg b { font-size: 13px; display: block; } .evp-hyg small { font-size: 10.5px; line-height: 1.25; display: block; } .evp-hyg strong { font-size: 15px; color: #2a8a42; }
+.evp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 12px; } .evp-list .ok { color: #2a7a3a; font-weight: 700; } .evp-list .no { color: #a05a1a; }
+.evp-stat { display: flex; flex-wrap: wrap; gap: 5px; font-size: 11.5px; } .evp-stat span { padding: 2px 9px; border-radius: 99px; background: rgba(255, 255, 255, .7); }
+.evp-log { display: grid; gap: 5px; } .evp-log > div { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 12px; background: var(--card); border: 1.5px solid var(--line); font-size: 12px; text-align: left; } .evp-log .good { border-left: 4px solid #3aa84a; } .evp-log .bad { border-left: 4px solid #c8301f; } .evp-log i { font-style: normal; font-size: 18px; } .evp-log span { flex: 1; } .evp-log small { white-space: nowrap; }
+body.reduce-motion #evfx::before, body.reduce-motion #evfx::after, body.reduce-motion .ev-badge i, body.reduce-motion .ev-flash { animation: none !important; }

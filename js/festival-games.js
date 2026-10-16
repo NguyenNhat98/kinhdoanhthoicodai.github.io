@@ -48,11 +48,13 @@
     track(sf, 'pointerdown', down); track(sf, 'pointerup', up); track(sf, 'pointercancel', up); track(sf, 'lostpointercapture', up);
     const spawn = () => {
       const k = Math.random(), kind = k < .38 ? 'star' : k < .75 ? 'bird' : 'storm', e = document.createElement('span');
-      e.className = 'sky-it ' + kind; e.textContent = kind === 'star' ? '⭐' : kind === 'bird' ? '🐦' : '⛈️';
+      e.className = 'sky-it ' + kind; e.style.left = '0'; e.style.bottom = '0'; e.textContent = kind === 'star' ? '⭐' : kind === 'bird' ? '🐦' : '⛈️';
       const y = rnd(14, 88); sf.appendChild(e); r.items.push({ e, x: 108, y, v: kind === 'star' ? rnd(28, 36) : rnd(34, 52) + (30 - r.left) * .6, kind });
     };
     r.end = () => { if (r.won === undefined) r.won = 1; F.finish(r, Math.min(30, Math.round(r.score / 3)), `Diều bay được ${Math.round(r.score)} điểm (hệ số cao nhất x${Math.min(3, 1 + Math.floor(r.best / 4))}).`); };
+    let sw = sf.clientWidth, sh = sf.clientHeight;
     loop(r, (dt) => {
+      if (r.t % 1 < dt) { sw = sf.clientWidth; sh = sf.clientHeight; }
       r.vy += (r.hold ? 130 : -95) * dt; r.vy = clamp(r.vy, -48, 52); r.y = clamp(r.y + r.vy * dt, 8, 94);
       const c = 50 + 27 * Math.sin(r.t * .75) + 11 * Math.sin(r.t * 1.9), hw = 14;
       wb.style.bottom = (c - hw) + '%'; wb.style.height = hw * 2 + '%';
@@ -70,7 +72,7 @@
       r.inBand = inBand;
       r.next -= dt; if (r.next <= 0) { spawn(); r.next = rnd(.7, 1.3); }
       r.items = r.items.filter((it) => {
-        it.x -= it.v * dt; it.e.style.left = it.x + '%'; it.e.style.bottom = it.y + '%';
+        it.x -= it.v * dt; it.e.style.translate = (it.x / 100 * sw) + 'px ' + (-(it.y / 100 * sh)) + 'px';
         if (it.kind === 'bird') it.e.style.transform = `translate(-50%, 50%) translateY(${Math.sin(r.t * 9 + it.y) * 5}px)`;
         const hit = Math.abs(it.x - kx) < 6.5 && Math.abs(it.y - r.y) < 8.5;
         if (hit) {
@@ -104,7 +106,8 @@
     const spawnCandy = () => { if (candies.length < 4) candies.push({ x: rnd(20, W - 20), y: rnd(20, H - 20), p: rnd(0, 6), icon: Math.random() < .25 ? '🍭' : '🍬' }); };
     r.end = () => F.finish(r, clamp(Math.round(r.score * 1.35), 0, 30), `Đoàn dài ${segs.length - 1} bạn · ăn ${r.collected} kẹo, mất ${r.lost} bạn.`);
     for (let i = 0; i < 3; i++) spawnCandy();
-    const emoji = (t, x, y, s, rot) => { ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.font = s + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, 0, 0); ctx.restore(); };
+    const ART = { '☁️': 'cloud', '🍭': 'lolly', '🍬': 'candy', '🐉': 'dragonhead', '🧙': 'doctor', '🧒': 'boy', '👧': 'girl', '👦': 'boy2', '🧑': 'boy3', '👶': 'girl2' };
+    const emoji = (t, x, y, s, rot) => { if (ART[t] && window.GameArt && GameArt.draw(ctx, ART[t], x, y, s * (t === '☁️' ? 1.5 : 1.25), rot)) return; ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.font = s + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, 0, 0); ctx.restore(); };
     loop(r, (dt) => {
       // đầu rồng đuổi theo ngón tay
       const h = segs[0], dx = tgt.x - h.x, dy = tgt.y - h.y, d = Math.hypot(dx, dy), sp = Math.min(d, 175 * dt);

@@ -123,3 +123,11 @@ body.reduce-motion #festivalGame.fg-stage, body.reduce-motion .river::after, bod
 .fg-stage[data-g="oanquan"] .folk-game, .fg-stage[data-g="memory"] .folk-game, .fg-stage[data-g="bitmat"] .folk-game, .fg-stage[data-g="goibanh"] .folk-game, .fg-stage[data-g="mualan"] .folk-game, .fg-stage[data-g="thoicom"] .folk-game, .fg-stage[data-g="denlong"] .folk-game { color: #ffe9b8; }
 .fg-stage[data-g="oanquan"] .folk-game p, .fg-stage[data-g="memory"] .folk-game p { color: #f3d9a8; opacity: 1; }
 .fg-stage[data-g="oanquan"] .folk-game .seg { align-self: center; } .fg-stage .game-guide, .fg-stage .game-guide * { color: #4a2a14; }
+
+/* mượt hơn: tách lớp cho vật thể chuyển động */
+.lant, .duck, .sky-it, .drum-note, .boat, .goat, .kite, .basket, .runner, .jumper, .lion, .ch-ball { will-change: transform; backface-visibility: hidden; }
+.lantern-field, .pond, .sky-field, .drum-field, .river, .blind-field, .stilt-field { contain: layout paint; transform: translateZ(0); }
+.ga-host .ga { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .28)); }
+.ch-ball .ga { width: 1.5em; height: 1.5em; } .stone .ga { width: 1.5em; height: 1.5em; } .goat .ga { width: 1.25em; height: 1.25em; } .rice-pot .ga { width: 1.7em; height: 1.7em; } .boat .ga { width: 2.1em; height: 1.4em; } .boat.me .ga { width: 2.4em; height: 1.6em; }
+.throw-ball .ga { width: 1.5em; height: 1.5em; } .throw-hoop .ga { width: 1.7em; } .runner .ga, .jumper .ga, .kid .ga { width: 1.15em; height: 1.15em; } .flames b .ga { width: 1em; height: 1em; } .lion .ga { width: 1.2em; height: 1.2em; } .drum-note .ga { width: 1.2em; height: 1.2em; } .drum-btn .ga { width: 1.2em; height: 1.2em; }
+.duck .ga { width: 1.4em; height: 1.4em; } .basket .ga { width: 1.2em; height: 1.2em; } .kite b .ga { width: 1.3em; height: 1.3em; } .sky-it .ga { width: 1.3em; height: 1.3em; }

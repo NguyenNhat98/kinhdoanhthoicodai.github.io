@@ -64,7 +64,7 @@
 
   /* ---------------- điều hướng ---------------- */
   function buildNav() {
-    $('#nav').innerHTML = [['market', '🏮', 'Chợ'], ['festival', '🪁', 'Hội làng'], ['quest', '📜', 'Nhiệm vụ'], ['dev', '🏗️', 'Phát triển'], ['perks', '🧧', 'Phúc đức'], ['theme', '🎨', 'Giao diện'], ['settings', '⚙️', 'Cài đặt']]
+    $('#nav').innerHTML = [['market', '🏮', 'Chợ'], ['festival', '🪁', 'Hội làng'], ['quest', '📜', 'Nhiệm vụ'], ['dev', '🏗️', 'Phát triển'], ['perks', '🧧', 'Phúc đức'], ['settings', '⚙️', 'Cài đặt']]
       .map(([p, i, l]) => `<button data-page="${p}" class="${p === 'market' ? 'on' : ''}"><i>${p === 'festival' ? i : `<img class="nav-sprite" src="assets/sprites/trasua2-ui-${({market:'shop',quest:'quest',dev:'upgrade',perks:'bag',theme:'decor',settings:'settings'})[p]}.png" alt="">`}</i><span>${l}</span></button>`).join('');
   }
 
