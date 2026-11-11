@@ -46,7 +46,7 @@
     const s = G.S.settings, b = document.body;
     b.dataset.quality = s.quality; b.dataset.hints = s.hints; b.dataset.contrast = s.contrast;
     b.style.setProperty('--text-scale', s.textSize);
-    b.classList.toggle('reduce-motion', s.reduce || matchMedia('(prefers-reduced-motion: reduce)').matches);
+    b.classList.toggle('reduce-motion', s.reduce);   // chỉ theo cài đặt trong game: WebView Android báo reduce khi máy tiết kiệm pin/tắt hoạt ảnh làm mất hiệu ứng
     if(b.classList.contains('reduce-motion')){window.MM.cancelMotion();L.stopConversation();}
     b.dataset.light = s.daylight || [1, 2, 3][(G.S.day - 1) % 3]; b.dataset.weather = s.weather;
     if ($('#walkers')) L.buildWalkers();

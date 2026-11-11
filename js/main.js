@@ -26,7 +26,8 @@
       window.Audio2.unlock(); window.Audio2.sfx('gong'); G.buzz([40, 50, 80]);
       sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, 600);
       const off = G.offline();
-      if (off && off.earn > 0) { window.UI.modal(`<h3>🌙 Trong lúc bạn vắng mặt…</h3><p>Tiểu nhị quản lý quầy <b>${Math.round(off.dt / 60)} phút</b> và kiếm được</p><p class="big">${window.Art.coin(24)} ${G.fmt(off.earn)}</p><button class="btn gold" data-close>Nhận xu</button>`); window.Audio2.sfx('coins'); }
+      if (off && off.earn > 0) { window.UI.modal(`<h3>🌙 Trong lúc bạn vắng mặt…</h3><p>Tiểu nhị quản lý quầy <b>${Math.round(off.dt / 60)} phút</b> và kiếm được</p><p class="big">${window.Art.coin(24)} ${G.fmt(off.earn)}</p><button class="btn gold" data-close>Nhận xu</button>`); window.Audio2.sfx('coins');
+        window.Ads.inject($('#modal'), '[data-close]', `📺 Xem quảng cáo: nhận ×2 (+${G.fmt(off.earn)} xu)`, () => { G.addCoins(off.earn); G.save(); window.UI.toast(`📺 Nhận thêm ${G.fmt(off.earn)} xu`, 'ok'); window.Audio2.sfx('coins'); }); }
       else window.UI.chapterIntro();
       G.dailyBonus(); G.save();
       if (resumed) window.WUI.open(window.WS.state().shop);

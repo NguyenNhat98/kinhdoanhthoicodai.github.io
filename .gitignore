@@ -4,3 +4,6 @@
 assets/sprites/contact*.png
 assets/sprites/portraits-review.png
 assets/scenes/*.png
+
+# APK build output
+apk/

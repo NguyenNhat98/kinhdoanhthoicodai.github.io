@@ -232,7 +232,7 @@
   }
   function researchTab() {
     const rb = resBusy(), top = topLevel();
-    const busy = rb ? (() => { const r = RESEARCH.find((x) => x.id === rb.id); const gold = rb.left * 2; return `<div class="rs-busy"><div class="rs-lab"><i>🔬</i><div><b>Đang nghiên cứu: ${esc(r.name)} → bậc ${rb.to}</b><small>Còn ${rb.left} ca bán (mỗi ca bán xong tính 1 ca)</small></div></div><div class="dv-bar rs-prog">${Array.from({ length: rb.total }, (_, i) => `<i class="${i < rb.total - rb.left ? 'on' : ''}"></i>`).join('')}</div><button class="btn gold sm" data-dx="rush" ${G.S.gold >= gold ? '' : 'disabled'}>⚡ Hoàn thành ngay · ${Art.gold(13)} ${gold}</button></div>`; })() : '<p class="dv-hint">Phòng nghiên cứu đang rảnh. Chọn một đề tài bên dưới, hiệu quả áp dụng cho <b>mọi quầy</b>.</p>';
+    const busy = rb ? (() => { const r = RESEARCH.find((x) => x.id === rb.id); const gold = rb.left * 2; return `<div class="rs-busy"><div class="rs-lab"><i>🔬</i><div><b>Đang nghiên cứu: ${esc(r.name)} → bậc ${rb.to}</b><small>Còn ${rb.left} ca bán (mỗi ca bán xong tính 1 ca)</small></div></div><div class="dv-bar rs-prog">${Array.from({ length: rb.total }, (_, i) => `<i class="${i < rb.total - rb.left ? 'on' : ''}"></i>`).join('')}</div><button class="btn gold sm" data-dx="rush" ${G.S.gold >= gold ? '' : 'disabled'}>⚡ Hoàn thành ngay · ${Art.gold(13)} ${gold}</button>${window.Ads && window.Ads.enabled ? '<button class="btn ad-btn sm" data-dx="rushad">📺 Xem quảng cáo: rút ngắn 1 ca</button>' : ''}</div>`; })() : '<p class="dv-hint">Phòng nghiên cứu đang rảnh. Chọn một đề tài bên dưới, hiệu quả áp dụng cho <b>mọi quầy</b>.</p>';
     const cards = RESEARCH.map((r) => {
       const l = resLv(r.id), max = l >= 3, cost = max ? 0 : resCost(r, l), need = resNeed(l), okLv = top >= need, doing = rb && rb.id === r.id;
       return `<article class="dv-card ${max ? 'max' : ''}"><div class="dv-ic big">${r.icon}</div><div class="dv-bd"><h4>${esc(r.name)} <em>R${l}</em></h4><p class="dv-now">${l ? esc(r.tiers[l - 1]) : 'Chưa nghiên cứu'}</p>${max ? '' : `<p class="dv-next">▸ Bậc ${l + 1}: ${esc(r.tiers[l])} · ${resShifts(l)} ca</p>`}<div class="dv-bar">${[1, 2, 3].map((i) => `<i class="${i <= l ? 'on' : ''}"></i>`).join('')}</div></div>
@@ -281,6 +281,10 @@
     else if (a === 'svc') { const s = SERVICES.find((x) => x.id === id), cost = svcCost(D.shop, s); if (G.S.coins < cost) return fail('Chưa đủ xu.'); G.S.coins -= cost; const m = (flags().svc = flags().svc || {}); (m[D.shop] = m[D.shop] || {})[s.id] = (m[D.shop][s.id] || 0) + s.shifts; ok(`Đã mua “${s.name}”`); }
     else if (a === 'research') { const r = RESEARCH.find((x) => x.id === id), l = resLv(id), c = resCost(r, l); if (resBusy() || G.S.coins < c || topLevel() < resNeed(l)) return fail('Chưa đủ điều kiện.'); G.S.coins -= c; flags().resBusy = { id, to: l + 1, left: resShifts(l), total: resShifts(l) }; ok(`Bắt đầu nghiên cứu “${r.name}”`, 'levelup'); }
     else if (a === 'rush') { const rb = resBusy(); if (!rb) return; const g = rb.left * 2; if (G.S.gold < g) return fail('Chưa đủ nguyên bảo.'); G.S.gold -= g; completeRes(); ok('', 'levelup'); }
+    else if (a === 'rushad') {
+      if (!resBusy() || !window.Ads) return;
+      window.Ads.showRewarded(() => { const r = resBusy(); if (!r) return; r.left -= 1; if (r.left <= 0) completeRes(); ok('📺 Đã rút ngắn 1 ca nghiên cứu', 'levelup'); }, () => fail('Chưa có quảng cáo hoặc chưa xem hết, thử lại sau nhé.'));
+    }
     else if (a === 'donate') { const c = donateCost(); if (G.S.coins < c) return fail('Chưa đủ xu.'); G.S.coins -= c; G.S.rep += 3; flags().donated = (flags().donated || 0) + 1; ok('Cảm ơn tấm lòng! Uy tín +3', 'cheer'); }
   });
 
